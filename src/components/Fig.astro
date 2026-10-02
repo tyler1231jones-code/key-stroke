@@ -1,0 +1,10 @@
+---
+// Sets every numeral in a run of copy in the data family, including mid-sentence.
+import { figureRuns } from '../lib/format';
+
+interface Props {
+  text: string;
+}
+const runs = figureRuns(Astro.props.text);
+---
+{runs.map((run) => (run.fig ? <span class="fig">{run.text}</span> : run.text))}

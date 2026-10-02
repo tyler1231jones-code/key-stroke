@@ -1,0 +1,17 @@
+/* Licensed faces. NOT imported yet: see README, "Licensed fonts".
+   The token block already lists Knockout, Sohne and Sohne Mono first in each
+   stack, so once these rules load, the licensed files take over and the open
+   fallbacks (Oswald, Archivo, IBM Plex Mono) stop being used. The family
+   names must match the token block exactly.
+
+   Put the .woff2 files in public/fonts/ and import this file in
+   src/layouts/Base.astro, above tokens.css. */
+
+@font-face { font-family: Knockout; font-weight: 500; font-style: normal; font-display: swap; src: url("/fonts/knockout-500.woff2") format("woff2"); }
+@font-face { font-family: Knockout; font-weight: 600; font-style: normal; font-display: swap; src: url("/fonts/knockout-600.woff2") format("woff2"); }
+
+@font-face { font-family: Sohne; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/soehne-400.woff2") format("woff2"); }
+@font-face { font-family: Sohne; font-weight: 600; font-style: normal; font-display: swap; src: url("/fonts/soehne-600.woff2") format("woff2"); }
+
+@font-face { font-family: "Sohne Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/soehne-mono-400.woff2") format("woff2"); }
+@font-face { font-family: "Sohne Mono"; font-weight: 500; font-style: normal; font-display: swap; src: url("/fonts/soehne-mono-500.woff2") format("woff2"); }

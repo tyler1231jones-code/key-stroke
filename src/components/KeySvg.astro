@@ -1,0 +1,32 @@
+---
+// The drawn keycap: a photography stand-in built entirely from tokens. It
+// holds the place of the 3D key until the canvas is ready, and stays if WebGL
+// is not available. It is not a mark.
+interface Props {
+  legend?: string;
+  worn?: boolean;
+  class?: string;
+}
+const { legend = 'V', worn = true, class: cls } = Astro.props;
+---
+<svg class:list={['key-svg', cls]} viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+  <!-- sides, in rule -->
+  <rect x="6" y="6" width="188" height="188" rx="6" fill="var(--rule)" />
+  <!-- the four slopes read by value alone -->
+  <polygon points="6,6 194,6 162,34 38,34" fill="var(--rule)" opacity="0.82" />
+  <polygon points="6,194 194,194 162,158 38,158" fill="var(--hairline)" />
+  <polygon points="6,6 38,34 38,158 6,194" fill="var(--rule)" opacity="0.66" />
+  <polygon points="194,6 162,34 162,158 194,194" fill="var(--rule)" opacity="0.5" />
+  <!-- face, in readout -->
+  <rect x="38" y="34" width="124" height="124" rx="3" fill="var(--readout)" />
+  <!-- legend, in base-900 -->
+  <text x="100" y="124" text-anchor="middle" font-family="var(--font-body)" font-weight="600" font-size="78" fill="var(--base-900)">{legend}</text>
+  {worn && (
+    <g fill="var(--readout)">
+      <!-- wear: asymmetric facets where a fingertip has been -->
+      <polygon points="100,128 118,84 132,90 110,130" />
+      <polygon points="96,104 104,118 99,128 90,112" />
+      <polygon points="116,70 126,66 131,78 121,86" opacity="0.8" />
+    </g>
+  )}
+</svg>

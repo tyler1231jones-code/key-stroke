@@ -1,0 +1,19 @@
+---
+// "Book the audit". While site.bookingUrl is TODO the control renders
+// disabled, with no link target.
+import { site, has } from '../lib/data';
+
+interface Props {
+  label?: string;
+}
+const { label = 'Book the audit' } = Astro.props;
+const ready = has('bookingUrl');
+---
+{ready ? (
+  <a class="key" href={site.bookingUrl}>{label}</a>
+) : (
+  <span class="key-wrap">
+    <button class="key" type="button" disabled aria-disabled="true">{label}</button>
+    <span class="plate key-note">Booking link not connected yet</span>
+  </span>
+)}

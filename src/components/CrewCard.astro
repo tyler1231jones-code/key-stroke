@@ -1,0 +1,60 @@
+---
+// Roster card for one unit, built to the design system's crew card. Presented
+// openly as software. "Not a person." is a field at field weight. No signal on
+// this card. The live mark is added on load, only while the unit is running,
+// and never while its data is demo.
+import Counter from './Counter.astro';
+import { unitTotal, crewSize, type CrewUnit } from '../lib/data';
+import { designation, tapeGeometry } from '../lib/tape';
+import { dateShort } from '../lib/format';
+
+interface Props {
+  unit: CrewUnit;
+  onDate: string;
+  widest: number;
+}
+const { unit: u, onDate, widest } = Astro.props;
+const label = designation(u.unit, u.verb);
+const tape = tapeGeometry(label);
+const running = unitTotal(u.unit, onDate);
+const year = onDate.slice(0, 4);
+---
+<article class="crew-card" data-unit={u.unit} data-start={u.start} data-end={u.end} data-days={u.runDays.join(',')} data-demo={u.demo ? 'true' : 'false'}>
+  <header class="crew-plate">
+    <h3 class="plate crew-name">Unit {u.unit} &mdash; {u.verb}</h3>
+    <p class="plate crew-pos"><span class="crew-live"></span>{u.unit} / {String(crewSize).padStart(2, '0')}</p>
+  </header>
+  <div class="crew-tape" role="img" aria-label={`Punched tape encoding ${label}`}>
+    <div class="tape-run" style={`--tape-w:${tape.width}px`}>
+      {[0, 1, 2, 3].map(() => (
+        <svg class="tape" width={tape.width} height={tape.height} viewBox={`0 0 ${tape.width} ${tape.height}`} aria-hidden="true">
+          {tape.holes.map((h) => <rect x={h.x} y={h.y} width={h.size} height={h.size} fill="var(--readout)" />)}
+        </svg>
+      ))}
+    </div>
+  </div>
+  <dl class="crew-fields">
+    <div>
+      <dt class="plate muted">Function</dt>
+      <dd class="body-s">{u.function}</dd>
+    </div>
+    <div>
+      <dt class="plate muted">Schedule</dt>
+      <dd class="figure">{u.start}&ndash;{u.end} {u.zone}<br /><span class="body-s muted">{u.days} / </span>{u.runs.split(' ')[0]}<span class="body-s muted"> {u.runs.split(' ').slice(1).join(' ')}</span></dd>
+    </div>
+    <div>
+      <dt class="plate muted">Running total</dt>
+      <dd>
+        <Counter value={running.value} widest={widest} size="s" data-unit-total={u.unit} />
+        <p class="plate muted crew-total-label">
+          {running.demo && <>Demonstration figure<br /></>}
+          Keystrokes cleared in <span data-year>{year}</span> / to <span data-as-at>{dateShort(onDate)}</span>
+        </p>
+      </dd>
+    </div>
+  </dl>
+  <footer class="crew-status">
+    <p class="plate">Not a person.</p>
+    <p class="plate muted">Software</p>
+  </footer>
+</article>

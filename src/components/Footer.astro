@@ -1,0 +1,29 @@
+---
+import { site, crew } from '../lib/data';
+
+interface Props {
+  /** The stand-in notice is said once, on pages that show the 3D objects. */
+  standIn?: boolean;
+}
+const { standIn = false } = Astro.props;
+const year = new Date().getFullYear();
+---
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <p class="lede tagline">{site.tagline}</p>
+      <ul class="foot-nav plate">
+        <li><a href="/#cases">Cases</a></li>
+        <li><a href="/#audit">Audit</a></li>
+        <li><a href="/quiz">The quiz</a></li>
+        <li><a href="/counting">The counting method</a></li>
+      </ul>
+    </div>
+    <div class="foot-line plate">
+      <p>{site.name} / {site.principals.join(' and ')} / {site.principals.length} principals{crew.length > 0 && <> / {crew.length} units</>} / Australia / {year}</p>
+      {site.demo && <p>Figures on this site are illustrative until the ledger opens.</p>}
+      {standIn && <p>The 3D objects stand in for a photo shoot that has not happened.</p>}
+      <p>Keystroke totals are rounded down to the nearest hundred. <a href="/counting">The counting method</a></p>
+    </div>
+  </div>
+</footer>

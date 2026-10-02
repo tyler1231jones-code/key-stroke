@@ -1,0 +1,142 @@
+{
+  "audit": {
+    "name": "The Keystroke Audit",
+    "price": "$1,500",
+    "terms": "Fixed",
+    "delivery": "1–2 weeks",
+    "includes": [
+      "One process, defined in writing",
+      "The count and its cost in hours",
+      "A ranked list of what to fix",
+      "A scoped quote for the first build",
+      "One initial tool"
+    ]
+  },
+  "builds": [
+    {
+      "band": "small",
+      "name": "Small engagement",
+      "range": "$2,500–$4,000"
+    },
+    {
+      "band": "typical",
+      "name": "Typical build",
+      "range": "$6,000–$15,000"
+    },
+    {
+      "band": "large",
+      "name": "Integration and software",
+      "range": "Above $15,000"
+    }
+  ],
+  "items": [
+    {
+      "id": "reporting-pack",
+      "order": 1,
+      "practice": "count",
+      "name": "A reporting pack that builds itself",
+      "band": "typical",
+      "cases": [
+        "001",
+        "003",
+        "007"
+      ],
+      "demo": true
+    },
+    {
+      "id": "job-costing",
+      "order": 2,
+      "practice": "count",
+      "name": "Job costing you can read while the job is running",
+      "band": "typical",
+      "cases": [
+        "001",
+        "007"
+      ],
+      "demo": true
+    },
+    {
+      "id": "re-entry",
+      "order": 3,
+      "practice": "clear",
+      "name": "One entry that writes every system",
+      "band": "typical",
+      "cases": [
+        "002",
+        "004"
+      ],
+      "demo": true
+    },
+    {
+      "id": "integration",
+      "order": 4,
+      "practice": "clear",
+      "name": "Systems that keep each other in step",
+      "band": "large",
+      "cases": [
+        "008"
+      ],
+      "demo": true
+    },
+    {
+      "id": "application",
+      "order": 5,
+      "practice": "build",
+      "name": "A tool built for how the business runs",
+      "band": "large",
+      "cases": [
+        "005",
+        "006"
+      ],
+      "demo": true
+    },
+    {
+      "id": "identity",
+      "order": 6,
+      "practice": "face",
+      "name": "One identity and one set of documents",
+      "band": "typical",
+      "cases": [
+        "010",
+        "009"
+      ],
+      "demo": true
+    }
+  ],
+  "estimates": {
+    "demo": true,
+    "unit": "hours a year lost to re-entry",
+    "bands": {
+      "5–10": "40–70",
+      "11–25": "80–120",
+      "26–50": "120–200"
+    }
+  },
+  "savers": {
+    "label": "Foundation pricing",
+    "response": "1 business day",
+    "includes": [
+      "Monitoring and repair of everything we built",
+      "The monthly reporting pack, produced and checked",
+      "A block of change hours",
+      "A scheduled review"
+    ],
+    "tiers": [
+      {
+        "name": "Watch",
+        "hours": 10,
+        "monthly": "$1,500"
+      },
+      {
+        "name": "Run",
+        "hours": 20,
+        "monthly": "$3,000"
+      },
+      {
+        "name": "Own",
+        "hours": 35,
+        "monthly": "$5,250"
+      }
+    ]
+  }
+}

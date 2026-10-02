@@ -1,0 +1,24 @@
+---
+// The counter, as marked up in the design system's Build notes. The label
+// always sits outside the housing, in plate, and is rendered by the caller.
+// `widest` fixes the number of cells: a housing keeps the cells its largest
+// figure needs, and cells a smaller figure does not use are blank, not zero.
+import { num } from '../lib/format';
+
+interface Props {
+  value: number | null;
+  widest?: number;
+  size: 'xl' | 'm' | 's';
+  class?: string;
+  [key: string]: unknown;
+}
+const { value, widest, size, class: cls, ...rest } = Astro.props;
+const pattern = num(widest ?? value ?? 0).split('');
+const text = value === null ? '' : num(value);
+const cells = text.padStart(pattern.length, ' ').split('');
+---
+<div class:list={['ctr', cls]} data-size={size} role="img" aria-label={text || 'No figure'} data-value={value ?? ''} {...rest}>
+  {pattern.map((p, i) => (
+    <span class={p === ',' ? 'c' : 'd'} aria-hidden="true">{cells[i].trim()}<span class="seam"></span></span>
+  ))}
+</div>

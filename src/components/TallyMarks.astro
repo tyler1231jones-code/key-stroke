@@ -1,0 +1,19 @@
+---
+// A count drawn as tally strokes: four uprights and a diagonal for every five.
+interface Props {
+  count: number;
+}
+const { count } = Astro.props;
+const groups = Math.ceil(count / 5);
+---
+<span class="tally-marks" data-tally={count} aria-hidden="true">
+  {Array.from({ length: groups }).map((_, g) => {
+    const inGroup = Math.min(5, count - g * 5);
+    return (
+      <span class="tm-group">
+        {Array.from({ length: Math.min(4, inGroup) }).map(() => <i class="tm-stroke"></i>)}
+        {inGroup === 5 && <i class="tm-stroke tm-cross"></i>}
+      </span>
+    );
+  })}
+</span>

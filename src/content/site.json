@@ -1,0 +1,14 @@
+{
+  "demo": true,
+  "name": "KEYSTROKE",
+  "tagline": "Let us push the buttons for you.",
+  "principals": [
+    "Kieran",
+    "Tyler"
+  ],
+  "email": "TODO",
+  "bookingUrl": "TODO",
+  "domain": "TODO",
+  "logotype": "drum",
+  "timezone": "Australia/Brisbane"
+}

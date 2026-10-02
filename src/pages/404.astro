@@ -1,0 +1,29 @@
+---
+import '../styles/home.css';
+import '../styles/pages.css';
+import Base from '../layouts/Base.astro';
+import Counter from '../components/Counter.astro';
+---
+<Base title="Page not found" description="There is no page at this address." page="404">
+  <section class="lost">
+    <div class="wrap lost-inner">
+      <p class="eyebrow">Error <span class="fig">404</span></p>
+      <h1 class="display-xl">Nothing here to count.</h1>
+      <div>
+        <Counter value={0} widest={100} size="m" data-figure="other" />
+        <p class="plate muted" style="margin-top: var(--space-3)">Pages at this address</p>
+      </div>
+      <p class="lede">Somebody typed this address, or followed a link that somebody else typed. Either way it was typed by hand, which is the kind of thing we are against.</p>
+      <ul class="lost-links plate">
+        <li><a href="/">Home</a></li>
+        <li><a href="/#cases">The cases</a></li>
+        <li><a href="/quiz">Nine questions</a></li>
+        <li><a href="/counting">The counting method</a></li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<script>
+  document.documentElement.classList.add('run');
+</script>

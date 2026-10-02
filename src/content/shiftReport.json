@@ -1,0 +1,39 @@
+{
+  "demo": true,
+  "client": "Electrical contractor · 14 staff · Geelong",
+  "process": "Job sheets to invoices",
+  "recorded": "2026-01-19",
+  "count": {
+    "value": 58200,
+    "unit": "keystrokes a year"
+  },
+  "hours": {
+    "value": 95,
+    "unit": "hours a year"
+  },
+  "afterRebuild": {
+    "value": 2100,
+    "unit": "keystrokes a year"
+  },
+  "fixes": [
+    {
+      "rank": 1,
+      "what": "Job details typed into the job system, then again into the accounts",
+      "count": 41800
+    },
+    {
+      "rank": 2,
+      "what": "Invoice PDFs attached and sent by hand",
+      "count": 11600
+    },
+    {
+      "rank": 3,
+      "what": "Approvals chased by email",
+      "count": 4800
+    }
+  ],
+  "quote": {
+    "scope": "Job sheets to invoices",
+    "range": "$6,000–$8,000"
+  }
+}

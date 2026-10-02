@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Drum reduced mark, dark-ground file: cell in ink, K knocked out. Ink is baked in because a file cannot inherit colour. -->
+  <rect width="32" height="32" fill="#e6eaee"/>
+  <rect x="8.5" y="5" width="4.4" height="18" fill="#0b0d10"/>
+  <polygon points="12.9,14.4 18.9,5 23.9,5 16.2,16.6" fill="#0b0d10"/>
+  <polygon points="14.6,13.4 18.2,11.2 24.4,23 19.4,23" fill="#0b0d10"/>
+  <rect y="21" width="32" height="1" fill="#5c666f"/>
+</svg>

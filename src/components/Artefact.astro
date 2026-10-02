@@ -1,0 +1,198 @@
+---
+// The artefact: a small mock of the thing running, drawn from tokens. Sample
+// rows are invented and the element is marked data-artefact. An artefact never
+// shows a keystroke figure. Elements with data-step are revealed in order when
+// the case enters; with motion off the finished state is what renders.
+import artefacts from '../content/artefacts.json';
+
+interface Props {
+  caseId: string;
+}
+const { caseId } = Astro.props;
+const a = (artefacts as Record<string, any>)[caseId];
+let s = 0;
+const step = () => ++s;
+---
+{a && (
+  <figure class="artefact" data-artefact data-kind={a.kind} aria-label="Illustration of the build running. Sample data.">
+    {a.kind === 'report-table' && (
+      <>
+        <header class="art-head plate"><span>{a.title}</span><span data-step={step()}>{a.stamp}</span></header>
+        <div class="art-body">
+          <table class="art-table">
+            <thead><tr>{a.columns.map((c: string, i: number) => <th class:list={['plate', { n: i > 0 }]}>{c}</th>)}</tr></thead>
+            <tbody>
+              {a.rows.map((row: string[]) => (
+                <tr data-step={step()}>{row.map((cell, i) => <td class:list={[{ n: i > 0 }]}>{cell}</td>)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <footer class="art-foot plate"><span>{a.source}</span><span data-step={step()}>{a.foot}</span></footer>
+      </>
+    )}
+
+    {a.kind === 'form-invoice' && (
+      <>
+        <header class="art-head plate"><span>{a.form.title} {a.form.ref}</span><span>{a.invoice.system}</span></header>
+        <div class="art-body art-split">
+          <div class="art-pane">
+            <p class="plate muted">{a.form.title}</p>
+            <dl class="art-fields">
+              {a.form.fields.map(([k, v]: string[]) => (
+                <div><dt class="plate muted">{k}</dt><dd data-step={step()} data-type>{v}</dd></div>
+              ))}
+            </dl>
+          </div>
+          <div class="art-arrow figure" aria-hidden="true" data-step={step()}>&gt;</div>
+          <div class="art-pane art-pane-out">
+            <p class="plate muted">{a.invoice.title} <span data-step={step()}>{a.invoice.ref}</span></p>
+            <table class="art-table">
+              <tbody>
+                {a.invoice.lines.map(([k, v]: string[]) => (
+                  <tr data-step={step()}><td>{k}</td><td class="n">{v}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <footer class="art-foot plate"><span>Typed once, on site</span><span data-step={step()}>{a.invoice.status}</span></footer>
+      </>
+    )}
+
+    {a.kind === 'reconcile-list' && (
+      <>
+        <header class="art-head plate"><span>{a.title}</span><span>{a.stamp}</span></header>
+        <div class="art-body">
+          <table class="art-table">
+            <tbody>
+              {a.rows.map((row: (string | null)[]) => (
+                <tr>
+                  <td>{row[0]}</td>
+                  <td>{row[1]}</td>
+                  <td class="n">{row[2]}</td>
+                  <td class="n">{row[3] ? <span data-step={step()}>{row[3]}</span> : <span data-step={step()}>&mdash;</span>}</td>
+                  <td class="plate">{row[3] ? <span data-step={s}>{a.matched}</span> : <span class="muted" data-step={s}>Listed</span>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <footer class="art-foot plate"><span>{a.exception}</span><span data-step={step()}>{a.foot}</span></footer>
+      </>
+    )}
+
+    {a.kind === 'one-to-three' && (
+      <>
+        <header class="art-head plate"><span>{a.source.title} {a.source.ref}</span><span>{a.source.system}</span></header>
+        <div class="art-body art-fan">
+          <div class="art-pane">
+            <dl class="art-fields">
+              {a.source.fields.map(([k, v]: string[]) => (
+                <div><dt class="plate muted">{k}</dt><dd data-step={step()} data-type>{v}</dd></div>
+              ))}
+            </dl>
+          </div>
+          <ul class="art-targets">
+            {a.targets.map((t: { title: string; detail: string }) => (
+              <li>
+                <span class="art-wire" data-step={step()} aria-hidden="true"></span>
+                <div class="art-target" data-step={s}>
+                  <p class="plate muted">{t.title}</p>
+                  <p>{t.detail}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <footer class="art-foot plate"><span>One record</span><span data-step={step()}>{a.foot}</span></footer>
+      </>
+    )}
+
+    {a.kind === 'timesheet-app' && (
+      <>
+        <header class="art-head plate"><span>{a.title}</span><span>{a.week}</span></header>
+        <div class="art-body">
+          <table class="art-table art-grid">
+            <thead><tr><th class="plate">Emp</th><th class="plate">Job</th>{a.days.map((d: string) => <th class="plate n">{d}</th>)}</tr></thead>
+            <tbody>
+              {a.rows.map((row: [string, string, string[]]) => (
+                <tr>
+                  <td>{row[0]}</td>
+                  <td>{row[1]}</td>
+                  {row[2].map((h) => <td class="n"><span data-step={step()}>{h}</span></td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ul class="art-outs">
+            {a.outputs.map(([k, v]: string[]) => (
+              <li data-step={step()}><span class="plate muted">{k}</span><span>{v}</span></li>
+            ))}
+          </ul>
+        </div>
+        <footer class="art-foot plate"><span>Cloudflare web app</span><span data-step={step()}>{a.foot}</span></footer>
+      </>
+    )}
+
+    {a.kind === 'system-sync' && (
+      <>
+        <header class="art-head plate"><span>Overnight sync</span><span>{a.stamp}</span></header>
+        <div class="art-body">
+          <table class="art-table art-grid">
+            <thead><tr><th class="plate">Order</th>{a.systems.map((sys: string) => <th class="plate n">{sys}</th>)}</tr></thead>
+            <tbody>
+              {a.rows.map((row: [string, boolean, boolean, boolean]) => (
+                <tr>
+                  <td>{row[0]}</td>
+                  {[row[1], row[2], row[3]].map((ok) => (
+                    <td class="n"><span data-step={step()}>{ok ? '+' : '×'}</span></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ul class="art-outs">
+            {a.exceptions.map((e: string) => <li data-step={step()}><span class="plate muted">Exception</span><span>{e}</span></li>)}
+          </ul>
+        </div>
+        <footer class="art-foot plate"><span>{a.systems.join(' / ')}</span><span data-step={step()}>{a.foot}</span></footer>
+      </>
+    )}
+
+    {a.kind === 'tender-pages' && (
+      <>
+        <header class="art-head plate"><span>{a.title} {a.ref}</span><span>{a.pages} pages</span></header>
+        <div class="art-body">
+          <ul class="art-parts plate">
+            {a.parts.map((p: string) => <li data-step={step()}>{p}</li>)}
+          </ul>
+          <div class="art-pages" aria-hidden="true">
+            {Array.from({ length: a.pages }).map((_, i) => (
+              <span class="art-page" data-step={i % 6 === 0 ? step() : s}><i></i><i></i><i></i></span>
+            ))}
+          </div>
+        </div>
+        <footer class="art-foot plate"><span>Owned by the business</span><span data-step={step()}>{a.foot}</span></footer>
+      </>
+    )}
+
+    {a.kind === 'letterhead-system' && (
+      <>
+        <header class="art-head plate"><span>{a.title}</span><span>{a.master}</span></header>
+        <div class="art-body art-sheets" aria-hidden="true">
+          {a.templates.map((t: string, i: number) => (
+            <div class="art-sheet" data-theme="light" data-step={step()}>
+              <span class="art-sheet-mast"></span>
+              <span class="art-sheet-rule"></span>
+              {Array.from({ length: 4 + (i % 3) }).map(() => <i></i>)}
+              <span class="art-sheet-band"></span>
+              <span class="plate art-sheet-name">{t}</span>
+            </div>
+          ))}
+        </div>
+        <footer class="art-foot plate"><span>{a.templates.length} templates shown</span><span data-step={step()}>{a.foot}</span></footer>
+      </>
+    )}
+  </figure>
+)}

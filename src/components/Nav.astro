@@ -1,0 +1,65 @@
+---
+import Logotype from './Logotype.astro';
+
+interface Props {
+  /** The key of the current page, if it is one of the nav items. */
+  current?: string;
+}
+const { current } = Astro.props;
+
+// The first five are anchors on the homepage. The live underline marks the
+// current page only, so on the homepage no item carries it. No scroll-spy.
+const items = [
+  { key: 'cases', label: 'Cases', href: '/#cases' },
+  { key: 'audit', label: 'Audit', href: '/#audit' },
+  { key: 'practices', label: 'Practices', href: '/#practices' },
+  { key: 'crew', label: 'Crew', href: '/#crew' },
+  { key: 'savers', label: 'Savers', href: '/#savers' },
+  { key: 'counting', label: 'Counting', href: '/counting' },
+];
+---
+<header class="bar">
+  <div class="wrap">
+    <a class="bar-home" href="/" aria-label="KEYSTROKE, home">
+      <Logotype variant="lockup" />
+      <Logotype variant="mark" />
+    </a>
+    <nav aria-label="Site">
+      <ul class="nav-list plate">
+        {items.map((item) => (
+          <li><a href={item.href} aria-current={current === item.key ? 'page' : undefined}>{item.label}</a></li>
+        ))}
+      </ul>
+      <details class="menu">
+        <summary class="plate">Menu</summary>
+        <ul class="menu-list">
+          {items.map((item, i) => (
+            <li>
+              <a href={item.href} aria-current={current === item.key ? 'page' : undefined}>
+                {item.label}<span class="plate">{String(i + 1).padStart(2, '0')}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </nav>
+  </div>
+</header>
+
+<script>
+  // The phone menu is a <details>, so it opens without script. This closes it
+  // again when a link is followed or Escape is pressed.
+  const menu = document.querySelector<HTMLDetailsElement>('details.menu');
+  if (menu) {
+    menu.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a')) menu.open = false;
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menu.open) {
+        menu.open = false;
+        menu.querySelector('summary')?.focus();
+      }
+    });
+    menu.addEventListener('toggle', () => document.documentElement.classList.toggle('menu-open', menu.open));
+  }
+</script>

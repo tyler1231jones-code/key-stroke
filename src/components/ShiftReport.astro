@@ -1,0 +1,52 @@
+---
+// The shift report: the deliverable of the audit, shown as a sample document.
+// A document, so it takes the light theme. Filled from shiftReport.json.
+import { shiftReport as r, site } from '../lib/data';
+import { num, dateShort } from '../lib/format';
+---
+{r && (
+  <div class="report" data-theme="light" id="shift-report">
+    <header class="report-head">
+      <p class="display-s">Shift report</p>
+      <p class="plate muted">{site.name} audit{r.demo && ' / Sample / Demonstration figures'}</p>
+    </header>
+    <dl class="report-meta rule-top">
+      <div><dt class="plate muted">Business</dt><dd class="figure">{r.client}</dd></div>
+      <div><dt class="plate muted">Process</dt><dd class="figure">{r.process}</dd></div>
+      <div><dt class="plate muted">Recorded</dt><dd class="figure">{dateShort(r.recorded)}</dd></div>
+    </dl>
+    <div class="report-count">
+      <div>
+        <p class="plate muted">The count</p>
+        <div class="report-fig"><span class="counter-s">{num(r.count.value)}</span><span class="unit">{r.count.unit}</span></div>
+      </div>
+      <div>
+        <p class="plate muted">The cost in hours</p>
+        <div class="report-fig"><span class="counter-s">{num(r.hours.value)}</span><span class="unit">{r.hours.unit}</span></div>
+      </div>
+      <div>
+        <p class="plate muted">After a rebuild</p>
+        <div class="report-fig"><span class="counter-s">{num(r.afterRebuild.value)}</span><span class="unit">{r.afterRebuild.unit}</span></div>
+      </div>
+    </div>
+    <div class="report-fixes">
+      <p class="plate muted">What to fix, ranked</p>
+      <ol>
+        {r.fixes.map((f) => (
+          <li>
+            <span class="figure">{f.rank}</span>
+            <span class="body-s">{f.what}</span>
+            <span class="figure">{num(f.count)}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+    <footer class="report-quote rule-top">
+      <div>
+        <p class="plate muted">Scoped quote, first build</p>
+        <p class="body-s">{r.quote.scope}</p>
+      </div>
+      <p class="counter-s">{r.quote.range}</p>
+    </footer>
+  </div>
+)}

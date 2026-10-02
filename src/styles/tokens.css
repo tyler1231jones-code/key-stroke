@@ -1,0 +1,62 @@
+/* Pasted from the design system, Build notes. Do not retype or edit values. */
+
+:root {
+  --base-000:#0b0d10; --base-100:#14181c; --base-900:#07090b;
+  --rule:#5c666f;     --hairline:#1e252b;
+  --ink:#e6eaee;      --ink-muted:#8d97a2; --ink-inverse:#e6eaee;
+  --readout:#d6dee6;  --live:#4ea8ff;
+  --signal:#ff5247;   --signal-inverse:#ff5247;
+  --focus:var(--ink);
+
+  --shadow-rest:0 2px 0 #5c666f;
+  --shadow-press:0 1px 0 #5c666f;
+
+  --space-1:4px;  --space-2:8px;  --space-3:12px; --space-4:16px;
+  --space-6:24px; --space-8:32px; --space-12:48px;
+  --space-19:76px; --space-24:96px;
+
+  --radius-0:0; --radius-key:3px; --radius-cap:6px;
+
+  --font-display:Knockout, Oswald, "Arial Narrow", sans-serif;
+  --font-body:Sohne, Archivo, Helvetica, Arial, sans-serif;
+  --font-data:"Sohne Mono", "IBM Plex Mono", ui-monospace, monospace;
+}
+
+[data-theme="light"] {
+  --base-000:#ffffff; --base-100:#f4f6f8; --base-900:#0b0d10;
+  --rule:#8a939d;     --hairline:#e4e9ed;
+  --ink:#0b0d10;      --ink-muted:#5b6672;
+  --live:#0b5fd0;     --signal:#cc1f14;
+  --shadow-rest:0 2px 0 #8a939d;
+  --shadow-press:0 1px 0 #8a939d;
+}
+
+html { background:var(--base-000); color:var(--ink); }
+body { margin:0; font-family:var(--font-body); -webkit-font-smoothing:antialiased; }
+:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+
+.num, .ctr, [class*="counter"] { font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1; }
+
+/* The counter. */
+.ctr{display:inline-flex;background:var(--base-900);border:1px solid var(--rule)}
+.ctr .d,.ctr .c{position:relative;overflow:hidden;display:flex;align-items:center;
+  justify-content:center;color:var(--readout);font-family:var(--font-data);font-weight:500;
+  font-variant-numeric:tabular-nums;border-right:1px solid var(--rule);flex:none}
+.ctr .c{color:var(--rule)}
+.ctr > :last-child{border-right:0}
+.ctr[data-size="xl"] .d{width:76px;height:104px;font-size:76px;line-height:1}
+.ctr[data-size="xl"] .c{width:32px;height:104px;font-size:76px;line-height:1}
+.ctr[data-size="m"]  .d{width:40px;height:58px;font-size:42px;line-height:1}
+.ctr[data-size="m"]  .c{width:18px;height:58px;font-size:42px;line-height:1}
+.ctr[data-size="s"]  .d{width:21px;height:30px;font-size:21px;line-height:1}
+.ctr[data-size="s"]  .c{width:10px;height:30px;font-size:21px;line-height:1}
+.ctr .seam{position:absolute;left:0;right:0;top:62%;height:1px;background:var(--hairline)}
+
+/* Permitted addition: the XL counter on phones. It keeps its proportions and
+   scales from one custom property, so six cells and the separator fit the
+   viewport with space-4 margins. 6 cells + 32/76 of a cell = 6.4211 cells. */
+@media (max-width:719px){
+  .ctr[data-size="xl"]{--ctr-u:min(76px, calc((100vw - 2 * var(--space-4) - 2px) / 6.4211))}
+  .ctr[data-size="xl"] .d{width:var(--ctr-u);height:calc(var(--ctr-u) * 1.3684);font-size:var(--ctr-u)}
+  .ctr[data-size="xl"] .c{width:calc(var(--ctr-u) * 0.4211);height:calc(var(--ctr-u) * 1.3684);font-size:var(--ctr-u)}
+}

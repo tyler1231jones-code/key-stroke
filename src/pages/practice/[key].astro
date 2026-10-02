@@ -1,0 +1,124 @@
+---
+import '../../styles/home.css';
+import '../../styles/pages.css';
+import Base from '../../layouts/Base.astro';
+import Counter from '../../components/Counter.astro';
+import CaseArticle from '../../components/CaseArticle.astro';
+import Mechanism from '../../components/Mechanism.astro';
+import BookButton from '../../components/BookButton.astro';
+import { practices, cases, products, practiceTotals } from '../../lib/data';
+
+export function getStaticPaths() {
+  return practices.map((p) => ({ params: { key: p.key }, props: { p } }));
+}
+
+const { p } = Astro.props;
+const own = cases.filter((c) => c.practice === p.key);
+const totals = practiceTotals(p.key);
+const counted = totals.rows > 0;
+const index = practices.findIndex((x) => x.key === p.key);
+const next = practices[(index + 1) % practices.length];
+---
+<Base
+  title={`${p.name}: ${p.field.toLowerCase()}`}
+  description={`Practice ${p.n}, ${p.name}. ${p.field}. ${p.sells}`}
+  canvas
+  page="practice"
+>
+  <section
+    class="phero"
+    id="practice"
+    data-scene="practice"
+    data-object={p.object}
+    data-before={counted ? totals.before : 0}
+    data-after={counted ? totals.after : 0}
+  >
+    <div class="phero-pin">
+      <div class="wrap phero-grid">
+        <div class="phero-copy">
+          <p class="eyebrow">Practice <span class="fig">{p.n}</span> / {p.name} / {p.field}</p>
+          <h1 class="display-xl phero-h">{p.symptom.replace(/\.$/, '')}.</h1>
+          <p class="lede">{p.line}</p>
+          {counted ? (
+            <div class="phero-count">
+              <div class="case-figure">
+                <Counter value={totals.after} widest={totals.before} size="m" id="practice-counter" data-before={totals.before} />
+                <span class="unit">keystrokes a year</span>
+              </div>
+              <p class="plate muted">
+                Left to type across {totals.rows} {p.name} builds
+                {totals.demo && <><br />Demonstration figure</>}
+              </p>
+              <p class="figure case-ba" id="practice-ba">
+                <span class="vh">Before: </span><span class="struck">{totals.before.toLocaleString('en-AU')}</span>
+                <span class="muted" aria-hidden="true">&rarr;</span>
+                <span class="vh">After: </span><span>{totals.after.toLocaleString('en-AU')}</span>
+                <span class="unit">keystrokes a year</span>
+              </p>
+            </div>
+          ) : p.key === 'face' && (
+            <p class="body phero-note">Design is not effort removed, so it is not counted in keystrokes. Its place is after the rebuild: practices <span class="fig">01</span> to <span class="fig">03</span> clear the desk, and this one builds what goes on it.</p>
+          )}
+        </div>
+        <div class="phero-slot" data-slot aria-hidden="true">
+          <img class="slot-still" src={`/stills/practice-${p.key}.webp`} alt="" loading="lazy" decoding="async" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad pdoes">
+    <div class="wrap pdoes-grid">
+      <header class="section-head">
+        <p class="eyebrow">What it sells</p>
+        <h2 class="display-l">{p.sells}</h2>
+      </header>
+      <div class="pdoes-body" data-practice-block={p.key}>
+        <Mechanism kind={p.mechanism} practiceKey={p.key} practiceName={p.name} />
+        <p class="plate muted field-label">{p.field}</p>
+        <ul class="caps">
+          {p.capabilities.map((c) => <li class="body-s">{c}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {own.length > 0 && (
+    <section class="cases" id="cases">
+      <div class="wrap cases-head">
+        <header class="section-head">
+          <p class="eyebrow">{p.name} cases</p>
+          <h2 class="display-l">What was built, and what it did.</h2>
+        </header>
+      </div>
+      <div class="case-list">
+        {own.map((c) => <CaseArticle item={c} />)}
+      </div>
+    </section>
+  )}
+
+  <section class="section-pad pnext">
+    <div class="wrap pnext-grid">
+      <header class="section-head">
+        <p class="eyebrow">What a build costs</p>
+        <h2 class="display-l">We quote the build.</h2>
+        <p class="body">Every relationship starts with the audit: <span class="fig">{products.audit.price}</span>, fixed, one process, delivered in <span class="fig">{products.audit.delivery.split(' ')[0]}</span> weeks. What follows is quoted on hours, inside one of three published ranges.</p>
+      </header>
+      <div>
+        <ul class="ranges">
+          {products.builds.map((b) => (
+            <li><span class="plate muted">{b.name}</span><span class="figure">{b.range}</span></li>
+          ))}
+        </ul>
+        <div class="pnext-actions">
+          <BookButton />
+          <a class="plate pnext-link" href={`/practice/${next.key}`}>Next: practice {next.n} / {next.name} <span aria-hidden="true">&gt;</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../../scripts/practice.ts';
+</script>

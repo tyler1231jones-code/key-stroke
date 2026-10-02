@@ -1,0 +1,257 @@
+// npm run check
+//
+// Reads the rendered text of the built pages (text nodes only: not markup,
+// scripts or styles) and the built CSS, and fails on:
+//   - a banned word outside an approved copy bank line
+//   - an exclamation mark or an emoji in text
+//   - font-style: italic, a radius above 6px, or a colour value that is not a token
+//   - a keystroke or dollar figure in text that does not match a value in a
+//     content file or one computed from the ledger
+// Text inside [data-artefact] is skipped: artefacts show invented sample rows.
+// Warns, without failing, on any TODO left in site.json.
+//
+// Run after `npm run build`.
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { join, relative, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { parse } from 'parse5';
+import { total, totalWeekAgo, accrual, clearedPerYear, roundDownHundred } from '../src/lib/ledger.ts';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const dist = join(root, 'dist');
+const content = join(root, 'src', 'content');
+const json = (name) => JSON.parse(readFileSync(join(content, name), 'utf8'));
+
+const failures = [];
+const warnings = [];
+const fail = (where, what) => failures.push(`${where}: ${what}`);
+
+if (!existsSync(dist)) {
+  console.error('dist/ not found. Run `npm run build` first.');
+  process.exit(1);
+}
+
+/* ---------- What is allowed ---------- */
+
+// The approved copy bank, as written. A banned word inside one of these lines is permitted.
+const APPROVED = [
+  'Let us push the buttons for you.',
+  "We don't sell transformation. We sell a smaller number than the one you've got.",
+  'Somebody in your office types the same invoice details three times. We counted.',
+  'Your quote lives in four places. It should live in one and tell the other three.',
+  'We rebuilt the intake so the form writes the job. Nobody retypes the address.',
+  'The crew runs at 4am. Nobody types anything.',
+  'An agent does not get bored on the four hundredth invoice, which is the entire point.',
+  "We quote the build. We don't quote the transformation, because there isn't one.",
+  "We counted. Here's the number.",
+];
+
+// Three copy bank lines the brief excludes. They must not appear at all.
+const EXCLUDED = [/seven agents/i, /you don.t pay for the month/i, /812,000/];
+
+const BANNED = [
+  /\bAI[- ]powered\b/i, /\bseamless/i, /\bnext[- ]generation\b/i, /\bsolutions that scale\b/i, /\bunlock/i,
+  /\bdigital experiences?\b/i, /\btransformation/i, /\bjourney/i, /\bempower/i, /\bleverag/i, /\brobust/i,
+  /\binnovati/i, /\bcutting[- ]edge\b/i, /\bgame[- ]changing\b/i, /\bbest[- ]in[- ]class\b/i, /\bsynerg/i,
+  /\bstreamlin/i, /\bsupercharg/i, /\brevolutioni[sz]/i, /\breimagin/i,
+];
+
+// Example figures quoted in the published counting method. They illustrate the method; they are not claims.
+const METHOD_EXAMPLES = [1920, 14600];
+
+const TOKENS = ['base-000', 'base-100', 'base-900', 'rule', 'hairline', 'ink', 'ink-muted', 'ink-inverse', 'readout', 'live', 'signal', 'signal-inverse', 'focus', 'shadow-rest', 'shadow-press'];
+
+const NAMED_COLOURS = new Set('black white red green blue yellow orange purple pink brown gray grey silver gold navy teal aqua cyan magenta maroon olive lime fuchsia beige ivory tan coral salmon khaki crimson indigo violet turquoise orchid plum lavender azure snow linen wheat tomato sienna peru chocolate firebrick whitesmoke gainsboro lightgray lightgrey darkgray darkgrey dimgray dimgrey slategray slategrey rebeccapurple steelblue royalblue skyblue'.split(' '));
+
+/* ---------- Figures the site may state ---------- */
+
+function numbersIn(value, out) {
+  if (typeof value === 'number') out.add(value);
+  else if (Array.isArray(value)) value.forEach((v) => numbersIn(v, out));
+  else if (value && typeof value === 'object') Object.values(value).forEach((v) => numbersIn(v, out));
+}
+function stringsIn(value, out) {
+  if (typeof value === 'string') out.push(value);
+  else if (Array.isArray(value)) value.forEach((v) => stringsIn(v, out));
+  else if (value && typeof value === 'object') Object.values(value).forEach((v) => stringsIn(v, out));
+}
+
+const site = json('site.json');
+const ledgerAll = json('ledger.json');
+const casesAll = json('cases.json');
+const live = (rows) => (site.demo ? rows : rows.filter((r) => !r.demo));
+const ledger = live(ledgerAll);
+const cases = live(casesAll);
+const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'shiftReport.json', 'quiz.json', 'practices.json'].map(json);
+
+function allowedFor(date) {
+  const numbers = new Set([0]);
+  sources.forEach((s) => numbersIn(s, numbers));
+  METHOD_EXAMPLES.forEach((n) => numbers.add(n));
+  // Computed from the ledger.
+  for (const row of ledger) {
+    numbers.add(clearedPerYear(row));
+    numbers.add(roundDownHundred(accrual(row, date)));
+  }
+  const today = total(ledger, date);
+  const weekAgo = totalWeekAgo(ledger, date);
+  numbers.add(today).add(weekAgo).add(today - weekAgo);
+  for (const unit of new Set(ledger.map((r) => r.crewUnit))) numbers.add(total(ledger.filter((r) => r.crewUnit === unit), date));
+  for (const practice of new Set(cases.map((c) => c.practice))) {
+    const rows = ledger.filter((r) => cases.find((c) => c.id === r.caseId)?.practice === practice);
+    numbers.add(rows.reduce((t, r) => t + clearedPerYear(r), 0));
+    numbers.add(rows.reduce((t, r) => t + r.baselinePerYear, 0));
+    numbers.add(rows.reduce((t, r) => t + r.remainingPerYear, 0));
+  }
+  return numbers;
+}
+
+const strings = [];
+sources.forEach((s) => stringsIn(s, strings));
+const allowedDollars = new Set();
+for (const s of strings) for (const m of s.matchAll(/\$\d[\d,]*(?:\.\d+)?/g)) allowedDollars.add(m[0]);
+
+/* ---------- Reading the built pages ---------- */
+
+function walk(dir, ext, out = []) {
+  for (const name of readdirSync(dir)) {
+    const p = join(dir, name);
+    if (statSync(p).isDirectory()) walk(p, ext, out);
+    else if (p.endsWith(ext)) out.push(p);
+  }
+  return out;
+}
+
+const BLOCK = new Set('address article aside blockquote body br caption dd details div dl dt fieldset figcaption figure footer form h1 h2 h3 h4 h5 h6 header hr html label legend li main nav ol p section summary table tbody td tfoot th thead title tr ul option button'.split(' '));
+const SKIP = new Set(['script', 'style', 'template', 'svg']);
+const attr = (node, name) => node.attrs?.find((a) => a.name === name)?.value;
+const hasClass = (node, cls) => (attr(node, 'class') ?? '').split(/\s+/).includes(cls);
+
+function readPage(html) {
+  const doc = parse(html, { scriptingEnabled: false });
+  const page = { text: '', counters: [], h1: 0, robots: null, buildDate: null, crewCards: 0, crewCardsMarked: 0, styles: [], inline: [] };
+  const textOf = (node) => {
+    if (node.nodeName === '#text') return node.value;
+    return (node.childNodes ?? []).map(textOf).join('');
+  };
+  const visit = (node) => {
+    const tag = node.tagName;
+    if (tag === 'style') page.styles.push(textOf(node));
+    if (tag === 'meta') {
+      if (attr(node, 'name') === 'robots') page.robots = attr(node, 'content');
+      if (attr(node, 'name') === 'ks-build-date') page.buildDate = attr(node, 'content');
+      if (attr(node, 'name') === 'description') page.text += `\n${attr(node, 'content')}\n`;
+    }
+    if (node.attrs) {
+      for (const a of node.attrs) {
+        if (a.name === 'style' || a.name === 'fill' || a.name === 'stroke') page.inline.push(`${a.name}:${a.value}`);
+        if (a.name === 'aria-label' || a.name === 'alt') page.text += `\n${a.value}\n`;
+      }
+    }
+    if (tag && SKIP.has(tag)) return;
+    if (node.attrs && attr(node, 'data-artefact') !== undefined) return; // sample data
+    if (tag === 'h1') page.h1++;
+    if (tag && hasClass(node, 'crew-card')) {
+      page.crewCards++;
+      if (/Not a person\./.test(textOf(node))) page.crewCardsMarked++;
+    }
+    if (tag && hasClass(node, 'ctr') && attr(node, 'data-figure') !== 'other') {
+      page.counters.push(textOf(node).replace(/\s+/g, ''));
+    }
+    if (node.nodeName === '#text') page.text += node.value;
+    if (tag && BLOCK.has(tag)) page.text += '\n';
+    for (const child of node.childNodes ?? []) visit(child);
+    if (tag && BLOCK.has(tag)) page.text += '\n';
+  };
+  visit(doc);
+  page.text = page.text.replace(/[ \t ]+/g, ' ').replace(/\s*\n\s*/g, '\n');
+  return page;
+}
+
+const toNumber = (s) => Number(s.replace(/,/g, ''));
+
+for (const file of walk(dist, '.html')) {
+  const where = relative(dist, file).replace(/\\/g, '/');
+  const page = readPage(readFileSync(file, 'utf8'));
+  const allowed = allowedFor(page.buildDate ?? new Date().toISOString().slice(0, 10));
+
+  // Words.
+  let text = page.text;
+  for (const line of EXCLUDED) if (line.test(text)) fail(where, `uses a copy bank line the brief excludes (${line})`);
+  for (const line of APPROVED) text = text.split(line).join(' ').split(line.toUpperCase()).join(' ');
+  for (const word of BANNED) {
+    const m = text.match(word);
+    if (m) fail(where, `banned word "${m[0]}" outside an approved copy bank line`);
+  }
+  const automation = text.match(/\bautomation\b/gi) ?? [];
+  if (automation.length > 1) fail(where, `"automation" appears ${automation.length} times; it is permitted once per page`);
+  if (text.includes('!')) fail(where, `exclamation mark in text: "${text.split('\n').find((l) => l.includes('!'))?.trim().slice(0, 80)}"`);
+  const emoji = text.match(/\p{Extended_Pictographic}/u);
+  if (emoji) fail(where, `emoji in text: ${emoji[0]}`);
+
+  // Figures.
+  for (const m of page.text.matchAll(/\$\d[\d,]*(?:\.\d+)?/g)) {
+    if (!allowedDollars.has(m[0])) fail(where, `dollar figure ${m[0]} is not in a content file`);
+  }
+  for (const m of page.text.matchAll(/(?<![$\d,.])(\d{1,3}(?:,\d{3})+)(?![\d,]*\.\d)/g)) {
+    if (!allowed.has(toNumber(m[1]))) fail(where, `figure ${m[1]} is not in a content file and is not computed from the ledger`);
+  }
+  // Same line only: a year at the end of one block is not a figure for the next.
+  for (const m of page.text.matchAll(/(?<![$\d,.])(\d[\d,]*) +keystrokes?\b/gi)) {
+    if (!allowed.has(toNumber(m[1]))) fail(where, `keystroke figure ${m[1]} is not in a content file and is not computed from the ledger`);
+  }
+  for (const c of page.counters) {
+    if (c !== '' && !allowed.has(toNumber(c))) fail(where, `counter shows ${c}, which is not in a content file and is not computed from the ledger`);
+  }
+
+  // Structure the brief asks for.
+  if (page.h1 !== 1) fail(where, `${page.h1} h1 elements; there must be one`);
+  if (site.demo && !/noindex/.test(page.robots ?? '')) fail(where, 'demo mode is on but the page does not carry noindex');
+  if (page.crewCards !== page.crewCardsMarked) fail(where, 'a crew card is missing "Not a person."');
+
+  checkCss(where, page.styles.join('\n'));
+  checkCss(`${where} (inline)`, page.inline.map((d) => `x{${d}}`).join('\n'));
+}
+
+/* ---------- Reading the built CSS ---------- */
+
+function checkCss(where, cssText) {
+  if (!cssText.trim()) return;
+  let css = cssText.replace(/\/\*[\s\S]*?\*\//g, '');
+  if (/font-style\s*:\s*(italic|oblique)/i.test(css)) fail(where, 'font-style: italic');
+  for (const m of css.matchAll(/border(?:-[a-z]+)*-radius\s*:\s*([^;}]+)/gi)) {
+    for (const v of m[1].matchAll(/(-?[\d.]+)(px|%|em|rem|vw|vh)?/g)) {
+      const n = Number(v[1]);
+      if (!n) continue;
+      if (v[2] !== 'px' || n > 6) fail(where, `radius above 6px: border-radius: ${m[1].trim()}`);
+    }
+  }
+  // Token declarations are where colour values live. Everything else must use them.
+  css = css.replace(new RegExp(`--(?:${TOKENS.join('|')})\\s*:[^;}]+`, 'g'), '');
+  for (const m of css.matchAll(/#[0-9a-f]{3,8}\b/gi)) {
+    if (/^#0{4}$|^#0{8}$/i.test(m[0])) continue; // "transparent", as a minifier writes it
+    fail(where, `colour ${m[0]} is not a token`);
+  }
+  for (const m of css.matchAll(/\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([^)]*\)/gi)) fail(where, `colour ${m[0]} is not a token`);
+  for (const m of css.matchAll(/(?:^|[;{\s])((?:background|border|outline|text-decoration|column-rule|caret|accent|fill|stroke|color|box-shadow)[a-z-]*)\s*:\s*([^;}]+)/gi)) {
+    for (const word of m[2].toLowerCase().match(/[a-z]+/g) ?? []) {
+      if (NAMED_COLOURS.has(word)) fail(where, `named colour "${word}" in ${m[1]}: ${m[2].trim()}`);
+    }
+  }
+}
+
+for (const file of walk(dist, '.css')) checkCss(relative(dist, file).replace(/\\/g, '/'), readFileSync(file, 'utf8'));
+
+/* ---------- Config ---------- */
+
+for (const [key, value] of Object.entries(site)) {
+  if (value === 'TODO') warnings.push(`site.json: "${key}" is still TODO. The control that needs it renders disabled.`);
+}
+
+for (const w of warnings) console.warn(`warn  ${w}`);
+if (failures.length) {
+  for (const f of [...new Set(failures)]) console.error(`FAIL  ${f}`);
+  console.error(`\n${new Set(failures).size} problem(s).`);
+  process.exit(1);
+}
+console.log(`check passed: ${walk(dist, '.html').length} pages, ${walk(dist, '.css').length} stylesheets.`);

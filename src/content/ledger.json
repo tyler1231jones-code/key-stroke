@@ -1,0 +1,98 @@
+[
+  {
+    "id": "L-001",
+    "caseId": "001",
+    "crewUnit": "03",
+    "baselinePerYear": 41900,
+    "remainingPerYear": 400,
+    "frequency": "Monthly",
+    "goLive": "2026-02-09",
+    "confirmed": "2026-03-09",
+    "stopped": null,
+    "demo": true
+  },
+  {
+    "id": "L-002",
+    "caseId": "002",
+    "crewUnit": "02",
+    "baselinePerYear": 58200,
+    "remainingPerYear": 2100,
+    "frequency": "Each job",
+    "goLive": "2026-03-02",
+    "confirmed": "2026-03-30",
+    "stopped": null,
+    "demo": true
+  },
+  {
+    "id": "L-003",
+    "caseId": "003",
+    "crewUnit": "01",
+    "baselinePerYear": 33600,
+    "remainingPerYear": 1800,
+    "frequency": "Monthly",
+    "goLive": "2026-03-23",
+    "confirmed": "2026-04-20",
+    "stopped": null,
+    "demo": true
+  },
+  {
+    "id": "L-004",
+    "caseId": "004",
+    "crewUnit": "04",
+    "baselinePerYear": 96400,
+    "remainingPerYear": 6300,
+    "frequency": "Each quote",
+    "goLive": "2026-04-13",
+    "confirmed": "2026-05-11",
+    "stopped": null,
+    "demo": true
+  },
+  {
+    "id": "L-005",
+    "caseId": "005",
+    "crewUnit": "02",
+    "baselinePerYear": 27300,
+    "remainingPerYear": 900,
+    "frequency": "Weekly",
+    "goLive": "2026-05-04",
+    "confirmed": "2026-06-01",
+    "stopped": null,
+    "demo": true
+  },
+  {
+    "id": "L-006",
+    "caseId": "006",
+    "crewUnit": "02",
+    "baselinePerYear": 44800,
+    "remainingPerYear": 3200,
+    "frequency": "Each request",
+    "goLive": "2026-05-25",
+    "confirmed": "2026-06-22",
+    "stopped": null,
+    "demo": true
+  },
+  {
+    "id": "L-007",
+    "caseId": "007",
+    "crewUnit": "03",
+    "baselinePerYear": 51700,
+    "remainingPerYear": 2400,
+    "frequency": "Daily",
+    "goLive": "2026-06-15",
+    "confirmed": "2026-07-13",
+    "stopped": null,
+    "demo": true
+  },
+  {
+    "id": "L-008",
+    "caseId": "008",
+    "crewUnit": "05",
+    "baselinePerYear": 112500,
+    "remainingPerYear": 4700,
+    "frequency": "Daily",
+    "goLive": "2026-07-06",
+    "confirmed": "2026-08-03",
+    "stopped": null,
+    "demo": true
+  }
+]

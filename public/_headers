@@ -1,0 +1,11 @@
+# Cloudflare Workers static assets: custom headers.
+# Astro fingerprints everything under /_astro/, so it can be cached for good.
+/_astro/*
+	Cache-Control: public, max-age=31536000, immutable
+
+/stills/*
+	Cache-Control: public, max-age=604800
+
+/*
+	X-Content-Type-Options: nosniff
+	Referrer-Policy: strict-origin-when-cross-origin

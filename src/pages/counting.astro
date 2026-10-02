@@ -1,0 +1,152 @@
+---
+// The counting method, as published in the design system, then the ledger.
+// A document, so it takes the light theme. Almost no motion.
+import '../styles/home.css';
+import '../styles/pages.css';
+import Base from '../layouts/Base.astro';
+import Counter from '../components/Counter.astro';
+import { site, ledger, caseById, unit, homepageTotal, rowAccrued, anyDemo } from '../lib/data';
+import { dateInZone } from '../lib/ledger';
+import { num, dateShort } from '../lib/format';
+
+const today = dateInZone(site.timezone);
+const year = today.slice(0, 4);
+const home = homepageTotal(today);
+const demo = anyDemo(ledger);
+const earlierYears = [...new Set(ledger.map((row) => row.confirmed.slice(0, 4)))].filter((y) => y < year);
+---
+<Base
+  title="The counting method"
+  description="How a keystroke is defined, measured and audited, and the ledger the counter reads from."
+  theme="light"
+  current="counting"
+  page="counting"
+>
+  <article class="doc">
+    <div class="wrap">
+      <header class="doc-head">
+        <p class="eyebrow">Counting</p>
+        <h1 class="display-l">The counting method.</h1>
+        <p class="lede">The brand is a number. A number is only worth as much as its method, so the method is published, the definition is narrow, and the figure is never rounded up.</p>
+      </header>
+
+      <div class="doc-body">
+        <section class="doc-section">
+          <h2 class="display-m">What counts as a keystroke</h2>
+          <div class="doc-copy">
+            <p class="body">One keystroke is one deliberate input a person makes that the rebuilt system no longer requires. Counted inputs:</p>
+            <ul class="body">
+              <li>A character typed into a field.</li>
+              <li>A click or tap that selects, confirms, submits or navigates.</li>
+              <li>A copy and a paste, counted as two.</li>
+              <li>A file attachment, counted as one.</li>
+            </ul>
+            <p class="body">Not counted: reading, deciding, a person choosing to check something, or any input the new system still requires. Time saved is not converted into keystrokes, and keystrokes are not converted into dollars anywhere in KEYSTROKE's own copy.</p>
+          </div>
+        </section>
+
+        <section class="doc-section">
+          <h2 class="display-m">How a baseline is established</h2>
+          <div class="doc-copy">
+            <p class="body">Before a build, the task is recorded once, start to finish, with the client watching. Inputs are counted from the recording, not estimated. The count is multiplied by the client's own stated frequency, invoices a week or jobs a month, taken from their system's records, not from what anyone remembers.</p>
+            <p class="body">The baseline is agreed in writing with the client before any figure is published. If the client disputes the frequency, their figure is used.</p>
+          </div>
+        </section>
+
+        <section class="doc-section">
+          <h2 class="display-m">How the cleared figure accrues</h2>
+          <div class="doc-copy">
+            <p class="body">A task's keystroke count moves from baseline to cleared only after the rebuilt process has run in production for four consecutive weeks without a manual fallback. A task that is half automated contributes nothing. There is no partial credit.</p>
+            <p class="body">The running total accrues at the rate the process actually runs. If a client's invoicing runs <span class="fig">60</span> times a week and each run cleared <span class="fig">32</span> inputs, the counter advances <span class="fig">1,920</span> a week, not in a lump on the day it went live.</p>
+          </div>
+        </section>
+
+        <section class="doc-section">
+          <h2 class="display-m">Stating the figure</h2>
+          <div class="doc-copy">
+            <ul class="body">
+              <li>The homepage counter states the current calendar year. It resets on <span class="fig">1</span> January and the previous year's total is archived on this page, not deleted.</li>
+              <li>Client figures are stated per year and rounded down to the nearest hundred.</li>
+              <li>Any published figure carries its date and its scope. "<span class="fig">14,600</span> a year, across quoting and invoicing, from March <span class="fig">2026</span>."</li>
+              <li>A figure that cannot be traced to a recorded baseline does not get published. There is no house average and no industry benchmark.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="doc-section">
+          <h2 class="display-m">Audit</h2>
+          <div class="doc-copy">
+            <p class="body">The counter reads from a ledger with one row per cleared task per client: baseline count, agreed frequency, go-live date, four-week confirmation date, and the accrual to date. Any client may ask for their own rows and gets them the same week.</p>
+            <p class="body">If a client stops using a rebuilt process, its accrual stops and the total stops rising. It is not clawed back, because the keystrokes were cleared while it ran, but the ledger records the stop date.</p>
+          </div>
+        </section>
+      </div>
+
+      <section class="ledger" id="ledger" aria-labelledby="ledger-h">
+        <header class="section-head">
+          <p class="eyebrow">The ledger</p>
+          <h2 class="display-l" id="ledger-h">One row per cleared task.</h2>
+          {demo && <p class="plate demo-plate">Demonstration figures / illustrative until the ledger opens</p>}
+        </header>
+        {ledger.length > 0 ? (
+          <>
+            <div class="table-frame">
+              <table class="table ledger-table">
+                <caption class="vh">The ledger behind the counter, as at {dateShort(today)}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Row</th>
+                    <th scope="col">Scope</th>
+                    <th scope="col" class="n">Baseline a year</th>
+                    <th scope="col" class="n">Remaining a year</th>
+                    <th scope="col">Frequency</th>
+                    <th scope="col">Go-live</th>
+                    <th scope="col">Confirmed</th>
+                    <th scope="col">Stopped</th>
+                    <th scope="col" class="n">Accrued in <span data-year>{year}</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ledger.map((row) => {
+                    const c = caseById(row.caseId);
+                    const u = unit(row.crewUnit);
+                    return (
+                      <tr>
+                        <td class="n">{row.id}</td>
+                        <td class="wrap-cell">{c?.scope}<br /><span class="muted">{c?.descriptor}{u && <> / Unit {u.unit}</>}</span></td>
+                        <td class="n">{num(row.baselinePerYear)}</td>
+                        <td class="n">{num(row.remainingPerYear)}</td>
+                        <td>{row.frequency}</td>
+                        <td class="n">{dateShort(row.goLive)}</td>
+                        <td class="n">{dateShort(row.confirmed)}</td>
+                        <td class="n">{row.stopped ? dateShort(row.stopped) : <span class="muted">Running</span>}</td>
+                        <td class="n" data-accrued={row.id}>{num(rowAccrued(row, today))}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="8">Keystrokes cleared in <span data-year>{year}</span>, to <span data-as-at>{dateShort(today)}</span>. Added first, then rounded down once.{demo && ' Demonstration figure.'}</td>
+                    <td class="n"><Counter value={home.today} size="s" id="ledger-total" /></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <div class="ledger-notes body-s">
+              <p>Keystroke totals are rounded down to the nearest hundred. Each row is rounded down on its own, so the rows need not add up to the total.</p>
+              <p>A row accrues nothing before its confirmed date, which is four weeks after go-live. After that it accrues its weekly rate for every completed week.</p>
+              <p>{earlierYears.length === 0 ? `No earlier year is on the ledger. ${year} is the first.` : `Earlier years on the ledger: ${earlierYears.join(', ')}.`}</p>
+            </div>
+          </>
+        ) : (
+          <p class="body">The ledger has no rows yet. No figure is published until it has one.</p>
+        )}
+      </section>
+    </div>
+  </article>
+</Base>
+
+<script>
+  import '../scripts/counting.ts';
+</script>

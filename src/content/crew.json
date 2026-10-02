@@ -1,0 +1,100 @@
+[
+  {
+    "unit": "01",
+    "verb": "Reconcile",
+    "function": "Matches bank lines and records between systems. Does not post a journal or approve a payment.",
+    "start": "02:00",
+    "end": "03:10",
+    "zone": "AEST",
+    "days": "Every day",
+    "runDays": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "runs": "7 runs a week",
+    "demo": true
+  },
+  {
+    "unit": "02",
+    "verb": "Intake",
+    "function": "Turns submitted forms into jobs, invoice drafts and work orders. Does not contact a customer.",
+    "start": "03:10",
+    "end": "03:40",
+    "zone": "AEST",
+    "days": "Every day",
+    "runDays": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "runs": "7 runs a week",
+    "demo": true
+  },
+  {
+    "unit": "03",
+    "verb": "Report",
+    "function": "Builds the reporting packs from source. Does not change a figure.",
+    "start": "04:00",
+    "end": "05:40",
+    "zone": "AEST",
+    "days": "Every day",
+    "runDays": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "runs": "7 runs a week",
+    "demo": true
+  },
+  {
+    "unit": "04",
+    "verb": "Draft",
+    "function": "Drafts quotes and documents from one record. Does not send anything.",
+    "start": "03:40",
+    "end": "04:00",
+    "zone": "AEST",
+    "days": "Monday to Friday",
+    "runDays": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "runs": "5 runs a week",
+    "demo": true
+  },
+  {
+    "unit": "05",
+    "verb": "Sync",
+    "function": "Keeps records in step between systems and lists the exceptions. Does not resolve an exception.",
+    "start": "05:40",
+    "end": "05:55",
+    "zone": "AEST",
+    "days": "Every day",
+    "runDays": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "runs": "7 runs a week",
+    "demo": true
+  }
+]

@@ -1,0 +1,54 @@
+---
+// The logotype sits behind this one component so another direction can replace it.
+// Direction comes from site.json ("drum"). Tally and Keycap are not in this build.
+//
+// Drum, per the design system: nine fixed cells at 58 x 84, 2px housing border,
+// 1px hairline dividers, a seam at 66%, letters at 66px in display 600, the
+// ninth cell holding two E's (+16% and -84%) clipped by the cell, and a 6px
+// descender rule space-1 below the housing. No tagline. Static.
+import { site } from '../lib/data';
+
+interface Props {
+  variant?: 'lockup' | 'mark';
+  /** On base-900 the border, letters and rule go to readout. */
+  reversed?: boolean;
+  class?: string;
+}
+const { variant = 'lockup', reversed = false, class: cls } = Astro.props;
+const ink = reversed ? 'var(--readout)' : 'var(--ink)';
+const letters = site.name.split('');
+const W = 58;
+const H = 84;
+const B = 2;
+const width = letters.length * W + B * 2;
+const height = H + B * 2 + 4 + 6;
+const clip = `ks-clip-${Math.random().toString(36).slice(2, 8)}`;
+---
+{variant === 'lockup' ? (
+  <svg class:list={['lockup', cls]} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={site.name} data-logotype={site.logotype}>
+    <defs>
+      <clipPath id={clip}><rect x={B + (letters.length - 1) * W} y={B} width={W} height={H} /></clipPath>
+    </defs>
+    <rect x={B / 2} y={B / 2} width={width - B} height={H + B} fill="none" stroke={ink} stroke-width={B} />
+    {letters.slice(1).map((_, i) => (
+      <rect x={B + (i + 1) * W - 0.5} y={B} width="1" height={H} fill="var(--hairline)" />
+    ))}
+    <rect x={B} y={B + H * 0.66} width={letters.length * W} height="1" fill="var(--hairline)" />
+    <g fill={ink} font-family="var(--font-display)" font-weight="600" font-size="66" text-anchor="middle">
+      {letters.slice(0, -1).map((ch, i) => (
+        <text x={B + i * W + W / 2} y={B + H / 2 + 24}>{ch}</text>
+      ))}
+      <g clip-path={`url(#${clip})`}>
+        <text x={B + (letters.length - 1) * W + W / 2} y={B + H / 2 + 24 + H * 0.16}>{letters.at(-1)}</text>
+        <text x={B + (letters.length - 1) * W + W / 2} y={B + H / 2 + 24 - H * 0.84}>{letters.at(-1)}</text>
+      </g>
+    </g>
+    <rect x="0" y={H + B * 2 + 4} width={width} height="6" fill={ink} />
+  </svg>
+) : (
+  <svg class:list={['mark', cls]} viewBox="0 0 32 32" role="img" aria-label={site.name} data-logotype={site.logotype}>
+    <rect x="1" y="1" width="30" height="30" fill="none" stroke={ink} stroke-width="2" />
+    <rect x="2" y="21" width="28" height="1" fill="var(--hairline)" />
+    <text x="16" y="23" fill={ink} font-family="var(--font-display)" font-weight="600" font-size="22" text-anchor="middle">{letters[0]}</text>
+  </svg>
+)}

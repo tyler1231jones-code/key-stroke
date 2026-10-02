@@ -1,0 +1,51 @@
+---
+// The four practice mechanisms, drawn from tokens and shown in their finished
+// positions. Count: digit cells settled. Clear: a tally struck out. Build:
+// cells assembled into a grid. Face: a blank sheet ruled into a letterhead.
+import Counter from './Counter.astro';
+import { ledger, caseById, anyDemo } from '../lib/data';
+import { clearedPerYear } from '../lib/ledger';
+
+interface Props {
+  kind: string;
+  practiceKey: string;
+  practiceName: string;
+}
+const { kind, practiceKey, practiceName } = Astro.props;
+const rows = ledger.filter((row) => caseById(row.caseId)?.practice === practiceKey);
+const sum = rows.reduce((t, row) => t + clearedPerYear(row), 0);
+---
+{kind === 'cells' && (
+  <div class="mech mech-cells" data-mech="cells">
+    {rows.length > 0 ? (
+      <>
+        <Counter value={sum} size="s" data-roll="spin" />
+        <p class="plate muted">Keystrokes a year, {rows.length} {practiceName} builds{anyDemo(rows) && <><br />Demonstration figure</>}</p>
+      </>
+    ) : (
+      <Counter value={null} widest={100000} size="s" />
+    )}
+  </div>
+)}
+{kind === 'tally' && (
+  <div class="mech mech-tally" data-mech="tally" aria-hidden="true">
+    {Array.from({ length: 4 }).map(() => (
+      <span class="tally-group">
+        {Array.from({ length: 5 }).map(() => <i class="tick"></i>)}
+      </span>
+    ))}
+  </div>
+)}
+{kind === 'grid' && (
+  <div class="mech mech-grid" data-mech="grid" aria-hidden="true">
+    {Array.from({ length: 12 }).map((_, i) => <i class:list={['cell', { lit: i === 6 }]} style={`--i:${i}`}></i>)}
+  </div>
+)}
+{kind === 'letterhead' && (
+  <div class="mech mech-sheet" data-mech="letterhead" data-theme="light" aria-hidden="true">
+    <i class="mast"></i>
+    <i class="rule"></i>
+    <i class="ln"></i><i class="ln"></i><i class="ln"></i><i class="ln short"></i>
+    <i class="band"></i>
+  </div>
+)}

@@ -1,0 +1,68 @@
+---
+// Nine questions, one per screen, tappable answers only, no email gate.
+// Answers are real radio and checkbox groups. The result has its own URL,
+// with the answers encoded in the hash.
+import '../styles/home.css';
+import '../styles/pages.css';
+import Base from '../layouts/Base.astro';
+import Counter from '../components/Counter.astro';
+import Fig from '../components/Fig.astro';
+import { questions } from '../lib/quiz';
+import { products } from '../lib/data';
+
+const available = products.items.length > 0;
+---
+<Base
+  title="Nine questions"
+  description="A diagnostic in nine questions and about ninety seconds. No email gate, no sales call unless you ask for one."
+  page="quiz"
+>
+  <section class="quiz">
+    <div class="wrap">
+      <div class="quiz-top" id="quiz-top">
+        <h1 class="eyebrow">Nine questions</h1>
+        <div class="plate quiz-progress" id="quiz-progress">
+          <Counter value={1} widest={questions.length} size="s" id="quiz-step" data-figure="other" />
+          <span>of <span>{questions.length}</span></span>
+        </div>
+      </div>
+
+      <noscript>
+        <p class="quiz-noscript body">The quiz works its result out in the browser, so it needs JavaScript. Without it, <a href="/#cases">the cases</a> are the place to start.</p>
+      </noscript>
+
+      {available ? (
+        <form id="quiz-form" novalidate>
+          <div class="quiz-frame" id="quiz-frame">
+            {questions.map((q, i) => (
+              <fieldset class="quiz-screen" data-q={q.id} data-type={q.type} data-exclusive={'exclusive' in q ? q.exclusive : undefined} hidden={i > 0}>
+                <legend class="display-l quiz-q" tabindex="-1"><Fig text={q.text} /></legend>
+                {'hint' in q && <p class="body-s quiz-hint">{q.hint}</p>}
+                <div class="quiz-options">
+                  {q.options.map((o) => (
+                    <label class="quiz-option">
+                      <input type={q.type === 'multi' ? 'checkbox' : 'radio'} name={q.id} value={o.id} />
+                      <span><Fig text={o.label} /></span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))}
+          </div>
+          <div class="quiz-nav">
+            <button type="button" class="key" id="quiz-next" disabled>Next</button>
+            <button type="button" class="body-s quiz-back" id="quiz-back" hidden>Back</button>
+          </div>
+        </form>
+      ) : (
+        <p class="body">The quiz recommends only from the product list, and the product list is empty. Nothing to recommend yet.</p>
+      )}
+
+      <div class="result" id="quiz-result" hidden></div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/quiz.ts';
+</script>

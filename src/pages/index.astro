@@ -1,0 +1,294 @@
+---
+import '../styles/home.css';
+import Base from '../layouts/Base.astro';
+import Counter from '../components/Counter.astro';
+import KeySvg from '../components/KeySvg.astro';
+import CaseArticle from '../components/CaseArticle.astro';
+import CrewCard from '../components/CrewCard.astro';
+import ShiftReport from '../components/ShiftReport.astro';
+import Mechanism from '../components/Mechanism.astro';
+import TallyMarks from '../components/TallyMarks.astro';
+import BookButton from '../components/BookButton.astro';
+import Fig from '../components/Fig.astro';
+import QuizLine from '../components/QuizLine.astro';
+import Skyline from '../components/Skyline.astro';
+import {
+  site, cases, crew, ledger, practices, products, shiftReport, businessTypes,
+  homepageTotal, largestCleared, unitTotal,
+} from '../lib/data';
+import { dateInZone } from '../lib/ledger';
+import { num, dateShort, monthYear, slug } from '../lib/format';
+
+const today = dateInZone(site.timezone);
+const year = today.slice(0, 4);
+const home = homepageTotal(today);
+const largest = largestCleared(4);
+const widestUnit = Math.max(0, ...crew.map((u) => unitTotal(u.unit, today).value));
+const usedPractices = practices.filter((p) => cases.some((c) => c.practice === p.key));
+const audit = products.audit;
+const [deliveryFig, ...deliveryRest] = audit.delivery.split(' ');
+const auditFields = [
+  { fig: audit.price, label: audit.terms.toLowerCase() },
+  { fig: deliveryFig, label: deliveryRest.join(' ') },
+  { fig: '1', label: 'process, defined in writing' },
+  { fig: '1', label: 'initial tool included' },
+];
+---
+<Base
+  title={site.name}
+  description="KEYSTROKE takes the manual admin out of Australian businesses of 5–50 staff and rebuilds it so it runs itself. We count the keystrokes, then we delete them."
+  canvas
+  page="home"
+>
+  <!-- 1. Hero -->
+  <section id="hero" class="hero on-900" data-scene="hero">
+    <div class="ground ground-900"></div>
+    <div class="hero-pin">
+      <div class="hero-copy">
+        <p class="eyebrow">For Australian businesses of <span class="fig">5–50</span> staff</p>
+        <h1 class="display-xl hero-h">{site.tagline}</h1>
+        <p class="lede">Somebody in your office types the same invoice details three times. We counted.</p>
+      </div>
+      <div class="hero-track">
+        <div class="hero-stage">
+          <div class="hero-slot" data-slot aria-hidden="true">
+            <KeySvg class="stand-in" />
+          </div>
+          <div class="hero-strip">
+            {ledger.length > 0 && (
+              <div class="hero-counter">
+                <div class="hero-ctr-row">
+                  <Counter value={home.today} size="xl" id="home-counter" data-week-ago={home.weekAgo} />
+                  <span class="delta figure struck" id="home-delta" hidden>&minus; {num(home.today - home.weekAgo)}</span>
+                </div>
+                <p class="plate hero-label">
+                  <span class="crew-live" data-any-unit></span>
+                  {home.demo && <>Demonstration figure / </>}
+                  Keystrokes cleared in <span data-year>{year}</span> / <span>{home.rows}</span> processes / to <span data-as-at>{dateShort(today)}</span>
+                </p>
+              </div>
+            )}
+            <p class="lede hero-voice">We don't sell transformation. We sell a smaller number than the one you've got.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. The count -->
+  {largest.length > 0 && (
+    <section id="count" class="count" data-scene="count">
+      <div class="count-pin">
+        <div class="wrap count-inner">
+          <header class="section-head">
+            <p class="eyebrow">The count</p>
+            <h2 class="display-l">We counted.</h2>
+            <p class="body">What one rebuilt process clears in a year. Each figure is a row in the ledger, counted from a recording, not estimated.</p>
+          </header>
+          <ol class="count-list">
+            {largest.map(({ row, cleared, case: c }) => (
+              <li class="count-item" data-figure={cleared}>
+                <div class="count-fig">
+                  <Counter value={cleared} size="m" data-roll="spin" />
+                  <span class="unit">keystrokes a year</span>
+                </div>
+                <p class="plate muted">
+                  {c?.scope} / from {monthYear(row.goLive)}
+                  {row.demo && <><br />Demonstration figure</>}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div class="count-slot" data-slot aria-hidden="true">
+          <img class="slot-still" src="/stills/count.webp" alt="" loading="lazy" decoding="async" />
+          <span class="count-seam"></span>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- 3. The cases -->
+  {cases.length > 0 && (
+    <section id="cases" class="cases">
+      <div class="wrap cases-head">
+        <header class="section-head">
+          <p class="eyebrow">The cases</p>
+          <h2 class="display-l">What was built, and what it did.</h2>
+          <p class="body"><span class="fig">{cases.length}</span> cases, each the same object: the business, the count before, what was wrong, what was built, the count after, and what builds like it cost.</p>
+        </header>
+      </div>
+      <div class="filters" id="filters">
+        <div class="wrap">
+          <div class="filter-row" role="group" aria-label="Filter the cases by practice">
+            <span class="plate muted filter-name">Practice</span>
+            <div class="filter-scroll">
+              <button class="chip plate" type="button" aria-pressed="true" data-filter="practice" data-value="all">All</button>
+              {usedPractices.map((p) => (
+                <button class="chip plate" type="button" aria-pressed="false" data-filter="practice" data-value={p.key}>{p.n} {p.name}</button>
+              ))}
+            </div>
+          </div>
+          <div class="filter-row" role="group" aria-label="Filter the cases by business type">
+            <span class="plate muted filter-name">Business</span>
+            <div class="filter-scroll">
+              <button class="chip plate" type="button" aria-pressed="true" data-filter="type" data-value="all">All</button>
+              {businessTypes.map((t) => (
+                <button class="chip plate" type="button" aria-pressed="false" data-filter="type" data-value={slug(t)}>{t}</button>
+              ))}
+            </div>
+          </div>
+          <p class="vh" id="filter-status" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+      <div class="case-list" id="case-list">
+        {cases.map((c, i) => (
+          <>
+            {i === Math.min(4, cases.length) && <QuizLine />}
+            <CaseArticle item={c} />
+          </>
+        ))}
+        {cases.length <= 4 && <QuizLine />}
+      </div>
+    </section>
+  )}
+
+  <Skyline />
+
+  <!-- 4. The audit -->
+  <section id="audit" class="audit" data-scene="audit">
+    <div class="audit-pin">
+      <div class="wrap audit-grid">
+        <div class="audit-copy">
+          <header class="section-head">
+            <p class="eyebrow">The front door</p>
+            <h2 class="display-l">{audit.name}.</h2>
+            <p class="body">We take one process end to end and count what a person physically does: characters typed, clicks, copies and pastes, attachments. You get the annual figure, what it costs in hours, and what it would be after a rebuild.</p>
+          </header>
+          <dl class="audit-fields">
+            {auditFields.map((f) => (
+              <div class="audit-field">
+                <dt class="counter-m">{f.fig}</dt>
+                <dd class="plate muted">{f.label}</dd>
+              </div>
+            ))}
+          </dl>
+          <div class="audit-next">
+            <p class="plate muted field-label">What happens next</p>
+            <p class="body-s">The audit is fixed. What follows is quoted on hours, and the audit's own numbers make the case for it. We quote the build. We don't quote the transformation, because there isn't one.</p>
+            <ul class="ranges">
+              {products.builds.map((b) => (
+                <li><span class="plate muted">{b.name}</span><span class="figure">{b.range}</span></li>
+              ))}
+            </ul>
+          </div>
+          <BookButton />
+        </div>
+        <div class="audit-doc">
+          <div class="audit-slot" data-slot aria-hidden="true"></div>
+          <div class="plate audit-sheets" id="audit-sheets" aria-hidden="true">
+            <Counter value={1} widest={40} size="s" id="sheet-counter" data-figure="other" /><span>of <span>40</span> sheets left</span>
+          </div>
+          {shiftReport ? <ShiftReport /> : <div class="report report-empty" data-theme="light" id="shift-report"></div>}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Practices -->
+  <section id="practices" class="practices section-pad">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="eyebrow">Practices</p>
+        <h2 class="display-l">Three clear the desk. One builds what goes on it.</h2>
+      </header>
+      <ol class="practice-seq">
+        {practices.map((p, i) => (
+          <li class:list={['practice', `practice-${p.key}`, { 'practice-last': i === practices.length - 1 }]} data-practice-block={p.key}>
+            <p class="plate muted practice-stage">{i < 3 ? (i === 0 ? 'Clear the desk' : ' ') : 'Then build what goes on it'}</p>
+            <a class="practice-card" href={`/practice/${p.key}`}>
+              <Mechanism kind={p.mechanism} practiceKey={p.key} practiceName={p.name} />
+              <p class="eyebrow">Practice <span class="fig">{p.n}</span></p>
+              <h3 class="display-m">{p.name}</h3>
+              <p class="body-s muted">{p.field}</p>
+              <p class="body-s practice-sells">{p.sells}</p>
+              <p class="plate practice-go">Open <span aria-hidden="true">&gt;</span></p>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- 6. The crew -->
+  {crew.length > 0 && (
+    <section id="crew" class="crew section-pad">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="eyebrow">The crew</p>
+          <h2 class="display-l">The crew runs at <span class="fig">4</span>am. Nobody types anything.</h2>
+          <p class="body"><span class="fig">{crew.length}</span> units. None of them are people. None of them take leave. An agent does not get bored on the four hundredth invoice, which is the entire point.</p>
+        </header>
+        <div class="crew-roster">
+          {crew.map((u) => <CrewCard unit={u} onDate={today} widest={widestUnit} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- 7. Keystroke Savers -->
+  <section id="savers" class="savers section-pad">
+    <div class="wrap savers-grid">
+      <header class="section-head">
+        <p class="eyebrow">Keystroke Savers / {products.savers.label}</p>
+        <h2 class="display-l">The agents keep running. Somebody watches them.</h2>
+        <p class="body">A monthly layer on top of a build. Support covers what KEYSTROKE built. That boundary is what stops it becoming a helpdesk.</p>
+      </header>
+      <div class="savers-body">
+        <div class="table-frame">
+          <table class="table savers-table">
+            <caption class="vh">Keystroke Savers tiers, {products.savers.label.toLowerCase()}</caption>
+            <thead>
+              <tr><th scope="col">Tier</th><th scope="col">Hours a month</th><th scope="col" class="col-response">Response</th><th scope="col" class="n">Monthly</th></tr>
+            </thead>
+            <tbody>
+              {products.savers.tiers.map((t) => (
+                <tr>
+                  <th scope="row" class="display-s">{t.name}</th>
+                  <td class="savers-hours"><span class="counter-s">{t.hours}</span><TallyMarks count={t.hours} /></td>
+                  <td class="col-response"><Fig text={products.savers.response} /></td>
+                  <td class="n counter-s">{t.monthly}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div class="savers-incl">
+          <p class="plate muted field-label">Every tier includes</p>
+          <ul class="body-s">
+            {products.savers.includes.map((line) => <li>{line}</li>)}
+          </ul>
+          <p class="plate muted">{products.savers.label}. Response is <Fig text={products.savers.response} /> on every tier. The tiers differ on hours alone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. The two of us -->
+  <section id="us" class="us" data-scene="us">
+    <div class="wrap us-grid section-pad">
+      <header class="section-head">
+        <p class="eyebrow">The two of us</p>
+        <h2 class="display-l">{site.principals.join(' and ')}. That is the whole firm.</h2>
+        <p class="body">Two principals do the work. The people who design a build are the people who deliver it. Nobody hands you to a junior, because there isn't one.</p>
+      </header>
+      <div class="us-slot" data-slot aria-hidden="true">
+        {site.principals.map((name) => <KeySvg class="stand-in" legend={name[0]} worn={false} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/home.ts';
+</script>
