@@ -41,3 +41,26 @@ export function figureRuns(text: string): { text: string; fig: boolean }[] {
   if (last < text.length) out.push({ text: text.slice(last), fig: false });
   return out;
 }
+
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+
+/** 5 -> "five". Small counts in running copy are written as words; anything larger stays a figure. */
+export function words(n: number): string {
+  return WORDS[n] ?? String(n);
+}
+
+/** "electrical contractor" -> "an electrical contractor" */
+export function withArticle(noun: string): string {
+  return `${/^[aeiou]/i.test(noun) ? 'an' : 'a'} ${noun}`;
+}
+
+/** "02:00" -> "2:00am", "14:30" -> "2:30pm" */
+export function clock(hhmm: string): string {
+  const [h, m] = hhmm.split(':').map(Number);
+  return `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, '0')}${h < 12 ? 'am' : 'pm'}`;
+}
+
+/** "3 WEEKS PER TENDER. EACH ONE STARTS FROM THE LAST." -> "3 weeks per tender. Each one starts from the last." */
+export function sentenceCase(s: string): string {
+  return s.toLowerCase().replace(/(^|[.?]\s+)([a-z])/g, (_, lead: string, ch: string) => lead + ch.toUpperCase());
+}

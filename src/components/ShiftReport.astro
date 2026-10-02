@@ -1,52 +1,39 @@
 ---
-// The shift report: the deliverable of the audit, shown as a sample document.
-// A document, so it takes the light theme. Filled from shiftReport.json.
-import { shiftReport as r, site } from '../lib/data';
-import { num, dateShort } from '../lib/format';
+// The sample audit report: three labelled parts and the quote. A document,
+// so it takes the light theme. Filled from shiftReport.json. Every figure is
+// labelled in words.
+import { shiftReport as r } from '../lib/data';
+import { num } from '../lib/format';
 ---
 {r && (
   <div class="report" data-theme="light" id="shift-report">
     <header class="report-head">
-      <p class="display-s">Shift report</p>
-      <p class="plate muted">{site.name} audit{r.demo && ' / Sample / Demonstration figures'}</p>
+      <p class="display-s">Sample audit report</p>
+      <p class="body-s muted">{r.client}. {r.process}.</p>
     </header>
-    <dl class="report-meta rule-top">
-      <div><dt class="plate muted">Business</dt><dd class="figure">{r.client}</dd></div>
-      <div><dt class="plate muted">Process</dt><dd class="figure">{r.process}</dd></div>
-      <div><dt class="plate muted">Recorded</dt><dd class="figure">{dateShort(r.recorded)}</dd></div>
-    </dl>
-    <div class="report-count">
-      <div>
-        <p class="plate muted">The count</p>
-        <div class="report-fig"><span class="counter-s">{num(r.count.value)}</span><span class="unit">{r.count.unit}</span></div>
-      </div>
-      <div>
-        <p class="plate muted">The cost in hours</p>
-        <div class="report-fig"><span class="counter-s">{num(r.hours.value)}</span><span class="unit">{r.hours.unit}</span></div>
-      </div>
-      <div>
-        <p class="plate muted">After a rebuild</p>
-        <div class="report-fig"><span class="counter-s">{num(r.afterRebuild.value)}</span><span class="unit">{r.afterRebuild.unit}</span></div>
-      </div>
+    <div class="report-part">
+      <p class="display-s"><span class="fig">1</span> The count</p>
+      <p class="report-fig"><span class="counter-m">{num(r.count.value)}</span><span class="unit">{r.count.unit}, typed by hand</span></p>
     </div>
-    <div class="report-fixes">
-      <p class="plate muted">What to fix, ranked</p>
-      <ol>
+    <div class="report-part">
+      <p class="display-s"><span class="fig">2</span> What it costs you</p>
+      <p class="report-fig"><span class="counter-m">{num(r.hours.value)}</span><span class="unit">{r.hours.unit} of someone's time</span></p>
+    </div>
+    <div class="report-part">
+      <p class="display-s"><span class="fig">3</span> What to fix first</p>
+      <ol class="report-fixes">
         {r.fixes.map((f) => (
           <li>
             <span class="figure">{f.rank}</span>
             <span class="body-s">{f.what}</span>
-            <span class="figure">{num(f.count)}</span>
+            <span class="unit"><span class="fig">{num(f.count)}</span> keystrokes a year</span>
           </li>
         ))}
       </ol>
     </div>
-    <footer class="report-quote rule-top">
-      <div>
-        <p class="plate muted">Scoped quote, first build</p>
-        <p class="body-s">{r.quote.scope}</p>
-      </div>
-      <p class="counter-s">{r.quote.range}</p>
-    </footer>
+    <div class="report-part">
+      <p class="display-s">The quote</p>
+      <p class="report-fig"><span class="counter-m">{r.quote.range}</span><span class="unit">to rebuild this process</span></p>
+    </div>
   </div>
 )}

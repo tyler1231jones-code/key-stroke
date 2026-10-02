@@ -1,4 +1,4 @@
-// Hero. An exactly overhead macro of one worn V key. The camera stays
+// Hero. An exactly overhead macro of one worn K key. The camera stays
 // overhead and pulls straight back; the key turns out to be one in a field,
 // typed by nobody. The field drops out row by row until the worn key is the
 // only one left, and the camera comes straight back in.
@@ -8,7 +8,7 @@
 // change of distance along one axis and nothing else.
 import * as THREE from 'three';
 import { addRig, type SceneFactory, type LiveScene } from '../stage';
-import { makeKey, makeField, WORN_V, KEY_HEIGHT, KEY_TRAVEL, type Field } from '../objects/keycap';
+import { makeKey, makeField, WORN_K, KEY_HEIGHT, KEY_TRAVEL, type Field } from '../objects/keycap';
 import { bus, HERO } from '../../scripts/bus';
 
 const FOV = 30;
@@ -36,7 +36,7 @@ export const heroScene: SceneFactory = (ctx) => {
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.5, 200);
   camera.position.set(0, 0, 10);
 
-  const worn = makeKey(t, 'V', { wear: WORN_V, detail: ctx.phone ? 10 : 14, size: ctx.phone ? 512 : 1024 });
+  const worn = makeKey(t, 'K', { wear: WORN_K, detail: ctx.phone ? 10 : 14, size: ctx.phone ? 512 : 1024 });
   scene.add(worn.mesh);
 
   const slot = el.querySelector<HTMLElement>('.hero-slot')!;

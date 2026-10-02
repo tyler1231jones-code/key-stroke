@@ -6,8 +6,8 @@ import ledgerJson from '../content/ledger.json';
 import crewJson from '../content/crew.json';
 import productsJson from '../content/products.json';
 import shiftReportJson from '../content/shiftReport.json';
-import practicesJson from '../content/practices.json';
-import { accrual, clearedPerYear, roundDownHundred, total, totalWeekAgo, type LedgerRow } from './ledger';
+import servicesJson from '../content/services.json';
+import { clearedPerYear, total, totalWeekAgo, accrual, roundDownHundred, type LedgerRow } from './ledger';
 
 export const site = siteJson;
 
@@ -17,15 +17,14 @@ function live<T extends { demo?: boolean }>(rows: T[]): T[] {
 }
 
 export type Case = (typeof casesJson)[number];
-export type CrewUnit = (typeof crewJson)[number];
-export type Practice = (typeof practicesJson)[number];
+export type CrewAgent = (typeof crewJson)[number];
+export type Service = (typeof servicesJson)[number];
 
 export const cases: Case[] = live(casesJson);
 export const ledger: LedgerRow[] = live(ledgerJson as LedgerRow[]);
-export const crew: CrewUnit[] = live(crewJson);
-export const crewSize: number = crewJson.length;
+export const crew: CrewAgent[] = live(crewJson);
 export const shiftReport = site.demo || !shiftReportJson.demo ? shiftReportJson : null;
-export const practices: Practice[] = practicesJson;
+export const services: Service[] = servicesJson;
 
 export const products = {
   audit: productsJson.audit,
@@ -35,72 +34,76 @@ export const products = {
   savers: productsJson.savers,
 };
 
-export function practice(key: string): Practice {
-  return practices.find((p) => p.key === key)!;
+export function service(slug: string): Service {
+  return services.find((s) => s.slug === slug)!;
 }
 
-export function unit(id: string | null): CrewUnit | undefined {
-  return id ? crew.find((u) => u.unit === id) : undefined;
-}
-
-export function ledgerRowFor(caseId: string): LedgerRow | undefined {
-  return ledger.find((row) => row.caseId === caseId);
+/** Quiz items and old links still name a practice; every practice is one service. */
+export function serviceOfPractice(key: string): Service {
+  return services.find((s) => s.practice === key)!;
 }
 
 export function caseById(id: string): Case | undefined {
   return cases.find((c) => c.id === id);
 }
 
-/** True while any row feeding a figure is demo: the figure is then labelled as a demonstration. */
-export function anyDemo(rows: { demo?: boolean }[]): boolean {
-  return rows.some((row) => row.demo);
+export function casesOf(slug: string): Case[] {
+  return cases.filter((c) => c.service === slug);
 }
+
+/** The three cases on the homepage, named in site.json. */
+export const featuredCases: Case[] = site.featuredCases.map(caseById).filter((c): c is Case => Boolean(c));
 
 export function homepageTotal(onDate: string) {
-  return {
-    today: total(ledger, onDate),
-    weekAgo: totalWeekAgo(ledger, onDate),
-    rows: ledger.length,
-    demo: anyDemo(ledger),
-  };
+  return { today: total(ledger, onDate), weekAgo: totalWeekAgo(ledger, onDate) };
 }
 
-export function unitTotal(unitId: string, onDate: string) {
-  const rows = ledger.filter((row) => row.crewUnit === unitId);
-  return { value: total(rows, onDate), rows: rows.length, demo: anyDemo(rows) };
+/** What one crew agent has cleared this year, from the ledger rows it runs. */
+export function agentTotal(unitId: string, onDate: string): number {
+  return total(ledger.filter((row) => row.crewUnit === unitId), onDate);
 }
 
-/** The largest cleared-per-year figures in the ledger. */
-export function largestCleared(n = 4) {
+/** The largest cleared-per-year figures in the ledger, each with the business it belongs to. */
+export function proofFigures(n = 4) {
   return [...ledger]
     .sort((a, b) => clearedPerYear(b) - clearedPerYear(a))
     .slice(0, n)
-    .map((row) => ({ row, cleared: clearedPerYear(row), case: caseById(row.caseId) }));
+    .map((row) => ({ cleared: clearedPerYear(row), who: (caseById(row.caseId)?.descriptor ?? '').split(' · ')[0].toLowerCase() }))
+    .filter((f) => f.who);
 }
 
 export function rowAccrued(row: LedgerRow, onDate: string): number {
   return roundDownHundred(accrual(row, onDate));
 }
 
-/** Tally bar: cleared share rounded down to a whole segment, so anything left to type never shows a full bar. */
-export function tallySegments(before: number, after: number, segments = 20): number {
-  if (before <= 0) return 0;
-  return Math.floor(((before - after) / before) * segments);
-}
-
-export const businessTypes: string[] = [...new Set(cases.map((c) => c.businessType))];
-export const todos: string[] = Object.entries(site)
-  .filter(([, v]) => v === 'TODO')
-  .map(([k]) => k);
-export const has = (key: 'email' | 'bookingUrl' | 'domain'): boolean => site[key] !== 'TODO' && site[key] !== '';
-
-/** Before and after, a year, summed across the ledger rows of one practice. */
-export function practiceTotals(key: string) {
-  const rows = ledger.filter((row) => caseById(row.caseId)?.practice === key);
+/** Before and after, a year, summed across the ledger rows of one service. */
+export function serviceTotals(slug: string) {
+  const rows = ledger.filter((row) => caseById(row.caseId)?.service === slug);
   return {
     before: rows.reduce((t, row) => t + row.baselinePerYear, 0),
     after: rows.reduce((t, row) => t + row.remainingPerYear, 0),
     rows: rows.length,
-    demo: anyDemo(rows),
   };
 }
+
+/** A value in site.json that the principals have set. Anything still TODO is left off the page. */
+export const has = (key: 'email' | 'bookingUrl' | 'domain'): boolean => site[key] !== 'TODO' && site[key] !== '';
+
+/** Shown only when yearsExperience is a number. */
+export const experienceLine: string | null = (() => {
+  const years: unknown = site.yearsExperience;
+  const n = typeof years === 'number' ? years : typeof years === 'string' && /^\d+$/.test(years) ? Number(years) : null;
+  return n === null ? null : site.experienceLine.replace('{years}', String(n));
+})();
+
+/** Every "Book the audit" control goes to the booking block at the foot of the audit page. */
+export const BOOK_HREF = '/audit#book';
+export const QUIZ_HREF = '/quiz';
+
+/** Cases in an order that shows the range of work first: one from each service in turn. */
+export const casesMixed: Case[] = (() => {
+  const groups = services.map((s) => casesOf(s.slug));
+  const out: Case[] = [];
+  for (let i = 0; groups.some((g) => i < g.length); i++) for (const g of groups) if (g[i]) out.push(g[i]);
+  return out;
+})();

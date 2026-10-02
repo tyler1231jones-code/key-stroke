@@ -1,30 +1,31 @@
 // The quiz interpreter: deterministic rules over quiz.json and products.json.
 // No model call. It recommends only from the product list, never more than
 // three items, never a price beyond the published ranges, and nothing the
-// answers do not support. Too small or too simple: it says buy nothing yet.
+// answers do not support. When no item qualifies it says buy nothing yet.
 import quiz from '../content/quiz.json';
-import { products, cases, type Case } from './data';
+import { products, cases, serviceOfPractice, type Case } from './data';
 
 export type Answers = Record<string, string[]>;
 
 export interface Recommendation {
   id: string;
   name: string;
-  practice: string;
-  bandName: string;
+  /** The service the item belongs to, by name. */
+  service: string;
+  serviceSlug: string;
   range: string;
   case: Case | null;
 }
 
 export interface Result {
+  /** The read: what the answers say, in two or three short sentences. */
   read: string[];
   buyNothing: boolean;
-  tooLarge: boolean;
-  estimate: { label: string; text: string; admission: string } | null;
+  estimate: { hours: string; label: string; admission: string } | null;
   items: Recommendation[];
   order: string | null;
-  closing: string;
-  businessType: string | null;
+  /** One or two sentences on what was stopping them, said before the next step. */
+  next: string;
   showBook: boolean;
 }
 
@@ -48,9 +49,6 @@ function joinList(parts: string[]): string {
 }
 
 export function interpret(a: Answers): Result {
-  const size = a.q2?.[0];
-  const tooSmall = size === quiz.sizing.tooSmall;
-  const tooLarge = size === quiz.sizing.tooLarge;
   const businessType = (option('q1', a.q1?.[0] ?? '')?.businessType as string | null) ?? null;
 
   // The evidence, in their own answers.
@@ -68,7 +66,7 @@ export function interpret(a: Answers): Result {
     .filter((item): item is (typeof products.items)[number] => Boolean(item))
     .sort((x, y) => x.order - y.order);
 
-  const buyNothing = tooSmall || qualified.length === 0;
+  const buyNothing = qualified.length === 0;
 
   const read: string[] = [];
   if (evidence.length > 0) {
@@ -77,16 +75,14 @@ export function interpret(a: Answers): Result {
   } else {
     read.push(quiz.read.none);
   }
-  if (tooSmall) read.push(quiz.read.tooSmall);
-  if (tooLarge && !buyNothing) read.push(quiz.read.tooLarge);
   const payoff = option('q8', a.q8?.[0] ?? '')?.payoff as string | undefined;
   if (buyNothing) read.push(quiz.read.buyNothing);
   else if (payoff) read.push(payoff);
 
-  const closing = (quiz.closing as Record<string, string>)[a.q9?.[0] ?? ''] ?? '';
+  const next = (quiz.closing as Record<string, string>)[a.q9?.[0] ?? ''] ?? '';
 
   if (buyNothing) {
-    return { read, buyNothing, tooLarge, estimate: null, items: [], order: null, closing, businessType, showBook: false };
+    return { read, buyNothing, estimate: null, items: [], order: null, next, showBook: false };
   }
 
   const items: Recommendation[] = qualified.slice(0, quiz.sizing.maxItems).map((item) => {
@@ -95,32 +91,25 @@ export function interpret(a: Answers): Result {
       item.cases.map((id) => cases.find((c) => c.id === id)).find((c) => c && c.businessType === businessType) ??
       item.cases.map((id) => cases.find((c) => c.id === id)).find(Boolean) ??
       null;
-    return { id: item.id, name: item.name, practice: item.practice, bandName: band?.name ?? '', range: band?.range ?? '', case: linked };
+    const s = serviceOfPractice(item.practice);
+    return { id: item.id, name: item.name, service: s.name, serviceSlug: s.slug, range: band?.range ?? '', case: linked };
   });
 
-  // The estimate is a figure about re-entry, so it shows only when re-entry qualifies,
-  // only for a size band that has one, and never for a business over 50.
+  // The estimate is a figure about typing things twice, so it shows only when
+  // that item qualifies, and only for a size of business that has one.
   let estimate: Result['estimate'] = null;
-  const band = option('q2', size ?? '')?.band as string | null | undefined;
+  const band = option('q2', a.q2?.[0] ?? '')?.band as string | null | undefined;
   const reEntry = qualified.some((item) => item.id === quiz.sizing.estimateItem);
   const hours = band && products.estimates ? (products.estimates.bands as Record<string, string>)[band] : undefined;
-  if (reEntry && !tooLarge && band && hours) {
-    estimate = {
-      label: quiz.estimate.label,
-      text: quiz.estimate.text.replace('{band}', band).replace('{hours}', hours),
-      admission: quiz.estimate.admission,
-    };
-  }
+  if (reEntry && hours) estimate = { hours, label: quiz.estimate.label, admission: quiz.estimate.admission };
 
   return {
     read,
     buyNothing,
-    tooLarge,
     estimate,
     items,
     order: items.length > 1 ? quiz.order.many : quiz.order.one,
-    closing,
-    businessType,
+    next,
     showBook: true,
   };
 }

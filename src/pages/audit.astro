@@ -1,0 +1,92 @@
+---
+// The audit, in four short blocks: what it is, how it works, what you get,
+// and the price with one button. The stack of forms at the top is the page's
+// one set piece. The page ends on the booking block that every "Book the
+// audit" control on the site points at.
+import Base from '../layouts/Base.astro';
+import ShiftReport from '../components/ShiftReport.astro';
+import BookButton from '../components/BookButton.astro';
+import Fig from '../components/Fig.astro';
+import { products, shiftReport } from '../lib/data';
+import '../styles/pages.css';
+
+const audit = products.audit;
+---
+<Base title={audit.name} description={audit.what} canvas current="audit" page="audit" band="book">
+  <!-- 1. What it is -->
+  <section class="phero" data-scene="audit">
+    <div class="phero-pin">
+      <div class="wrap phero-grid">
+        <div class="phero-copy">
+          <h1 class="display-xl load-in">{audit.name}.</h1>
+          <p class="lede load-in" style="--i:1">{audit.what}</p>
+          <p class="body-s muted load-in" style="--i:1">A keystroke is one thing a person has to type or click.</p>
+        </div>
+        <div class="phero-slot" data-slot aria-hidden="true">
+          <img class="slot-still" src="/stills/audit.webp" alt="" loading="lazy" decoding="async" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. How it works -->
+  <section class="section-pad" id="how">
+    <div class="wrap">
+      <header class="section-head">
+        <h2 class="display-l">How it works.</h2>
+      </header>
+      <ol class="steps">
+        {audit.steps.map((step, i) => (
+          <li class="step" style={`--i:${i}`}>
+            <span class="step-n" aria-hidden="true">{i + 1}</span>
+            <h3 class="display-s">{step.title}</h3>
+            <p class="body">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- 3. What you get -->
+  {shiftReport && (
+    <section class="section-pad home-alt" id="report">
+      <div class="wrap audit-get">
+        <header class="section-head">
+          <h2 class="display-l">What you get.</h2>
+          <p class="body">A short report and a fixed quote. This is a sample.</p>
+        </header>
+        <ShiftReport />
+      </div>
+    </section>
+  )}
+
+  <!-- 4. The price -->
+  <section class="section-pad" id="price">
+    <div class="wrap audit-price">
+      <div>
+        <header class="section-head">
+          <h2 class="display-l">What it costs.</h2>
+        </header>
+        <p class="price"><span class="counter-m">{audit.price}</span><span class="unit">{audit.terms.toLowerCase()} price</span></p>
+        <ul class="ticks after-list">
+          <li>Delivered in <span class="fig">{audit.delivery.split(' ')[0]}</span> {audit.delivery.split(' ').slice(1).join(' ')}</li>
+          <li>{audit.tool}</li>
+        </ul>
+        <div class="after-list"><BookButton /></div>
+      </div>
+      <div class="audit-next">
+        <h3 class="display-s">What happens next</h3>
+        <p class="body"><Fig text={audit.next} /></p>
+        <ul class="ranges">
+          {products.builds.map((b) => (
+            <li><span>{b.name}</span><span class="figure">{b.range}</span></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/object-page.ts';
+</script>

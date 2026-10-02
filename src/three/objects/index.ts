@@ -1,5 +1,4 @@
-// The object library, by name. Each case names one evidence object; practice
-// pages reuse them. Every object reports its footprint so a scene can fit it
+// The object library, by name. Each service page shows one object. Every object reports its footprint so a scene can fit it
 // to a slot, and which way it is looked at: exactly overhead or square-on.
 //
 // assets.json can replace any object with a GLB model or an offline render
@@ -7,13 +6,11 @@
 import * as THREE from 'three';
 import type { Tokens } from '../tokens';
 import assets from '../../content/assets.json';
-import { makeField, makeKey, KEY_TRAVEL, WORN_V } from './keycap';
+import { makeField } from './keycap';
 import { makeDrums, DRUM_R } from './drums';
 import { makeStack, makeSheet, SHEET_W, SHEET_PITCH } from './forms';
-import { makeNumpad, NUMPAD_SIZE } from './numpad';
-import { makeMouse, MOUSE_SIZE } from './mouse';
 
-export type ObjectName = 'drum' | 'key-field' | 'numpad' | 'forms-stack' | 'mouse' | 'sheet' | 'key-worn';
+export type ObjectName = 'drum' | 'key-field' | 'forms-stack' | 'sheet';
 
 export interface Evidence {
   root: THREE.Object3D;
@@ -154,22 +151,6 @@ function build(name: ObjectName, t: Tokens, data: EvidenceData, phone: boolean):
         dispose: () => field.dispose(),
       };
     }
-    case 'numpad': {
-      const pad = makeNumpad(t);
-      return {
-        root: pad.group,
-        size: NUMPAD_SIZE,
-        view: 'overhead',
-        update(p) {
-          // 4, 5, 6: the three keys that did the work, pressed once more in passing.
-          for (let i = 0; i < 3; i++) {
-            const k = span(p, 0.36 + i * 0.05, 0.44 + i * 0.05);
-            pad.press(i, Math.sin(k * Math.PI));
-          }
-        },
-        dispose: () => pad.dispose(),
-      };
-    }
     case 'forms-stack': {
       const count = 40;
       const stack = makeStack(t, count);
@@ -192,24 +173,17 @@ function build(name: ObjectName, t: Tokens, data: EvidenceData, phone: boolean):
         dispose: () => stack.dispose(),
       };
     }
-    case 'mouse': {
-      const mouse = makeMouse(t);
-      return { root: mouse.mesh, size: MOUSE_SIZE, view: 'overhead', update() {}, dispose: () => mouse.dispose() };
-    }
     case 'sheet': {
       const sheet = makeSheet(t, data.sheet ?? 'tender');
-      return { root: sheet.mesh, size: { w: SHEET_W, h: 297 }, view: 'square', update() {}, dispose: () => sheet.dispose() };
-    }
-    case 'key-worn': {
-      const key = makeKey(t, 'V', { wear: WORN_V, detail: 10, size: 512 });
       return {
-        root: key.mesh,
-        size: { w: 1, h: 1 },
-        view: 'overhead',
+        root: sheet.mesh,
+        size: { w: SHEET_W, h: 297 },
+        view: 'square',
         update(p) {
-          key.mesh.position.z = -Math.sin(span(p, 0.4, 0.5) * Math.PI) * KEY_TRAVEL;
+          // Laid down slightly askew, then squared up.
+          sheet.mesh.rotation.z = (1 - smooth(span(p, 0.1, 0.7))) * -0.14;
         },
-        dispose: () => key.dispose(),
+        dispose: () => sheet.dispose(),
       };
     }
   }

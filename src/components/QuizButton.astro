@@ -1,0 +1,10 @@
+---
+// "Take the 90-second quiz": the site's primary action.
+import { QUIZ_HREF } from '../lib/data';
+
+interface Props {
+  secondary?: boolean;
+}
+const { secondary = false } = Astro.props;
+---
+<a class:list={['key', 'key-l', { 'key-2': secondary }]} href={QUIZ_HREF}><span>Take the <span class="fig">90</span>-second quiz</span></a>

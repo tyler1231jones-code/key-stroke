@@ -14,7 +14,7 @@ import { serve, launch } from './shots.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'public', 'stills');
-const routes = ['/', '/practice/count', '/practice/clear', '/practice/build', '/practice/face'];
+const routes = ['/audit', '/services/automation', '/services/reporting', '/services/web-software', '/services/brand-design'];
 
 await mkdir(out, { recursive: true });
 const { server, url } = await serve();

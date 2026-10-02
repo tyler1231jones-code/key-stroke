@@ -1,0 +1,98 @@
+---
+// One service: what it is, three examples, two cases, the price
+// ranges and one button. The hero carries the page's one small scroll moment.
+import Base from '../../layouts/Base.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import BookButton from '../../components/BookButton.astro';
+import Fig from '../../components/Fig.astro';
+import { services, casesOf, products, serviceTotals } from '../../lib/data';
+import { num, words } from '../../lib/format';
+import '../../styles/pages.css';
+
+export function getStaticPaths() {
+  return services.map((s) => ({ params: { slug: s.slug }, props: { s } }));
+}
+
+const { s } = Astro.props;
+const own = casesOf(s.slug).slice(0, 2);
+const totals = serviceTotals(s.slug);
+const keystrokes = own.some((c) => /keystroke/.test(c.before.unit));
+// The drums show a figure, so the figure is said in words beside them.
+const drums = s.object === 'drum' && totals.rows > 0;
+---
+<Base title={s.name} description={`${s.name}. ${s.what}`} canvas current="services" page="service">
+  <section
+    class="phero"
+    data-scene="service"
+    data-object={s.object}
+    data-before={drums ? totals.before : 0}
+    data-after={drums ? totals.after : 0}
+  >
+    <div class="phero-pin">
+      <div class="wrap phero-grid">
+        <div class="phero-copy">
+          <p class="tag load-in">{s.practiceName}</p>
+          <h1 class="display-xl load-in">{s.name}</h1>
+          <p class="lede load-in" style="--i:1">{s.what}</p>
+        </div>
+        <div class="phero-figure">
+          <div class="phero-slot" data-slot aria-hidden="true">
+            <img class="slot-still" src={`/stills/service-${s.slug}.webp`} alt="" loading="lazy" decoding="async" />
+          </div>
+          {drums && (
+            <p class="unit phero-caption">
+              What {words(totals.rows)} clients typed in a year to build their reports: <span class="fig">{num(totals.before)}</span> keystrokes before, <span class="fig">{num(totals.after)}</span> after.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad">
+    <div class="wrap">
+      <header class="section-head" data-reveal>
+        <h2 class="display-l">What we build.</h2>
+      </header>
+      <ul class="steps">
+        {s.examples.map((e, i) => (
+          <li class="step" data-reveal style={`--i:${i}`}><p class="display-s">{e}</p></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {own.length > 0 && (
+    <section class="section-pad home-alt">
+      <div class="wrap">
+        <header class="section-head" data-reveal>
+          <h2 class="display-l">Jobs like this.</h2>
+          {keystrokes && <p class="body">A keystroke is one thing a person had to type or click.</p>}
+        </header>
+        <div class="cards cards-2">
+          {own.map((c) => <CaseCard item={c} />)}
+        </div>
+        <a class="more" href={`/cases?service=${s.slug}`}>See all cases</a>
+      </div>
+    </section>
+  )}
+
+  <section class="section-pad">
+    <div class="wrap">
+      <header class="section-head" data-reveal>
+        <h2 class="display-l">What it costs.</h2>
+        <p class="body"><Fig text={`Every job starts with the audit, at ${products.audit.price}. ${products.audit.next}`} /></p>
+      </header>
+      <ul class="ranges" data-reveal>
+        {products.builds.map((b) => (
+          <li><span>{b.name}</span><span class="figure">{b.range}</span></li>
+        ))}
+      </ul>
+      <div class="after-list"><BookButton /></div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../../scripts/object-page.ts';
+</script>

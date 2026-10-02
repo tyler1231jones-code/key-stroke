@@ -8,6 +8,7 @@ A scroll-driven site with real-time and pre-rendered 3D, built with Astro, three
 - `docs/KEYSTROKE - Design system.pdf` and `docs/KEYSTROKE - Business plan 2026-27.pdf` are the sources the brief is built on.
 - `docs/stack.md` lists the packages, versions and tools.
 - `docs/skill-corrections.md` lists where the skills in `.claude/skills/` are out of date or wrong. Read it before using any `threejs-*` or `gsap-*` skill.
+- `docs/revision-1.md` is the first revision of the build. Where it disagrees with the build brief or the design system, the revision wins.
 
 Precedence: the brief, then the design system, then the business plan.
 

@@ -1,0 +1,58 @@
+[
+  {
+    "slug": "automation",
+    "practice": "clear",
+    "name": "Automation and AI agents",
+    "line": "The work happens without anyone doing it.",
+    "what": "We take the work your team does by hand every week and rebuild it so it runs on its own.",
+    "examples": [
+      "Forms that write the job and the invoice",
+      "Approvals that route themselves",
+      "Systems that update each other overnight"
+    ],
+    "object": "forms-stack",
+    "practiceName": "Clear"
+  },
+  {
+    "slug": "reporting",
+    "practice": "count",
+    "name": "Reporting and dashboards",
+    "line": "See how the business is doing in time to act.",
+    "what": "We connect your systems so your reports build themselves and arrive while you can still act on them.",
+    "examples": [
+      "Monthly reporting packs",
+      "Job costing while the job is running",
+      "Dashboards the whole team can read"
+    ],
+    "object": "drum",
+    "practiceName": "Count"
+  },
+  {
+    "slug": "web-software",
+    "practice": "build",
+    "name": "Websites and software",
+    "line": "A site or a tool built for how you actually work.",
+    "what": "We build websites you can edit yourself and software shaped to the way your business runs.",
+    "examples": [
+      "Websites you can edit yourself",
+      "Online stores",
+      "Custom apps"
+    ],
+    "object": "key-field",
+    "practiceName": "Build"
+  },
+  {
+    "slug": "brand-design",
+    "practice": "face",
+    "name": "Branding and graphic design",
+    "line": "Look like the business you have become.",
+    "what": "We design the brand, the documents and the print your business sends out.",
+    "examples": [
+      "Logos and rebrands",
+      "Tender and capability documents",
+      "Brochures and stationery"
+    ],
+    "object": "sheet",
+    "practiceName": "Face"
+  }
+]

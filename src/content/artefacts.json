@@ -4,14 +4,49 @@
     "title": "Job-cost pack",
     "stamp": "Built 06:00 AEST on the 1st",
     "source": "simPRO + Xero > Power BI",
-    "columns": ["Job", "Cost to date", "Invoiced", "Margin"],
+    "columns": [
+      "Job",
+      "Cost to date",
+      "Invoiced",
+      "Margin"
+    ],
     "rows": [
-      ["J-2291 Plant room refit", "$48,210", "$61,400", "21%"],
-      ["J-2304 Chiller swap", "$12,960", "$15,300", "15%"],
-      ["J-2310 Ductwork, stage 2", "$87,450", "$96,000", "8%"],
-      ["J-2318 Service contract", "$6,120", "$9,800", "37%"],
-      ["J-2325 Cold room", "$31,700", "$33,100", "4%"],
-      ["J-2331 Rooftop units", "$22,840", "$29,500", "22%"]
+      [
+        "J-2291 Plant room refit",
+        "$48,210",
+        "$61,400",
+        "21%"
+      ],
+      [
+        "J-2304 Chiller swap",
+        "$12,960",
+        "$15,300",
+        "15%"
+      ],
+      [
+        "J-2310 Ductwork, stage 2",
+        "$87,450",
+        "$96,000",
+        "8%"
+      ],
+      [
+        "J-2318 Service contract",
+        "$6,120",
+        "$9,800",
+        "37%"
+      ],
+      [
+        "J-2325 Cold room",
+        "$31,700",
+        "$33,100",
+        "4%"
+      ],
+      [
+        "J-2331 Rooftop units",
+        "$22,840",
+        "$29,500",
+        "22%"
+      ]
     ],
     "foot": "6 jobs. Nobody typed this."
   },
@@ -20,14 +55,49 @@
     "title": "Project hours",
     "stamp": "Built 06:00 AEST, daily",
     "source": "Timesheets > Power BI",
-    "columns": ["Project", "Budget h", "Booked h", "Left h"],
+    "columns": [
+      "Project",
+      "Budget h",
+      "Booked h",
+      "Left h"
+    ],
     "rows": [
-      ["P-114 Culvert design", "320", "212", "108"],
-      ["P-118 Subdivision, stage 3", "860", "790", "70"],
-      ["P-121 Retaining walls", "140", "151", "-11"],
-      ["P-126 Stormwater model", "410", "96", "314"],
-      ["P-130 Bridge inspection", "95", "88", "7"],
-      ["P-133 Car park", "260", "40", "220"]
+      [
+        "P-114 Culvert design",
+        "320",
+        "212",
+        "108"
+      ],
+      [
+        "P-118 Subdivision, stage 3",
+        "860",
+        "790",
+        "70"
+      ],
+      [
+        "P-121 Retaining walls",
+        "140",
+        "151",
+        "-11"
+      ],
+      [
+        "P-126 Stormwater model",
+        "410",
+        "96",
+        "314"
+      ],
+      [
+        "P-130 Bridge inspection",
+        "95",
+        "88",
+        "7"
+      ],
+      [
+        "P-133 Car park",
+        "260",
+        "40",
+        "220"
+      ]
     ],
     "foot": "6 projects. Before work starts."
   },
@@ -37,11 +107,26 @@
       "title": "Job sheet",
       "ref": "J-5521",
       "fields": [
-        ["Site", "Unit 4, Moorabool St"],
-        ["Work", "Replace switchboard RCDs"],
-        ["Labour", "3.5 h"],
-        ["Materials", "2 x RCD, 14 m cable"],
-        ["Signed", "On site, 14:10"]
+        [
+          "Site",
+          "Unit 4, Moorabool St"
+        ],
+        [
+          "Work",
+          "Replace switchboard RCDs"
+        ],
+        [
+          "Labour",
+          "3.5 h"
+        ],
+        [
+          "Materials",
+          "2 x RCD, 14 m cable"
+        ],
+        [
+          "Signed",
+          "On site, 14:10"
+        ]
       ]
     },
     "invoice": {
@@ -49,10 +134,22 @@
       "ref": "INV-0931",
       "system": "Xero",
       "lines": [
-        ["Labour, 3.5 h", "$402.50"],
-        ["Materials", "$186.00"],
-        ["GST", "$58.85"],
-        ["Total", "$647.35"]
+        [
+          "Labour, 3.5 h",
+          "$402.50"
+        ],
+        [
+          "Materials",
+          "$186.00"
+        ],
+        [
+          "GST",
+          "$58.85"
+        ],
+        [
+          "Total",
+          "$647.35"
+        ]
       ],
       "status": "Routed for approval"
     }
@@ -62,13 +159,48 @@
     "title": "Bank reconciliation",
     "stamp": "Run 02:00 AEST",
     "rows": [
-      ["03 Mar", "EFT 4471", "$1,280.00", "INV-2207"],
-      ["03 Mar", "EFT 4472", "$640.50", "INV-2198"],
-      ["04 Mar", "DD Telco", "$219.00", "BILL-0871"],
-      ["04 Mar", "EFT 4475", "$3,905.00", "INV-2211"],
-      ["05 Mar", "Card 8841", "$74.90", "RCPT-3310"],
-      ["05 Mar", "EFT 4479", "$2,150.00", null],
-      ["06 Mar", "EFT 4480", "$980.00", "INV-2215"]
+      [
+        "03 Mar",
+        "EFT 4471",
+        "$1,280.00",
+        "INV-2207"
+      ],
+      [
+        "03 Mar",
+        "EFT 4472",
+        "$640.50",
+        "INV-2198"
+      ],
+      [
+        "04 Mar",
+        "DD Telco",
+        "$219.00",
+        "BILL-0871"
+      ],
+      [
+        "04 Mar",
+        "EFT 4475",
+        "$3,905.00",
+        "INV-2211"
+      ],
+      [
+        "05 Mar",
+        "Card 8841",
+        "$74.90",
+        "RCPT-3310"
+      ],
+      [
+        "05 Mar",
+        "EFT 4479",
+        "$2,150.00",
+        null
+      ],
+      [
+        "06 Mar",
+        "EFT 4480",
+        "$980.00",
+        "INV-2215"
+      ]
     ],
     "matched": "Matched",
     "exception": "No match. Listed for a person.",
@@ -81,16 +213,37 @@
       "ref": "Q-1187",
       "system": "SharePoint list",
       "fields": [
-        ["Route", "Townsville to Mount Isa"],
-        ["Load", "2 pallets, 1.4 t"],
-        ["Price", "$1,460 + GST"]
+        [
+          "Route",
+          "Townsville to Mount Isa"
+        ],
+        [
+          "Load",
+          "2 pallets, 1.4 t"
+        ],
+        [
+          "Price",
+          "$1,460 + GST"
+        ]
       ]
     },
     "targets": [
-      { "title": "Quote PDF", "detail": "Q-1187.pdf generated" },
-      { "title": "Job board", "detail": "Job card written" },
-      { "title": "Accounts", "detail": "Draft quote written" },
-      { "title": "Customer email", "detail": "PDF attached, queued" }
+      {
+        "title": "Quote PDF",
+        "detail": "Q-1187.pdf generated"
+      },
+      {
+        "title": "Job board",
+        "detail": "Job card written"
+      },
+      {
+        "title": "Accounts",
+        "detail": "Draft quote written"
+      },
+      {
+        "title": "Customer email",
+        "detail": "PDF attached, queued"
+      }
     ],
     "foot": "Entered once. 14:02."
   },
@@ -101,15 +254,33 @@
       "ref": "R-0412",
       "system": "Intake form",
       "fields": [
-        ["Property", "Unit 2, 18 View St"],
-        ["Issue", "Hot water system leaking"],
-        ["Access", "Weekdays after 09:00"]
+        [
+          "Property",
+          "Unit 2, 18 View St"
+        ],
+        [
+          "Issue",
+          "Hot water system leaking"
+        ],
+        [
+          "Access",
+          "Weekdays after 09:00"
+        ]
       ]
     },
     "targets": [
-      { "title": "Work order", "detail": "WO-0412 written" },
-      { "title": "Tradesperson", "detail": "Plumber booked, Thu 09:00" },
-      { "title": "Owner notice", "detail": "Notice drafted and sent" }
+      {
+        "title": "Work order",
+        "detail": "WO-0412 written"
+      },
+      {
+        "title": "Tradesperson",
+        "detail": "Plumber booked, Thu 09:00"
+      },
+      {
+        "title": "Owner notice",
+        "detail": "Notice drafted and sent"
+      }
     ],
     "foot": "Written once, by the tenant."
   },
@@ -117,33 +288,127 @@
     "kind": "timesheet-app",
     "title": "Timesheet",
     "week": "Week ending 12 Jun",
-    "days": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+    "days": [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri"
+    ],
     "rows": [
-      ["E-014", "J-880 Kitchen set", ["8.0", "8.0", "7.5", "8.0", "6.0"]],
-      ["E-017", "J-880 Kitchen set", ["8.0", "4.0", "8.0", "8.0", "8.0"]],
-      ["E-017", "J-884 Shopfit", ["0.0", "4.0", "0.0", "0.0", "0.0"]],
-      ["E-021", "J-884 Shopfit", ["7.5", "8.0", "8.0", "8.0", "7.0"]]
+      [
+        "E-014",
+        "J-880 Kitchen set",
+        [
+          "8.0",
+          "8.0",
+          "7.5",
+          "8.0",
+          "6.0"
+        ]
+      ],
+      [
+        "E-017",
+        "J-880 Kitchen set",
+        [
+          "8.0",
+          "4.0",
+          "8.0",
+          "8.0",
+          "8.0"
+        ]
+      ],
+      [
+        "E-017",
+        "J-884 Shopfit",
+        [
+          "0.0",
+          "4.0",
+          "0.0",
+          "0.0",
+          "0.0"
+        ]
+      ],
+      [
+        "E-021",
+        "J-884 Shopfit",
+        [
+          "7.5",
+          "8.0",
+          "8.0",
+          "8.0",
+          "7.0"
+        ]
+      ]
     ],
     "outputs": [
-      ["Payroll", "3 employees posted"],
-      ["Job costing", "2 jobs updated"]
+      [
+        "Payroll",
+        "3 employees posted"
+      ],
+      [
+        "Job costing",
+        "2 jobs updated"
+      ]
     ],
     "foot": "Entered on the floor, the same day."
   },
   "008": {
     "kind": "system-sync",
-    "systems": ["Orders", "Stock", "MYOB"],
+    "systems": [
+      "Orders",
+      "Stock",
+      "MYOB"
+    ],
     "stamp": "Synced 05:40 AEST",
     "rows": [
-      ["SO-7738", true, true, true],
-      ["SO-7739", true, true, true],
-      ["SO-7740", true, true, true],
-      ["SO-7741", true, false, true],
-      ["SO-7742", true, true, true],
-      ["SO-7743", true, true, true],
-      ["SO-7745", true, true, false]
+      [
+        "SO-7738",
+        true,
+        true,
+        true
+      ],
+      [
+        "SO-7739",
+        true,
+        true,
+        true
+      ],
+      [
+        "SO-7740",
+        true,
+        true,
+        true
+      ],
+      [
+        "SO-7741",
+        true,
+        false,
+        true
+      ],
+      [
+        "SO-7742",
+        true,
+        true,
+        true
+      ],
+      [
+        "SO-7743",
+        true,
+        true,
+        true
+      ],
+      [
+        "SO-7745",
+        true,
+        true,
+        false
+      ]
     ],
-    "exceptions": ["SO-7741: stock short by 3", "SO-7745: price differs from the order"],
+    "exceptions": [
+      "SO-7741: stock short by 3",
+      "SO-7745: price differs from the order"
+    ],
     "foot": "5 in step. 2 exceptions listed for a person."
   },
   "009": {
@@ -151,14 +416,82 @@
     "title": "Tender",
     "ref": "T-031",
     "pages": 60,
-    "parts": ["Structure", "Messaging", "Page templates", "Answer library"],
+    "parts": [
+      "Structure",
+      "Messaging",
+      "Page templates",
+      "Answer library"
+    ],
     "foot": "60 pages from one library."
   },
   "010": {
     "kind": "letterhead-system",
     "title": "Template system",
     "master": "Identity rules",
-    "templates": ["Letterhead", "Report", "Intake form", "Signage"],
+    "templates": [
+      "Letterhead",
+      "Report",
+      "Intake form",
+      "Signage"
+    ],
     "foot": "Everything drawn from one set of rules."
+  },
+  "011": {
+    "kind": "report-table",
+    "title": "Product catalogue",
+    "stamp": "Saved 10:42",
+    "columns": [
+      "Product",
+      "Unit",
+      "Price",
+      "Status"
+    ],
+    "rows": [
+      [
+        "River pebble 20mm",
+        "m3",
+        "$118.00",
+        "Live"
+      ],
+      [
+        "Garden mix",
+        "m3",
+        "$74.00",
+        "Live"
+      ],
+      [
+        "Hardwood sleeper 2.4m",
+        "each",
+        "$46.50",
+        "Live"
+      ],
+      [
+        "Crusher dust",
+        "m3",
+        "$58.00",
+        "Live"
+      ],
+      [
+        "Sandstone block B grade",
+        "each",
+        "$92.00",
+        "Draft"
+      ]
+    ],
+    "source": "Edited in the office",
+    "foot": "On the site the same day."
+  },
+  "012": {
+    "kind": "letterhead-system",
+    "title": "Capability statement and collateral",
+    "master": "One current version",
+    "templates": [
+      "Capability statement",
+      "Brochure",
+      "Project sheet",
+      "Project sheet"
+    ],
+    "left": "One family",
+    "foot": "Everyone sends the same one."
   }
 }

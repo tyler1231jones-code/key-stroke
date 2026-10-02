@@ -1,0 +1,39 @@
+---
+// The crew: five AI agents, each with a name and a drawn avatar, and each
+// plainly labelled as an AI agent. They are never presented as human staff.
+import Base from '../layouts/Base.astro';
+import CrewCard from '../components/CrewCard.astro';
+import { site, crew, agentTotal } from '../lib/data';
+import { dateInZone } from '../lib/ledger';
+import { words } from '../lib/format';
+import '../styles/pages.css';
+
+const today = dateInZone(site.timezone);
+const widest = Math.max(0, ...crew.map((a) => agentTotal(a.unit, today)));
+---
+<Base
+  title="The crew"
+  description={`Our crew is ${words(crew.length)} AI agents. They do the overnight work, and we check it.`}
+  current="crew"
+  page="crew"
+>
+  <section class="page-head">
+    <div class="wrap">
+      <h1 class="display-xl load-in">Meet the crew.</h1>
+      <p class="lede load-in" style="--i:1">Our crew is {words(crew.length)} AI agents. They do the overnight work, and we check it.</p>
+      <p class="body-s muted load-in" style="--i:1">A keystroke is one thing a person had to type or click.</p>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="wrap">
+      <div class="cards cards-3">
+        {crew.map((a) => <CrewCard agent={a} onDate={today} widest={widest} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/page.ts';
+</script>

@@ -6,20 +6,14 @@ import { createStage, type SceneFactory } from './stage';
 import { bootStill, type StillDef } from './still';
 import { fontFamily } from './tokens';
 import { heroScene } from './scenes/hero';
-import { countScene } from './scenes/count';
-import { caseScene } from './scenes/case';
 import { auditScene } from './scenes/audit';
-import { usScene } from './scenes/us';
-import { practiceScene } from './scenes/practice';
+import { serviceScene } from './scenes/service';
 import { bus } from '../scripts/bus';
 
 const SCENES: Record<string, { factory: SceneFactory; still?: boolean }> = {
   hero: { factory: heroScene },
-  count: { factory: countScene },
-  case: { factory: caseScene },
-  audit: { factory: auditScene, still: false },
-  us: { factory: usScene },
-  practice: { factory: practiceScene },
+  audit: { factory: auditScene },
+  service: { factory: serviceScene },
 };
 
 function noStage(): void {
@@ -27,7 +21,7 @@ function noStage(): void {
   document.documentElement.classList.add('no-stage', 'no-webgl');
 }
 
-export async function bootStage(_page: string): Promise<void> {
+export async function bootStage(): Promise<void> {
   const canvas = document.getElementById('stage') as HTMLCanvasElement | null;
   if (!canvas) return;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -35,13 +29,13 @@ export async function bootStage(_page: string): Promise<void> {
 
   // Textures are drawn with the page's own faces, so wait for the ones they use.
   await Promise.all([
-    document.fonts.load(`600 64px ${fontFamily('body')}`, 'KTV0123456789'),
+    document.fonts.load(`600 64px ${fontFamily('body')}`, 'K0123456789'),
     document.fonts.load(`500 64px ${fontFamily('data')}`, '0123456789'),
   ]).catch(() => {});
 
   const defs: StillDef[] = [];
-  document.querySelectorAll<HTMLElement>('[data-scene], .case[data-object]').forEach((el) => {
-    const key = el.dataset.scene ?? 'case';
+  document.querySelectorAll<HTMLElement>('[data-scene]').forEach((el) => {
+    const key = el.dataset.scene ?? '';
     const def = SCENES[key];
     if (def) defs.push({ el, factory: def.factory, still: def.still });
   });

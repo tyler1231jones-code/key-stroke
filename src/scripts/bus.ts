@@ -1,15 +1,11 @@
-// What the HTML choreography tells the 3D scenes. The section scripts write
+// What the HTML choreography tells the 3D scenes. The page scripts write
 // scroll progress and triggered values here; the scenes read them. The stage
 // registers invalidate() so a triggered tween can ask for a frame.
 
 export const bus = {
   hero: { p: 0, press: 0 },
-  count: { p: 0 },
   audit: { p: 0 },
-  us: { press: [0, 0] as [number, number] },
-  practice: { p: 0 },
-  /** Progress of each case through the viewport, by case id. */
-  cases: {} as Record<string, number>,
+  service: { p: 0 },
   invalidate: () => {},
 };
 
@@ -24,10 +20,8 @@ export const HERO = {
   roll: 0.82,
 };
 
+/** Audit beats: the stack clears, then the last sheet turns to face the visitor. */
 export const AUDIT = {
-  clear: [0.04, 0.5] as const,
-  turn: [0.5, 0.68] as const,
-  print: 0.68,
-  fields: 0.76,
-  next: 0.84,
+  clear: [0.06, 0.62] as const,
+  turn: [0.62, 0.94] as const,
 };

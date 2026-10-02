@@ -1,6 +1,9 @@
 [
   {
     "unit": "01",
+    "name": "Tilly",
+    "role": "Matches your accounts overnight",
+    "character": "Tilly checks every bank line against the books before anyone is awake. Tilly likes things to add up.",
     "verb": "Reconcile",
     "function": "Matches bank lines and records between systems. Does not post a journal or approve a payment.",
     "start": "02:00",
@@ -21,6 +24,9 @@
   },
   {
     "unit": "02",
+    "name": "Ivy",
+    "role": "Turns forms into jobs and invoices",
+    "character": "Ivy takes each form your team submits and writes the job, the invoice draft or the work order from it.",
     "verb": "Intake",
     "function": "Turns submitted forms into jobs, invoice drafts and work orders. Does not contact a customer.",
     "start": "03:10",
@@ -41,6 +47,9 @@
   },
   {
     "unit": "03",
+    "name": "Paige",
+    "role": "Builds your reports by morning",
+    "character": "Paige puts the reporting pack together overnight, so it is waiting when you sit down.",
     "verb": "Report",
     "function": "Builds the reporting packs from source. Does not change a figure.",
     "start": "04:00",
@@ -61,6 +70,9 @@
   },
   {
     "unit": "04",
+    "name": "Drew",
+    "role": "Writes the first draft",
+    "character": "Drew drafts every quote and document from one record. You read it and press send.",
     "verb": "Draft",
     "function": "Drafts quotes and documents from one record. Does not send anything.",
     "start": "03:40",
@@ -79,6 +91,9 @@
   },
   {
     "unit": "05",
+    "name": "Link",
+    "role": "Keeps your systems in step",
+    "character": "Link keeps your systems matching each other and lists anything that does not.",
     "verb": "Sync",
     "function": "Keeps records in step between systems and lists the exceptions. Does not resolve an exception.",
     "start": "05:40",

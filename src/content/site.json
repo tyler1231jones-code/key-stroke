@@ -2,6 +2,10 @@
   "demo": true,
   "name": "KEYSTROKE",
   "tagline": "Let us push the buttons for you.",
+  "description": "We find the admin your team does by hand and rebuild it so it runs itself. Then we build the reports, the software, the website and the brand to go with it.",
+  "origin": "Australian owned and operated.",
+  "yearsExperience": "TODO",
+  "experienceLine": "{years} years building systems, software and brands for Australian businesses.",
   "principals": [
     "Kieran",
     "Tyler"
@@ -9,6 +13,11 @@
   "email": "TODO",
   "bookingUrl": "TODO",
   "domain": "TODO",
+  "featuredCases": [
+    "002",
+    "003",
+    "011"
+  ],
   "logotype": "drum",
   "timezone": "Australia/Brisbane"
 }

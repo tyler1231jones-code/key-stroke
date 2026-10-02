@@ -1,0 +1,90 @@
+---
+// One case in full: the problem, what we built, the result, the build
+// running, what a build like it costs, and one button.
+import Base from '../../layouts/Base.astro';
+import Counter from '../../components/Counter.astro';
+import Artefact from '../../components/Artefact.astro';
+import BookButton from '../../components/BookButton.astro';
+import Fig from '../../components/Fig.astro';
+import { cases, service } from '../../lib/data';
+import { num, sentenceCase } from '../../lib/format';
+import '../../styles/pages.css';
+
+export function getStaticPaths() {
+  return cases.map((c) => ({ params: { id: c.id }, props: { item: c } }));
+}
+
+const { item } = Astro.props;
+const s = service(item.service);
+const who = item.descriptor.split(' · ')[0];
+const keystrokes = /keystroke/.test(item.before.unit);
+---
+<Base
+  title={`${who}: ${sentenceCase(item.headline).replace(/\.$/, '')}`}
+  description={`${item.wrong} ${item.summary}`}
+  current="cases"
+  page="case"
+>
+  <article>
+    <section class="page-head">
+      <div class="wrap">
+        <p class="body-s muted load-in">{item.descriptor}</p>
+        <h1 class="display-xl case-h load-in"><Fig text={item.headline} /></h1>
+        <p class="load-in" style="--i:1"><a class="tag" href={`/services/${s.slug}`}>{s.name}</a></p>
+      </div>
+    </section>
+
+    <section class="page-body">
+      <div class="wrap case-detail">
+        <div class="case-story">
+          <div class="case-block" data-reveal>
+            <h2 class="display-s">The problem</h2>
+            <p class="body"><Fig text={item.wrong} /></p>
+          </div>
+          <div class="case-block" data-reveal>
+            <h2 class="display-s">What we built</h2>
+            <p class="body"><Fig text={item.built} /></p>
+          </div>
+          <div class="case-block" data-reveal>
+            <h2 class="display-s">The result</h2>
+            <dl class="case-result">
+              <div>
+                <dt class="unit">Before</dt>
+                <dd>
+                  <div class="case-fig"><span class="counter-m">{num(item.before.value)}</span><span class="unit">{item.before.unit}</span></div>
+                  <p class="body-s"><Fig text={item.before.note} /></p>
+                </dd>
+              </div>
+              <div>
+                <dt class="unit">After</dt>
+                <dd>
+                  <div class="case-fig"><Counter value={item.after.value} widest={item.before.value} size="m" data-roll data-from={item.before.value} /><span class="unit">{item.after.unit}</span></div>
+                  <p class="body-s"><Fig text={item.after.note} /></p>
+                </dd>
+              </div>
+            </dl>
+            {keystrokes && <p class="body-s muted">A keystroke is one thing a person had to type or click.</p>}
+          </div>
+        </div>
+
+        <div class="case-art" data-reveal>
+          <Artefact caseId={item.id} />
+          <p class="unit">An illustration of the build running, with sample data.</p>
+        </div>
+
+        <div class="case-cost" data-reveal>
+          <h2 class="display-s">What a build like this costs</h2>
+          <p class="price"><span class="counter-m">{item.costRange}</span></p>
+          <BookButton />
+        </div>
+      </div>
+      <div class="wrap">
+        <a class="more" href="/cases">See all cases</a>
+      </div>
+    </section>
+  </article>
+</Base>
+
+<script>
+  import '../../scripts/cases.ts';
+</script>

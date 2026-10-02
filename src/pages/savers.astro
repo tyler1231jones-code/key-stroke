@@ -1,0 +1,39 @@
+---
+// Keystroke Savers: what it is in one sentence, three plans, and what every
+// plan includes.
+import Base from '../layouts/Base.astro';
+import TierCard from '../components/TierCard.astro';
+import Fig from '../components/Fig.astro';
+import { products } from '../lib/data';
+import '../styles/pages.css';
+
+const savers = products.savers;
+---
+<Base title="Keystroke Savers" description={savers.what} current="savers" page="savers">
+  <section class="page-head">
+    <div class="wrap">
+      <h1 class="display-xl load-in">Keystroke Savers.</h1>
+      <p class="lede load-in" style="--i:1">{savers.what}</p>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="wrap">
+      <p class="savers-label" data-reveal><span class="tag">{savers.label}</span><span class="body-s">{savers.foundationNote}</span></p>
+      <div class="cards cards-3">
+        {savers.tiers.map((t, i) => <TierCard tier={t} level="h2" index={i} />)}
+      </div>
+      <div class="savers-incl" data-reveal>
+        <h2 class="display-m">Every plan includes</h2>
+        <ul class="ticks">
+          {savers.includes.map((line) => <li>{line}</li>)}
+          <li>A reply within <Fig text={savers.response} /></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/page.ts';
+</script>

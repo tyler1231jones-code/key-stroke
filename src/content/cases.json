@@ -2,9 +2,11 @@
   {
     "id": "001",
     "practice": "count",
+    "service": "reporting",
     "businessType": "Trades and construction",
     "descriptor": "Mechanical contractor · 22 staff · Toowoomba",
     "headline": "NOBODY KNOWS WHAT A JOB MADE UNTIL IT IS FINISHED.",
+    "summary": "The job-cost report now builds itself overnight from the job system and the accounts.",
     "wrong": "Job costs were retyped from the job system into a spreadsheet once a month, four days after the month closed.",
     "built": "An API pipeline from simPRO and Xero into a Power BI model. The job-cost pack builds itself overnight.",
     "before": {
@@ -28,9 +30,11 @@
   {
     "id": "002",
     "practice": "clear",
+    "service": "automation",
     "businessType": "Trades and construction",
     "descriptor": "Electrical contractor · 14 staff · Geelong",
     "headline": "THE INVOICES GET TYPED TWICE.",
+    "summary": "The completed job form now writes the invoice draft and sends it for approval.",
     "wrong": "Every job sheet was typed once into the job system and again into the accounts.",
     "built": "A Power Automate flow. The completed job form writes the invoice draft in Xero and routes it for approval.",
     "before": {
@@ -54,9 +58,11 @@
   {
     "id": "003",
     "practice": "count",
+    "service": "reporting",
     "businessType": "Professional services",
     "descriptor": "Accounting practice · 9 staff · Ballarat",
     "headline": "MONTH-END TAKES FOUR DAYS.",
+    "summary": "Bank lines are matched overnight and the client packs build from the result.",
     "wrong": "Bank lines were matched by eye and client packs were assembled by copying between workbooks.",
     "built": "A reconciliation agent, an Excel system built to hold, and a pack generator that reads from both.",
     "before": {
@@ -80,9 +86,11 @@
   {
     "id": "004",
     "practice": "clear",
+    "service": "automation",
     "businessType": "Transport and logistics",
     "descriptor": "Freight operator · 38 staff · Townsville",
     "headline": "THE QUOTE LIVES IN FOUR PLACES.",
+    "summary": "One quote record now writes the PDF and tells the other three systems.",
     "wrong": "A quote was written in Word, then retyped into the job board, the accounts and the customer email.",
     "built": "One quote record in a SharePoint list. Document generation writes the PDF and Power Automate tells the other three.",
     "before": {
@@ -106,9 +114,11 @@
   {
     "id": "005",
     "practice": "build",
+    "service": "web-software",
     "businessType": "Manufacturing",
     "descriptor": "Joinery manufacturer · 17 staff · Newcastle",
     "headline": "TIMESHEETS ARRIVE ON PAPER ON FRIDAY.",
+    "summary": "Hours are entered once on the floor and feed payroll and job costing.",
     "wrong": "Paper timesheets were typed into payroll and typed again against each job.",
     "built": "A time-tracking web app on Cloudflare. Hours are entered once on the floor and feed payroll and job costing.",
     "before": {
@@ -132,9 +142,11 @@
   {
     "id": "006",
     "practice": "build",
+    "service": "web-software",
     "businessType": "Property",
     "descriptor": "Property manager · 11 staff · Bendigo",
     "headline": "EVERY MAINTENANCE REQUEST IS AN EMAIL SOMEBODY RETYPES.",
+    "summary": "The tenant fills in one form, which writes the work order, the booking and the owner notice.",
     "wrong": "Tenant emails were read, then retyped as a work order, a tradesperson booking and an owner notice.",
     "built": "An intake form and a small web app. The request writes the work order, the booking and the notice.",
     "before": {
@@ -158,9 +170,11 @@
   {
     "id": "007",
     "practice": "count",
+    "service": "reporting",
     "businessType": "Professional services",
     "descriptor": "Civil engineering consultancy · 31 staff · Wollongong",
     "headline": "PROJECT HOURS ARE KNOWN SIX WEEKS LATE.",
+    "summary": "A daily report of project hours now lands before work starts.",
     "wrong": "Timesheets were exported, cleaned by hand and pasted into a project workbook after invoicing.",
     "built": "An API pipeline from the timesheet system into Power BI project analytics. A daily report lands before work starts.",
     "before": {
@@ -184,9 +198,11 @@
   {
     "id": "008",
     "practice": "clear",
+    "service": "automation",
     "businessType": "Wholesale",
     "descriptor": "Wholesale distributor · 26 staff · Launceston",
     "headline": "THREE SYSTEMS. ONE PERSON COPYING BETWEEN THEM.",
+    "summary": "The three systems are kept in step overnight, with a list of anything that does not match.",
     "wrong": "Orders, stock and accounts were kept in step by one person copying and pasting each afternoon.",
     "built": "An integration between the order system, the inventory system and MYOB. An agent syncs them overnight and lists the exceptions.",
     "before": {
@@ -210,9 +226,11 @@
   {
     "id": "009",
     "practice": "face",
+    "service": "brand-design",
     "businessType": "Trades and construction",
     "descriptor": "Builder · 19 staff · Mackay",
     "headline": "3 WEEKS PER TENDER. EACH ONE STARTS FROM THE LAST.",
+    "summary": "A tender system the business owns: structure, messaging, page templates and a library of answers.",
     "wrong": "Each tender was assembled from the previous one, in Word, over three weeks.",
     "built": "A tender system: structure, messaging, page templates and a library of answers the business owns.",
     "before": {
@@ -236,9 +254,11 @@
   {
     "id": "010",
     "practice": "face",
+    "service": "brand-design",
     "businessType": "Health",
     "descriptor": "Allied health clinic · 12 staff · Albury",
     "headline": "THE BUSINESS GREW. THE LETTERHEAD DID NOT.",
+    "summary": "One identity and one set of templates, all drawn from the same rules.",
     "wrong": "14 document templates, made by different people over ten years, none matching.",
     "built": "One identity and one template system: letterhead, reports, forms and signage drawn from the same rules.",
     "before": {
@@ -256,6 +276,62 @@
     "scope": "Identity and document system",
     "goLive": "2026-07-20",
     "artefact": "letterhead-system",
+    "object": "sheet",
+    "demo": true
+  },
+  {
+    "id": "011",
+    "practice": "build",
+    "service": "web-software",
+    "businessType": "Trades and construction",
+    "descriptor": "Landscape supplier · 16 staff · Sunshine Coast",
+    "headline": "EVERY WEBSITE CHANGE WAITS ON A DEVELOPER.",
+    "summary": "A new website on Cloudflare with a product catalogue the office edits itself.",
+    "wrong": "Prices and products were out of date because nobody in the office could edit the site.",
+    "built": "A new website on Cloudflare with a product catalogue the office edits itself.",
+    "before": {
+      "value": 9,
+      "unit": "days to change a page",
+      "note": "Sent to a developer, then chased."
+    },
+    "after": {
+      "value": 1,
+      "unit": "day",
+      "note": "Changed in the office."
+    },
+    "crewUnit": null,
+    "costRange": "$6,000–$12,000",
+    "scope": "Website and product catalogue",
+    "goLive": "2026-08-10",
+    "artefact": "site-editor",
+    "object": "sheet",
+    "demo": true
+  },
+  {
+    "id": "012",
+    "practice": "face",
+    "service": "brand-design",
+    "businessType": "Trades and construction",
+    "descriptor": "Civil contractor · 45 staff · Rockhampton",
+    "headline": "4 CAPABILITY STATEMENTS IN CIRCULATION. NONE CURRENT.",
+    "summary": "One capability statement, a brochure and a set of project sheets, designed as a family and kept in one place.",
+    "wrong": "Each estimator kept a different version of the capability statement and edited it for every bid.",
+    "built": "One capability statement, a brochure and a set of project sheets, designed as a family and kept in one place.",
+    "before": {
+      "value": 4,
+      "unit": "versions in circulation",
+      "note": "All different."
+    },
+    "after": {
+      "value": 1,
+      "unit": "version",
+      "note": "Everyone sends the same one."
+    },
+    "crewUnit": null,
+    "costRange": "$2,500–$4,000",
+    "scope": "Capability statement and collateral",
+    "goLive": "2026-08-24",
+    "artefact": "collateral-set",
     "object": "sheet",
     "demo": true
   }

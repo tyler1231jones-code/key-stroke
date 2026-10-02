@@ -191,7 +191,7 @@ const step = () => ++s;
             </div>
           ))}
         </div>
-        <footer class="art-foot plate"><span>{a.templates.length} templates shown</span><span data-step={step()}>{a.foot}</span></footer>
+        <footer class="art-foot plate"><span>{a.left ?? `${a.templates.length} templates shown`}</span><span data-step={step()}>{a.foot}</span></footer>
       </>
     )}
   </figure>

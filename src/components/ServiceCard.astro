@@ -1,0 +1,27 @@
+---
+// One of the four services, all at equal size and weight. The short form is
+// the homepage card; `full` adds the three examples for the services page.
+import ServiceIcon from './ServiceIcon.astro';
+import type { Service } from '../lib/data';
+
+interface Props {
+  item: Service;
+  full?: boolean;
+  level?: 'h2' | 'h3';
+  index?: number;
+}
+const { item, full = false, level = 'h3', index = 0 } = Astro.props;
+const H = level;
+---
+<article class="card scard" data-reveal style={`--i:${index}`}>
+  <ServiceIcon slug={item.slug} />
+  {full && <p class="plate muted">{item.practiceName}</p>}
+  <H class="display-m"><a class="card-link" href={`/services/${item.slug}`}>{item.name}</a></H>
+  <p class="body">{item.line}</p>
+  {full ? (
+    <ul class="scard-examples">
+      {item.examples.map((e) => <li>{e}</li>)}
+    </ul>
+  ) : <span></span>}
+  <p class="scard-go" aria-hidden="true">See the service</p>
+</article>

@@ -11,12 +11,14 @@
     "preview": "astro preview",
     "check": "node tools/check.mjs",
     "check:types": "astro check",
+    "qa": "node tools/qa.mjs",
+    "ready": "node tools/predeploy.mjs",
     "shots": "node tools/shots.mjs",
+    "tour": "node tools/tour.mjs",
     "stills": "node tools/stills.mjs",
     "ledger": "node tools/verify-ledger.mjs",
-    "deploy": "astro build && node tools/check.mjs && wrangler deploy",
-    "astro": "astro",
-    "qa": "node tools/qa.mjs"
+    "deploy": "node tools/predeploy.mjs && astro build && node tools/check.mjs && wrangler deploy",
+    "astro": "astro"
   },
   "dependencies": {
     "@fontsource/archivo": "^5.3.0",

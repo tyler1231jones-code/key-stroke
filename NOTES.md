@@ -1,368 +1,356 @@
-# NOTES
+# Notes on the build
 
-Decisions made during the build, copy that needs the principals' approval,
-and what is still open. Written 2 October 2026.
+2 October 2026. This file covers revision 1 (`docs/revision-1.md`). The plan
+it followed is `REVISION-PLAN.md`. The state before the revision is commit
+`1d33a55`, "Before revision 1". **The revision itself is not committed**: it
+is in the working folder, waiting for you to look at it.
 
-## 1. State of the build
+The notes from the first build (machine and tools, packages, its decisions)
+are in that commit: `git show 1d33a55:NOTES.md`.
 
-- All eight homepage sections, the four practice pages, `/counting`, `/quiz`
-  and the 404 are built. `npm run build`, `npm run check`, `npm run qa` and
-  `npm run check:types` pass.
-- Homepage figure on the build date: `146,700`, from `138,200` seven days
-  earlier, delta `8,500`. Unit totals `14,000` / `47,800` / `33,500` /
-  `34,600` / `16,500`. `npm run ledger` prints them for any date.
-- Not done by me, by instruction: `wrangler login`, `wrangler deploy`, any
-  install outside the project, any account.
-- `git init` has been run, so the folder is a repository. Nothing has been
-  committed: the first commit is yours. The kit zip and the two top-level
-  PDFs are untracked duplicates of what is in `docs/`.
+## 1. Where things stand
 
-## 2. Machine and tools
+- `npm run build`, `npm run check`, `npm run check:types` and `npm run qa` pass.
+- The site has 25 pages: the homepage, `/services` and four service pages,
+  `/cases` and twelve case pages, `/audit`, `/crew`, `/savers`, `/quiz`,
+  `/counting` and the 404. The four old `/practice/*` addresses redirect.
+- All content is still mock. The pages no longer say so. `npm run deploy`
+  refuses to run until the mock content is replaced (section 6).
+- Nothing was deployed, and nobody has logged in to Cloudflare.
 
-| Tool | Found | Consequence |
+## 2. What changed, page by page
+
+**Homepage.** Was eight long sections, about 2,400 words. Now a short sales
+page of about 490 words: hero, four proof figures, four service cards, the
+audit in three steps with its price, three featured cases, the crew row,
+three Savers plans, a quiz band, and "Australian owned and operated".
+
+- Hero: the key is a K, in the 3D key, the drawn stand-in and every still.
+  The supporting copy is the one-sentence description. The audience line is
+  gone. Two 56px buttons: "Take the 90-second quiz" and "Book the audit".
+  On first load in a browser session the header, the headline line by line,
+  the sentence, the buttons and the key arrive over about 1.2 seconds.
+- The hero scroll sequence is unchanged apart from the K. I compared ten
+  frames at the same scroll positions before and after
+  (`shots/hero-compare.png`): the pull-back, the typed field, the row-by-row
+  drop, the counter rolling from 138,200 to 146,700 and the push back in all
+  match. Two small consequences of the taller copy block are in section 4.
+- Proof strip: the drum scene and the travelling reels are gone. Four
+  counters sit in place and roll once when reached. Each has a label in
+  words, such as "keystrokes a year a wholesale distributor no longer types".
+- Removed: the ten full cases and their 3D objects, the two-row filter bar,
+  the parallax interlude, the pinned audit sequence, the practice
+  mechanisms, the punched tape, the tally marks, and "the two of us" with
+  its K and T keys.
+
+**Services** (was Practices). `/services` has four equal cards. Each service
+page has one sentence, three examples, two cases, the three price ranges and
+one button. Each keeps one small scroll moment in its hero: the forms stack
+clears, the drums roll from before to after, the key field thins out, the
+sheet squares up. The practice name stays as a small label.
+
+**Cases.** `/cases` is a grid of twelve cards with one filter row by service.
+Every card has five things: who, the problem, what we did, before and after
+with units in words, and a service tag. The after figure rolls from the
+before figure when the card is reached. `/cases/[id]` holds the depth: the
+problem, what we built, the result, the illustration of the build running,
+"What a build like this costs", and one button. Cases 011 (website) and 012
+(capability statement) are added.
+
+**Audit.** Four blocks in the order asked: what it is, how it works in three
+steps, the sample report cut to three labelled parts and the quote, and the
+price with one button and "What happens next". The stack of forms is the
+set piece at the top, shortened from three screens of scrolling to under one.
+The page ends on the booking block, `/audit#book`.
+
+**Crew.** Five cards: a drawn avatar, the name, the tag `AI agent`, the role,
+the line of character, when the agent works, and a running total labelled in
+words. The punched tape, unit numbers, plate strip and "Not a person." are
+gone.
+
+**Savers.** One sentence, the foundation note beside its label, three plan
+cards with price, hours and who each suits, then what every plan includes.
+
+**Quiz.** In the header, and the primary button everywhere. The result is
+three parts: the read, the items to fix in order, the next step. The size
+wording and the under-five rule are gone; "Buy nothing yet" appears only
+when no item qualifies. "Next" is hidden until a question is answered, so no
+control is ever shown disabled.
+
+**Counting.** Out of the header, linked from the footer. A three-part plain
+summary comes first. The full method, word for word, is folded beneath it.
+The ledger table follows, with the rounding notice.
+
+**Every page.** New header (Services, Cases, Audit, Crew, Savers, Quiz, and a
+key-shaped "Book the audit"). New footer: logotype and description, the four
+services, company links, contact, "Australian owned and operated", copyright.
+A closing band with one sentence and the two buttons. No demo plates, no
+`TODO`, no stand-in notice, no case or unit numbers as headings.
+
+### Words on each page
+
+Counted from the built pages: text a visitor can read in `<main>`.
+
+| Page | Before | After | Fewer |
+|---|---|---|---|
+| Home | 2,413 | 492 | 80% |
+| Automation (was Clear) | 604 | 191 | 68% |
+| Reporting (was Count) | 668 | 203 | 70% |
+| Websites and software (was Build) | 470 | 181 | 61% |
+| Branding (was Face) | 375 | 165 | 56% |
+| Counting, as first seen | 746 | 360 | 52% |
+| Quiz result, same answers | 265 | 208 | 22% |
+| 404 | 46 | 31 | 33% |
+
+Two pages miss the "at least half" target. The quiz result is mostly the
+visitor's own answers read back, plus up to three item names; I cut the
+estimate, the cost lines and the closing paragraph and stopped there. The
+404 has 15 words of its own; the other 16 are the closing band.
+
+## 3. What each page is for, and the one thing it asks
+
+Answered after reading the after screenshots (`shots/after/`) beside the
+before set (`shots/before/`), at 1440×900 and 390×844.
+
+| Page | A first-time visitor would say it is for | The one thing it asks |
 |---|---|---|
-| Node 24.15, git, Edge | yes | |
-| Playwright Chromium rev 1243 | already in `ms-playwright`, and it is the build `@playwright/test` 1.63.0 expects | No browser download was needed |
-| ffmpeg | **no** | No loops or frame sequences encoded |
-| Blender | **no** | **Every 3D object is real-time three.js.** No offline render exists |
+| Home | "They take the admin work off a business, then build its software, website and brand." | Take the 90-second quiz |
+| Services | "The four things they do." | Pick the one that sounds like your problem |
+| A service page | "What this service is, what it looks like, and what it costs." | Book the audit |
+| Cases | "Jobs they have done, with the number before and after." | Open a case |
+| A case | "What was wrong for one business, what they built, and what changed." | Book the audit |
+| Audit | "How I start: they count one process and give me a report and a quote for $1,500." | Book the audit |
+| Crew | "The AI agents that do the overnight work." | Start with the quiz, or book the audit (closing band) |
+| Savers | "A monthly plan to keep what they built running." | Start with the quiz, or book the audit (closing band) |
+| Quiz | "Nine questions to find out what I should fix first." | Answer the question on screen; on the result, book the audit |
+| Counting | "How they count, so I can check their figures." | Start with the quiz, or book the audit (closing band) |
+| 404 | "That address has no page." | Go to the homepage |
 
-I asked once whether to install ffmpeg and Blender and carried on without
-them. The hooks are in place: `tools/blender/` (starter script, unrun, and the
-pipeline), `public/renders/`, `public/models/`, and `src/content/assets.json`,
-which swaps any library object for a render or a GLB with no scene change.
+Crew, Savers and Counting inform rather than sell, so their only action is
+the closing band. That is deliberate, not an omission.
 
-The kit arrived as `keystroke-build-kit.zip` in the project folder, not
-unpacked. I unpacked it in place (no file was overwritten). The two PDFs now
-exist both at the top of the folder and in `docs/`; the top-level copies and
-the zip can be deleted.
+## 4. Decisions where the revision left room
 
-### Packages
+1. **The hero sentence names all four services.** Section 11 of the revision
+   gives the description as "...Then we build the software, the website and
+   the brand to go with it." Section 5 says to name all four services in the
+   hero sentence, and that wording leaves out reporting. I added two words:
+   "Then we build **the reports,** the software, the website and the brand to
+   go with it." To go back, edit `description` in `src/content/site.json`.
+2. **Featured cases:** 002 (automation, electrical contractor), 003
+   (reporting, accounting practice) and 011 (website, landscape supplier).
+   Three services, three kinds of business. Change `featuredCases` in
+   `site.json`.
+3. **Book the audit goes to `/audit#book`.** That block is the audit page's
+   closing band. It shows a "Choose a time" button once `bookingUrl` is set
+   and the email address once `email` is set. Until then it shows the
+   sentence and the quiz button only, so today it is a dead end for someone
+   ready to book. The deploy guard does not let the site go live in that state.
+4. **The closing band** is on every page except two. The homepage ends as
+   section 3 of the revision sets out (quiz band, origin line). The quiz has
+   no band, because a "take the quiz" button on the quiz makes no sense and
+   its result already ends on the next step.
+5. **Quiz exits are no longer equal.** The build brief asked for three exits
+   at equal weight. The revision asks for one next step, so "Book the audit"
+   is primary and "Email me this" is secondary. "Ask a question about it"
+   needs the email address, so it is left out until `email` is set.
+6. **Quiz estimate kept, shortened.** It is one figure with its label
+   ("hours a year a business your size typically loses to typing things
+   twice. An estimate."). It still depends on the size answer, but no longer
+   says who the service is for.
+7. **Crew avatars are keycap-headed characters.** A keycap for a head makes
+   them friendly and plainly not people, which is the limit the business
+   plan sets. Each differs by one prop tied to the job: Tilly's eyeshade,
+   Ivy's clip and form, Paige's glasses and chart, Drew's pencil, Link's
+   aerial and chain. The tag `AI agent` is on every card and the check fails
+   without it. None of the crew copy uses "he", "she" or "it".
+8. **One sentence per case card.** Several `built` fields are two sentences,
+   so each case has a new `summary` field for the card (listed in section 5).
+9. **Service pages show two cases, not three,** to keep each page under half
+   its old length. "See all cases" opens `/cases` filtered to that service.
+10. **The counting method is folded, not cut.** The published text is intact
+    inside "The full counting method". A visitor sees the short summary first.
+11. **Reveals and figure rolls play once.** Before, most motion undid itself
+    when scrolling back up. Only the hero sequence still scrubs both ways.
+12. **The audit page has no scroll reveals.** The revision says nothing on
+    that page moves except the set piece and rolling figures, so its blocks
+    are simply there.
+13. **Two consequences of the taller hero copy.** The headline and its two
+    buttons take more room than the old headline alone. (a) The field keeps
+    clear of the copy, so a few keys at the lower left of the field no longer
+    appear. (b) On a window shorter than 860px the headline is set at 64px
+    instead of 88px, and the pinned sequence now needs a window at least
+    700px tall (it was 600px); below that the hero flows as it does on a
+    phone.
+14. **Build-brief rules that still hold:** blank counter cells are not
+    zeros, totals round down, and the running mark never shows for demo data.
+15. **`npm run check` no longer rations the word "automation" inside the
+    service's own name,** "Automation and AI agents". Elsewhere it is still
+    allowed once a page.
+16. **Unused 3D removed:** the drum scene on the homepage, the case scenes,
+    the K and T keys, and the keypad and mouse objects.
 
-Every version in `docs/stack.md` resolved and installed together without
-change. One addition: `parse5` (dev), used by `tools/check.mjs` to read text
-nodes from the built pages.
+## 5. Copy awaiting approval
 
-`npm audit` reports two high-severity advisories, both in the copy of `sharp`
-nested inside `@gltf-transform/cli` (a dev-only command-line tool that the
-site does not load). `npm audit fix` is offered. I left it alone because it
-changes a pinned tool; it has no bearing on what is deployed.
+Everything below is new or changed in this revision. The files are
+`src/content/*.json` unless a page is named.
 
-`vite-plugin-glsl` is installed and unused: no scene needed a hand-written
-shader.
+**Supplied in the revision, used as given**
 
-Fonts are imported as the `latin-*.css` files of the plain `@fontsource`
-packages (weights 500 and 600 of Oswald, 400 and 600 of Archivo, 400 and 500
-of IBM Plex Mono), not the full `400.css` to `700.css` set, to keep the CSS
-small. The arrow in the before/after line (U+2192) is not in the latin subset
-of IBM Plex Mono and falls back to the system monospace face.
+- Crew names, roles and character lines: Tilly, Ivy, Paige, Drew, Link (`crew.json`).
+- Savers "suits" lines and the foundation note (`products.json`).
+- The audit sentence, the Savers sentence, the crew sentence, the cases sentence.
 
-## 3. Decisions and interpretations
+**Supplied, then changed by me**
 
-Where the brief left a choice, or could not be done as written, this is what
-was done.
+- Hero sentence: "the reports," added (decision 1).
 
-**Hero**
+**Written by me**
 
-- The opening frame is a macro of the worn `V` key, but the edges of its
-  neighbours are in frame, as they would be in a real macro. By the end of
-  the section they are gone and the key is alone, which is the resting state.
-  The drawn SVG stand-in shows the key alone.
-- The copy owns its corner of the pinned frame. A key that would cross it at
-  any distance of the pull-back is not placed, so the field wraps the copy
-  and no key ever passes under a word. The worn key is therefore the leftmost
-  key of its row.
-- The camera is a perspective camera exactly above the worn key with its lens
-  shifted, so the key stays in its slot while the camera moves along one axis.
-  After the rows drop out it comes straight back in to the macro.
-- The typing wave: the wave front is scrubbed by scroll; each key the front
-  passes is struck in real time (90ms down, 120ms up), so nothing freezes
-  half-pressed when scrolling stops.
-- The delta stamps when the roll begins and is gone 400ms after the roll's
-  180ms, so it is on screen while the digits land.
+- Homepage (`src/pages/index.astro`):
+  - Counter label: "keystrokes our clients have not had to type in 2026"
+  - "We counted." / "A keystroke is one thing a person had to type or click.
+    Each figure is what one business stopped typing after we rebuilt one job."
+  - Figure labels: "keystrokes a year a wholesale distributor no longer types"
+    (and the same for the other three businesses)
+  - "Four things we do." / "It starts with one audit." / "Meet the crew." /
+    "Five AI agents do the overnight work, and we check it."
+  - "Not sure where to start?" / "Answer nine questions and we will tell you
+    what to fix first."
+  - Links: "See how we count", "See how the audit works", "See all cases",
+    "Meet the crew", "Compare the plans"
+- Closing band: "Start with the quiz, or book the audit."
+- Booking block: "Book the audit." / "One process, counted in 1–2 weeks, for
+  $1,500." / "Choose a time" / "Or write to us:"
+- Services (`services.json`):
+  - Automation and AI agents: "We take the work your team does by hand every
+    week and rebuild it so it runs on its own." Examples: Forms that write the
+    job and the invoice; Approvals that route themselves; Systems that update
+    each other overnight.
+  - Reporting and dashboards: "We connect your systems so your reports build
+    themselves and arrive while you can still act on them." Examples: Monthly
+    reporting packs; Job costing while the job is running; Dashboards the
+    whole team can read.
+  - Websites and software: "We build websites you can edit yourself and
+    software shaped to the way your business runs." Examples as given.
+  - Branding and graphic design: "We design the brand, the documents and the
+    print your business sends out." Examples as given.
+  - Page copy: "We do four things. Pick the one that sounds like your
+    problem." / "What we build." / "Jobs like this." / "What it costs." /
+    "Every job starts with the audit, at $1,500. After the audit we quote the
+    build, inside one of three ranges."
+  - Reporting page caption: "What three clients typed in a year to build
+    their reports: 127,200 keystrokes before, 4,600 after."
+- Case summaries (`cases.json`, `summary`):
+  - 001: The job-cost report now builds itself overnight from the job system and the accounts.
+  - 002: The completed job form now writes the invoice draft and sends it for approval.
+  - 003: Bank lines are matched overnight and the client packs build from the result.
+  - 004: One quote record now writes the PDF and tells the other three systems.
+  - 005: Hours are entered once on the floor and feed payroll and job costing.
+  - 006: The tenant fills in one form, which writes the work order, the booking and the owner notice.
+  - 007: A daily report of project hours now lands before work starts.
+  - 008: The three systems are kept in step overnight, with a list of anything that does not match.
+  - 009: A tender system the business owns: structure, messaging, page templates and a library of answers.
+  - 010: One identity and one set of templates, all drawn from the same rules.
+  - 011 and 012 use their `built` sentence as given.
+- Case page: "The problem" / "What we built" / "The result" / "An
+  illustration of the build running, with sample data." Sample rows for the
+  two new cases are in `artefacts.json`.
+- Audit (`products.json`, `audit`): the three step titles are from the
+  revision. Their supporting lines are mine: "Someone does the job once, the
+  usual way, while we record it." / "Every keystroke in it, and how often it
+  happens in a year." / "What it costs you, what to fix first, and what the
+  fix would cost." Also: "A short report and a fixed quote. This is a
+  sample." / "After the audit we quote the build, inside one of three
+  ranges." Report labels: "typed by hand", "of someone's time", "to rebuild
+  this process".
+- Crew card labels: "Works" / "Keystrokes Tilly has saved clients in 2026".
+- Savers: "a month" / "hours of our time each month" / "Every plan includes"
+  / "A reply within 1 business day".
+- Quiz (`quiz.json`):
+  - Estimate: "hours a year a business your size typically loses to typing
+    things twice. An estimate. We would count yours to be sure."
+  - The five closing paragraphs, each cut to one or two sentences:
+    - Trust: "You do not have to trust us yet. The audit ends with a figure you can check against your own records."
+    - Cost: "The audit is $1,500, fixed. What follows is quoted inside a range we publish before you ask."
+    - Time: "The audit takes 1–2 weeks. Your part is to do the task once while we record it."
+    - Failed before: "Most attempts fail by fitting the business to a platform. We count one process first, then build for the business as it is."
+    - Not sure: "Then count it before deciding. If the number is small, you can stop there."
+  - Result labels: "What we would fix, in order" / "is the usual cost" /
+    "See one we built for a mechanical contractor" / "The next step"
+- Counting summary: "How we count." and the three short blocks under it,
+  plus "One row for each job we have cleared. The counter on the homepage is
+  the sum of these rows."
+- 404: "There is no page at this address." / "Go to the homepage"
 
-**Counters**
+## 6. Publishing guard
 
-- Every changed cell rolls once, 180ms, linear, with a 60ms cascade from the
-  right. "Spin and settle" (the count, crew totals, the Count practice block)
-  passes a few digits at 180ms each and lands; the rightmost cell lands last.
-- A seam element sits in every cell (the design system's `.seam` rule); the
-  sample markup in the Build notes does not show it.
-- Counters that are not keystroke figures (sheets left, quiz step, the 404's
-  zero) carry `data-figure="other"` so `npm run check` does not test them
-  against the ledger.
+`npm run deploy` now runs `tools/predeploy.mjs` first. Today it stops with
+this list, which is the work left before the site can go live:
 
-**The count**
+- `site.json`: `demo` is true; `email` and `bookingUrl` are `TODO`
+- `cases.json`: 12 demo records
+- `crew.json`: 5 demo records
+- `ledger.json`: 8 demo records
+- `products.json`: 7 demo records (six quiz items and the estimates)
+- `shiftReport.json`: the sample report
 
-- The drums in the scene spell the same four ledger figures as the counters
-  above them, and each group lands as its counter settles. The drums are a
-  macro of the counters, not a second set of numbers.
-- The band crops the drums top and bottom (a scissor on the scene), and the
-  seam hairline at 62% is HTML.
+`npm run ready` prints the same list without deploying. I ran the guard on
+its own and confirmed it exits with an error. I did not run `npm run deploy`.
 
-**The cases**
+## 7. What was checked, and what was not
 
-- Cases are **not pinned**. Each is at least one viewport tall and plays as it
-  passes. A pinned case has to fit its whole narrative inside the viewport
-  under two sticky bars, which fails on a 768px-tall laptop, so the cases flow
-  and their mechanisms fire at a scroll line instead.
-- The evidence object sits behind and below the artefact panel and travels a
-  little slower than the page, so it slides under the panel: depth from two
-  flat planes. Drums show the case's own before figure rolling to its after
-  figure. Sheets leaving the forms stack always exit away from the copy.
-- Filtering reorders with a FLIP move: every case travels along the vertical
-  rail from where it was to where it now belongs, 540ms, linear. Matching both
-  rows sorts first, matching one sorts next, nothing is hidden.
-- The demo plate sits beside the eyebrow, and the counter label also says
-  `Demonstration figure`.
-- Face cases show their own units in the counter and before/after line
-  (`21 days to assemble -> 4 days`, `14 templates -> 1 system`).
+Checked:
 
-**The audit**
+- Every page at 1440×900 and 390×844, top to bottom, after the revision.
+  The hero also at 1280×720 and 768×1024.
+- The hero sequence against the before build, frame by frame.
+- `npm run check` against a deliberately broken page: it caught a banned
+  word, `TODO`, a demo label, "5–50 staff", "ledger", a unit number, a
+  disabled button, an invented dollar figure and keystroke figure, and a
+  crew card with its `AI agent` tag removed.
+- A build with `demo` set to false: 13 pages, no `noindex`, check passes.
+  Restored to true afterwards.
+- `npm run qa`: no sideways scroll, no body line over 66 characters,
+  contrast, keyboard reach on five pages, and 3D memory steady over two
+  passes of the homepage.
+- Reduced motion on the homepage, the audit page and a service page:
+  everything is in place and nothing animates.
 
-- The sheet takes the shift report's proportion rather than A4, so the last
-  sheet lands exactly on the HTML report, which then prints over it in eleven
-  stepped lines.
-- The shift report is a document, so it takes the light theme inside the dark
-  page. Its three figures are set as plain figures rather than counter
-  housings: in the light theme the counter seam is a light hairline on a dark
-  housing and reads as a strike-through at S size.
-- The four fields are derived from `products.json` (`price`, `terms`,
-  `delivery`, and the "one process" and "one initial tool" lines of
-  `includes`).
+Not checked:
 
-**Layered parallax**
+- **A real phone or tablet.** Phone layouts were checked in emulated
+  Chromium only.
+- **Frame rate.** Everything ran on a software WebGL renderer.
+- **Safari and Firefox.** Only Chromium was used.
+- **A screen reader.**
+- **The redirects on Cloudflare.** `public/_redirects` follows Cloudflare's
+  format but has not been served by Cloudflare. The fallback pages Astro
+  writes were built and are in `dist/practice/`.
+- **`wrangler deploy`.** Not run, by instruction.
 
-- The Firewatch technique is used once, as an interlude before the audit: a
-  side-on view of stacks of forms at five distances, each layer one flat
-  silhouette in one token, depth by value alone, speeds 0.1 / 0.2 / 0.38 /
-  0.64 / 1. It is drawn at build time from a seeded generator
-  (`src/components/Skyline.astro`). Phones get three of the five layers.
+One number moved the wrong way. On the throttled phone profile the largest
+paint is now at 1.8 seconds, up from under 1 second, because the load-in
+holds the hero sentence back for half a second. It is inside the 2.5 second
+limit. Layout shift is zero.
 
-**The crew**
+## 8. Open items for the principals
 
-- The design system says the sprocket row runs "through the fifth channel".
-  I drew the sprocket row as the fifth of nine rows: four data rows above,
-  four below. If the design system's drawing differs, change `SPROCKET_AFTER`
-  in `src/lib/tape.ts`.
-- Holes are squares, because the system has no circles.
-- Bits are most significant first, top to bottom.
+1. **Contact email** and **booking link**: `email` and `bookingUrl` in
+   `site.json`. Until both are set, "Book the audit" leads to a block with no
+   way to book.
+2. **Years of experience**: `yearsExperience` in `site.json`. The line stays
+   off the page until it is a number.
+3. **Copy approval**: section 5, and the hero sentence in decision 1.
+4. **Avatar artwork**, if you want to supply it: see README, "Crew avatars".
+5. **Real content**: section 6 is the list. Cases 011 and 012 have no ledger
+   row, as instructed.
+6. **Domain**: `domain` in `site.json`, after the first deploy.
+7. **Commit**: the revision is uncommitted. `git add -A` and commit when you
+   are happy with it.
+8. Still open from the first build: licensed fonts, offline renders (Blender
+   and ffmpeg are not installed), and the duplicate PDFs and kit zip at the
+   top of the folder.
 
-**Keystroke Savers**
-
-- Tally strokes are drawn in, 60ms a stroke. This is the one section where
-  something is added rather than removed; the brief asks for the hours "drawn
-  as tally strokes", so that is what it does.
-- On phones the Response column is hidden, because the table would otherwise
-  scroll sideways to reach the price. The line under the table states the
-  response time for every tier.
-
-**Pinning**
-
-- Hero, the count and the audit pin with CSS `position: sticky`, and only
-  when the pinned content fits: at least 960px wide (1100 for the audit) and
-  600 / 640 / 820px tall respectively. Below that the section flows and the
-  same beats fire as its stage passes through the viewport.
-- On phones the hero copy flows and the key scene pins on its own beneath it
-  for 320svh. That is sticky, native scrolling, nothing hijacked.
-
-**Scene manager**
-
-- Scenes anchor their objects to HTML slots (`[data-slot]`), so the phone
-  layout is decided in CSS and the 3D follows it.
-- The cut between two scenes at the viewport's midpoint is covered by a
-  scroll-linked dip of the canvas opacity.
-- With reduced motion the fixed canvas is not used. Each scene is built once,
-  drawn in its resting state into a small 2D canvas inside its slot, and
-  disposed, so the still scrolls with the page with no lag.
-- Without WebGL, or with no script, the slots show WebP stills
-  (`public/stills/`, made by `npm run stills` from the real scenes). The hero
-  and the two keys at the foot keep their drawn SVG stand-ins.
-- A watchdog steps the pixel ratio down, then hands over to stills, if frames
-  stay over 44ms.
-
-**Other pages**
-
-- Practice heroes show a counter computed from the ledger: the sum of
-  baseline and of remaining keystrokes a year across that practice's rows
-  (Count `127,200 -> 4,600`, Clear `267,100 -> 13,100`, Build
-  `72,100 -> 4,100`). These are new presentations of ledger figures.
-  Face has no keystroke figure and says why.
-- `/counting` reproduces the method from the design system with one change:
-  the "812,000 keystrokes cleared this year" example is removed, as the brief
-  excludes that line. The two worked examples (`1,920 a week`, `14,600 a
-  year`) are kept and are allow-listed in `tools/check.mjs` as examples.
-  A "Stopped" column is added to the ledger table.
-- The 404 shows a counter at `0` labelled "Pages at this address".
-
-**The check**
-
-- "A keystroke figure" is taken to mean: every counter's contents; any number
-  followed by the word keystroke(s); and any number written with a thousands
-  separator. Each must be a value in a content file or computed from the
-  ledger for the build date.
-- It also fails on: the three excluded copy bank lines; "automation" more
-  than once a page; a page without exactly one `h1`; a crew card without
-  "Not a person."; a missing `noindex` in demo mode.
-- `npm run deploy` runs the build, then the check, then `wrangler deploy`.
-
-## 4. Copy for approval
-
-All of this is mine and all of it is a commercial statement. None of it is in
-the approved copy bank.
-
-### Quiz: the read
-
-Built from the visitor's own answers. `{evidence}` is the list of evidence
-phrases below, joined with commas and "and".
-
-| Template | Text |
-|---|---|
-| Lead | You told us about {evidence}. |
-| One piece of evidence | That is one problem, and it can be counted. |
-| Two or more | That is not {n} problems. It is one problem showing up in {n} places. |
-| No evidence | Nothing in your answers points to work being done twice, late or by hand. |
-| Under 5 people | With fewer than 5 people, the audit is unlikely to repay what it costs. |
-| Over 50 people | KEYSTROKE works with businesses of 5–50 staff. Yours is larger, so read this as a first look, not a scope. |
-| Buy nothing yet | Our recommendation is to buy nothing yet. |
-
-Evidence phrases, in the order they are listed in the read:
-
-| Answer | Phrase |
-|---|---|
-| Q6: 3–4 | 3–4 systems that do not talk to each other |
-| Q6: 5 or more | 5 or more systems that do not talk to each other |
-| Q4: 3–5 days | a month-end that takes 3–5 days |
-| Q4: More than a week | a month-end that takes more than a week |
-| Q4: We do not really do one | no real month-end at all |
-| Q5: Only when it is finished | no view of what a job made until it is finished |
-| Q5: No | no view of what a job made |
-| Q3: typed twice | the same details typed twice |
-| Q3: reports too late | reports that arrive too late to act on |
-| Q3: one spreadsheet | one spreadsheet only one person understands |
-| Q3: inbox | things waiting in an inbox for approval |
-| Q3: unused tool | a tool you pay for and nobody uses |
-| Q7: 4–10 years ago | a look last updated 4–10 years ago |
-| Q7: Cannot remember | a look nobody can remember updating |
-
-Last sentence of the read, from Q8 (changes the language, not the content):
-
-| Answer | Text |
-|---|---|
-| Sales | Fix it and the hours go to sales. |
-| Delivery | Fix it and the hours go to delivery. |
-| The owner goes home on time | Fix it and the owner goes home on time. |
-| Fixing the next thing | Fix it and the hours go to fixing the next thing. |
-
-### Quiz: the estimate, the order
-
-- Estimate (only when `re-entry` qualifies, for 5–50 staff): "Businesses of
-  {band} people with this symptom typically lose {hours} hours a year to
-  re-entry alone. We would have to count yours to be sure." Labelled
-  `ESTIMATE / DEMONSTRATION FIGURE` while the bands are demo. Only 80–120 is
-  from the plan; 40–70 and 120–200 are the brief's placeholders.
-- Order, one item: "Start there."
-- Order, several: "Start with number 1. The rest is cheaper once it exists."
-- Result headings: "What your answers say." / "Buy nothing yet."
-
-### Quiz: the five closing paragraphs (Q9)
-
-1. **Do not know who to trust.** You do not have to trust us yet. The audit is
-   one process, counted from a recording you watch being made, and it ends
-   with a figure you can check against your own records. If the count is
-   wrong, you will know before you spend anything else.
-2. **Cost.** The audit is $1,500, fixed, and includes an initial tool. What
-   follows is quoted on hours, inside a range that is published before you
-   ask. We quote the build. We don't quote the transformation, because there
-   isn't one.
-3. **Time.** The audit takes one process and 1–2 weeks. Your part is to do the
-   task once, the usual way, while it is recorded. The counting is ours.
-4. **Tried before and it failed.** Most attempts that fail start with a
-   platform and then try to fit the business to it. We count one process
-   first, then build for the business as it is. If the count says there is
-   nothing worth building, the report says so.
-5. **Not sure it is a real problem.** Then count it before deciding. The audit
-   returns the annual figure and its cost in hours for one process. If the
-   number is small, you will know, and you can stop there.
-
-The item names in `products.json` are the brief's placeholders and appear in
-the result as written.
-
-### Site copy I wrote
-
-| Where | Text |
-|---|---|
-| Hero eyebrow | For Australian businesses of 5–50 staff |
-| The count | We counted. / What one rebuilt process clears in a year. Each figure is a row in the ledger, counted from a recording, not estimated. |
-| The cases | What was built, and what it did. / 10 cases, each the same object: the business, the count before, what was wrong, what was built, the count after, and what builds like it cost. |
-| Quiz line, second line | About 90 seconds / no email / no sales call unless you ask |
-| The audit | The front door / We take one process end to end and count what a person physically does: characters typed, clicks, copies and pastes, attachments. You get the annual figure, what it costs in hours, and what it would be after a rebuild. / The audit is fixed. What follows is quoted on hours, and the audit's own numbers make the case for it. |
-| Practices | Three clear the desk. One builds what goes on it. / Clear the desk / Then build what goes on it |
-| The crew | **5 units. None of them are people. None of them take leave.** This is the excluded "Seven agents" line with the number computed from `crew.json`. The brief excludes the line for its number; if the sentence itself is unwanted, delete it in `src/pages/index.astro`. |
-| Keystroke Savers | The agents keep running. Somebody watches them. / A monthly layer on top of a build. Support covers what KEYSTROKE built. That boundary is what stops it becoming a helpdesk. / Foundation pricing. Response is 1 business day on every tier. The tiers differ on hours alone. |
-| The two of us | Kieran and Tyler. That is the whole firm. / Two principals do the work. The people who design a build are the people who deliver it. Nobody hands you to a junior, because there isn't one. |
-| Footer | KEYSTROKE / Kieran and Tyler / 2 principals / 5 units / Australia / 2026 · Figures on this site are illustrative until the ledger opens. · The 3D objects stand in for a photo shoot that has not happened. |
-| Practice headlines | Count: The report arrives after the decision. Clear: The same details get typed twice. Build: The software assumes a different business. Face: The business grew. The letterhead did not. |
-| Practice ledes | Count: Numbers the business cannot see until it is too late to use them. Clear: Work a person does by hand every week, on a schedule a machine could keep. Build: A platform bought for a business shaped differently, still on the card. Face: Practices 01 to 03 clear the desk. This one builds what goes on it. |
-| Practice pages | We quote the build. / Every relationship starts with the audit: $1,500, fixed, one process, delivered in 1–2 weeks. What follows is quoted on hours, inside one of three published ranges. |
-| Face page note | Design is not effort removed, so it is not counted in keystrokes. Its place is after the rebuild: practices 01 to 03 clear the desk, and this one builds what goes on it. |
-| Counting page | One row per cleared task. / the three notes under the ledger table |
-| 404 | Nothing here to count. / Somebody typed this address, or followed a link that somebody else typed. Either way it was typed by hand, which is the kind of thing we are against. |
-| Disabled controls | Booking link not connected yet / Contact address not connected yet |
-| Artefacts | Captions on the sample mocks (`artefacts.json`), for example "6 jobs. Nobody typed this." |
-
-The tagline appears in sentence case with its stop in the footer and as the
-upper-case headline in the hero. The Drum lockup carries no tagline.
-
-## 5. Open items
-
-**Config (all `TODO` in `site.json`)**
-
-- `email`: "Ask a question about it" on the quiz result is disabled.
-- `bookingUrl`: "Book the audit" is disabled in the audit section, on the
-  practice pages and on the quiz result.
-- `domain`: not used by any page yet; needed for the Cloudflare route.
-
-**Not verified**
-
-- **No real phone.** Phone layouts were checked at 390 × 844 in Chromium with
-  touch emulation only. Lenis, the sticky pins and the frame rate have not
-  been tried on a device.
-- **Frame rate.** Everything was run on a software WebGL renderer in headless
-  Chromium, which says nothing about 60fps on a laptop or 30fps on a phone.
-  Scenes are light (the largest is about 160 instanced keys in a handful
-  of draw calls), render on demand, and cap the pixel ratio at 2 (1.5 on phones).
-  3D memory returns to its starting counts after two full passes of the page.
-- **Load.** LCP 0.94s and layout shift 0 on a throttled phone profile
-  (9 Mbps, 170ms, CPU four times slower), served locally without compression.
-  Compressed sizes: HTML 15 KB, CSS 7 KB, page script 51 KB, the three.js
-  chunk 121 KB (loaded after first paint), six font files of 12 to 15 KB.
-- **Deploy.** `wrangler.jsonc` was written against the installed Wrangler's
-  config schema and Cloudflare's current static assets documentation. It has
-  not been run, including as a dry run.
-- **Screen readers.** Semantics are in place (one `h1`, a skip link, counters
-  as labelled images, filters with `aria-pressed`, real radio and checkbox
-  groups, the canvas hidden). Tabbing was tested by script on three pages.
-  Nothing was listened to in a screen reader.
-
-**To decide or supply**
-
-- Approve or replace the copy in section 4.
-- The licensed fonts (`src/styles/licensed-fonts.css` is ready, not imported).
-- Offline renders of the worn key, numpad and mouse, once Blender is there.
-- Real cases, ledger rows, crew units and product names; then demo mode off.
-- The bounded "ask a question" conversation is not built. The quiz exit is a
-  mail link. A Worker route would attach in `src/scripts/quiz.ts` (the place
-  is marked) with `main` and `run_worker_first` added to `wrangler.jsonc`.
-- Demo mode off with all records still demo leaves a short site: hero without
-  a counter, the audit without a sample report, practices, Savers, the two of
-  us. That is by design, and worth seeing once before real rows go in.
-
-**Known rough edges**
-
-- Resizing a window across a pin breakpoint mid-page can leave a mechanism in
-  the wrong state until the next scroll. A reload fixes it.
-- A reduced-motion visitor without WebGL gets the stills; a no-script visitor
-  gets the stills and the resting layout, and the quiz explains that it needs
-  script.
-- The typing wave in the hero and the key strikes need a few frames after
-  scrolling stops; the stage keeps drawing until they finish.
+`PLAN.md` describes the first build and is now out of date in places. It is
+kept as the record of that build.

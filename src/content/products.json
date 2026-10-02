@@ -1,9 +1,26 @@
 {
   "audit": {
     "name": "The Keystroke Audit",
+    "what": "We watch one of your processes from start to finish, count every keystroke in it, and tell you what it costs and what to fix.",
     "price": "$1,500",
     "terms": "Fixed",
     "delivery": "1–2 weeks",
+    "tool": "One working tool included",
+    "steps": [
+      {
+        "title": "We watch one process.",
+        "text": "Someone does the job once, the usual way, while we record it."
+      },
+      {
+        "title": "We count it.",
+        "text": "Every keystroke in it, and how often it happens in a year."
+      },
+      {
+        "title": "You get a report and a fixed quote.",
+        "text": "What it costs you, what to fix first, and what the fix would cost."
+      }
+    ],
+    "next": "After the audit we quote the build, inside one of three ranges.",
     "includes": [
       "One process, defined in writing",
       "The count and its cost in hours",
@@ -114,6 +131,8 @@
   },
   "savers": {
     "label": "Foundation pricing",
+    "foundationNote": "Foundation pricing is our launch rate for early clients.",
+    "what": "We keep what we built running, fix it when something changes, and improve it every month.",
     "response": "1 business day",
     "includes": [
       "Monitoring and repair of everything we built",
@@ -125,17 +144,20 @@
       {
         "name": "Watch",
         "hours": 10,
-        "monthly": "$1,500"
+        "monthly": "$1,500",
+        "suits": "One or two automations that need to keep running."
       },
       {
         "name": "Run",
         "hours": 20,
-        "monthly": "$3,000"
+        "monthly": "$3,000",
+        "suits": "Several systems, with regular changes each month."
       },
       {
         "name": "Own",
         "hours": 35,
-        "monthly": "$5,250"
+        "monthly": "$5,250",
+        "suits": "We run and improve your admin systems as an ongoing job."
       }
     ]
   }

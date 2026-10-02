@@ -2,20 +2,21 @@
 // Nine questions, one per screen, tappable answers only, no email gate.
 // Answers are real radio and checkbox groups. The result has its own URL,
 // with the answers encoded in the hash.
-import '../styles/home.css';
-import '../styles/pages.css';
 import Base from '../layouts/Base.astro';
 import Counter from '../components/Counter.astro';
 import Fig from '../components/Fig.astro';
 import { questions } from '../lib/quiz';
 import { products } from '../lib/data';
+import '../styles/pages.css';
 
 const available = products.items.length > 0;
 ---
 <Base
   title="Nine questions"
   description="A diagnostic in nine questions and about ninety seconds. No email gate, no sales call unless you ask for one."
+  current="quiz"
   page="quiz"
+  band="none"
 >
   <section class="quiz">
     <div class="wrap">
@@ -28,7 +29,7 @@ const available = products.items.length > 0;
       </div>
 
       <noscript>
-        <p class="quiz-noscript body">The quiz works its result out in the browser, so it needs JavaScript. Without it, <a href="/#cases">the cases</a> are the place to start.</p>
+        <p class="quiz-noscript body">The quiz works its result out in the browser, so it needs JavaScript. Without it, <a href="/cases">the cases</a> are the place to start.</p>
       </noscript>
 
       {available ? (
@@ -50,12 +51,12 @@ const available = products.items.length > 0;
             ))}
           </div>
           <div class="quiz-nav">
-            <button type="button" class="key" id="quiz-next" disabled>Next</button>
+            <button type="button" class="key key-l" id="quiz-next" hidden>Next</button>
             <button type="button" class="body-s quiz-back" id="quiz-back" hidden>Back</button>
           </div>
         </form>
       ) : (
-        <p class="body">The quiz recommends only from the product list, and the product list is empty. Nothing to recommend yet.</p>
+        <p class="body">The quiz is not open yet.</p>
       )}
 
       <div class="result" id="quiz-result" hidden></div>

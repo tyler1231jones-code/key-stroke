@@ -1,19 +1,14 @@
 ---
-// "Book the audit". While site.bookingUrl is TODO the control renders
-// disabled, with no link target.
-import { site, has } from '../lib/data';
+// "Book the audit". Always goes to the booking block at the foot of the
+// audit page, so the control is never disabled and never a dead link.
+import { BOOK_HREF } from '../lib/data';
 
 interface Props {
   label?: string;
+  secondary?: boolean;
+  /** 44px instead of 56px, for use inside a section. */
+  small?: boolean;
 }
-const { label = 'Book the audit' } = Astro.props;
-const ready = has('bookingUrl');
+const { label = 'Book the audit', secondary = false, small = false } = Astro.props;
 ---
-{ready ? (
-  <a class="key" href={site.bookingUrl}>{label}</a>
-) : (
-  <span class="key-wrap">
-    <button class="key" type="button" disabled aria-disabled="true">{label}</button>
-    <span class="plate key-note">Booking link not connected yet</span>
-  </span>
-)}
+<a class:list={['key', { 'key-l': !small, 'key-2': secondary }]} href={BOOK_HREF}>{label}</a>

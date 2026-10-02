@@ -1,0 +1,48 @@
+---
+// One small drawing per service, built from tokens: a struck tally, a column
+// chart, a window of keys, a printed sheet. Decorative.
+interface Props {
+  slug: string;
+  class?: string;
+}
+const { slug, class: cls } = Astro.props;
+---
+<svg class:list={['scard-icon', cls]} viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+  {slug === 'automation' && (
+    <g fill="var(--ink)">
+      <rect x="8" y="8" width="3" height="32" />
+      <rect x="17" y="8" width="3" height="32" />
+      <rect x="26" y="8" width="3" height="32" />
+      <rect x="35" y="8" width="3" height="32" />
+      <polygon points="2,33 44,13 45.3,15.7 3.3,35.7" />
+    </g>
+  )}
+  {slug === 'reporting' && (
+    <g>
+      <rect x="6" y="27" width="9" height="13" fill="var(--rule)" />
+      <rect x="19.5" y="18" width="9" height="22" fill="var(--ink-muted)" />
+      <rect x="33" y="8" width="9" height="32" fill="var(--ink)" />
+      <rect x="3" y="42" width="42" height="2" fill="var(--rule)" />
+    </g>
+  )}
+  {slug === 'web-software' && (
+    <g>
+      <rect x="4.5" y="7.5" width="39" height="33" fill="none" stroke="var(--ink)" stroke-width="3" />
+      <rect x="6" y="15" width="36" height="2" fill="var(--ink)" />
+      <rect x="10" y="22" width="8" height="8" rx="1.5" fill="var(--ink)" />
+      <rect x="20" y="22" width="8" height="8" rx="1.5" fill="var(--rule)" />
+      <rect x="30" y="22" width="8" height="8" rx="1.5" fill="var(--rule)" />
+      <rect x="10" y="32" width="28" height="3" fill="var(--rule)" />
+    </g>
+  )}
+  {slug === 'brand-design' && (
+    <g>
+      <rect x="9" y="4" width="30" height="40" fill="var(--readout)" />
+      <rect x="13" y="9" width="12" height="4" fill="var(--base-900)" />
+      <rect x="13" y="18" width="22" height="2" fill="var(--rule)" />
+      <rect x="13" y="23" width="22" height="2" fill="var(--rule)" />
+      <rect x="13" y="28" width="14" height="2" fill="var(--rule)" />
+      <rect x="9" y="39" width="30" height="5" fill="var(--base-900)" />
+    </g>
+  )}
+</svg>

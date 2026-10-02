@@ -28,8 +28,11 @@ export function driver(pins: Pin[], flow: HTMLElement, flowRange: [number, numbe
       const start = a.host.getBoundingClientRect().top + y - top;
       return [start, start + Math.max(1, a.host.offsetHeight - a.pin.offsetHeight)];
     }
+    // In flow, progress runs while the stage element crosses the viewport. A
+    // stage that is already on screen at the top of the page starts from there.
     const t = flow.getBoundingClientRect().top + y;
-    return [t - flowRange[0] * vh, t - flowRange[1] * vh];
+    const start = Math.max(0, t - flowRange[0] * vh);
+    return [start, Math.max(start + 1, t - flowRange[1] * vh)];
   };
   return {
     pinned: () => Boolean(active()),

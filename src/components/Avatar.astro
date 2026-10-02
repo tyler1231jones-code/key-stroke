@@ -1,0 +1,21 @@
+---
+// A crew agent's avatar, loaded from src/assets/crew/ by the agent's name in
+// lower case: tilly.svg, ivy.svg and so on. The drawn SVGs are inlined so
+// they take the page's tokens. To replace one with supplied artwork, put a
+// file of the same name there (svg, png, jpg, webp or avif) and delete the
+// drawn one. Decorative: the name is always written beside it.
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  name: string;
+  class?: string;
+}
+const { name, class: cls } = Astro.props;
+const files = import.meta.glob<{ default: unknown }>('../assets/crew/*.{svg,png,jpg,jpeg,webp,avif}', { eager: true });
+const key = Object.keys(files).find((path) => path.split('/').pop()?.replace(/\.[a-z]+$/, '') === name.toLowerCase());
+const art = key ? files[key].default : null;
+const Inline = typeof art === 'function' ? (art as any) : null;
+const image = art && typeof art !== 'function' ? (art as ImageMetadata) : null;
+---
+{Inline && <Inline class:list={['avatar', cls]} width={null} height={null} aria-hidden="true" focusable="false" />}
+{image && <img class:list={['avatar', cls]} src={image.src} width={image.width} height={image.height} alt="" loading="lazy" decoding="async" />}

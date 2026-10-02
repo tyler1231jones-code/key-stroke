@@ -7,7 +7,7 @@ interface Props {
   worn?: boolean;
   class?: string;
 }
-const { legend = 'V', worn = true, class: cls } = Astro.props;
+const { legend = 'K', worn = true, class: cls } = Astro.props;
 ---
 <svg class:list={['key-svg', cls]} viewBox="0 0 200 200" aria-hidden="true" focusable="false">
   <!-- sides, in rule -->
@@ -24,9 +24,9 @@ const { legend = 'V', worn = true, class: cls } = Astro.props;
   {worn && (
     <g fill="var(--readout)">
       <!-- wear: asymmetric facets where a fingertip has been -->
-      <polygon points="100,128 118,84 132,90 110,130" />
-      <polygon points="96,104 104,118 99,128 90,112" />
-      <polygon points="116,70 126,66 131,78 121,86" opacity="0.8" />
+      <polygon points="104,104 122,98 130,118 112,128" />
+      <polygon points="96,112 106,118 102,128 92,124" />
+      <polygon points="72,66 84,62 87,76 76,80" opacity="0.8" />
     </g>
   )}
 </svg>

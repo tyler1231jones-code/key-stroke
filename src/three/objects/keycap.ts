@@ -130,9 +130,10 @@ export interface Key {
   dispose(): void;
 }
 
-export const WORN_V: WearSpec = { at: [0.64, 0.66], radius: 0.25, seed: 11, chip: [0.37, 0.36, 0.07] };
+/** Where a fingertip has worn the K: the foot of its leg, and a chip at the head of the stem. */
+export const WORN_K: WearSpec = { at: [0.69, 0.7], radius: 0.24, seed: 11, chip: [0.36, 0.35, 0.065] };
 
-/** A single keycap with a legend: the worn V, or a clean K or T. */
+/** A single keycap with a legend. The hero key is a worn K. */
 export function makeKey(t: Tokens, legend: string, opts: { wear?: WearSpec; detail?: number; size?: number } = {}): Key {
   const geometry = keycapGeometry({ detail: opts.detail ?? 12 });
   const mats = keyMaterials(t, keyFace(t, legend, opts.size ?? 1024, opts.wear));

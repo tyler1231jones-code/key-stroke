@@ -7,11 +7,13 @@ import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
+import '../styles/parts.css';
 import oswald600 from '@fontsource/oswald/files/oswald-latin-600-normal.woff2?url';
 import plex500 from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2?url';
 import archivo400 from '@fontsource/archivo/files/archivo-latin-400-normal.woff2?url';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import ClosingBand from '../components/ClosingBand.astro';
 import { site } from '../lib/data';
 import { dateInZone } from '../lib/ledger';
 
@@ -21,10 +23,13 @@ interface Props {
   theme?: 'dark' | 'light';
   /** Pages with 3D carry the one persistent canvas. */
   canvas?: boolean;
+  /** The header item this page belongs to, if any. */
   current?: string;
   page: string;
+  /** How the page ends: the closing band, the booking block, or neither. */
+  band?: 'close' | 'book' | 'none';
 }
-const { title, description, theme = 'dark', canvas = false, current, page } = Astro.props;
+const { title, description, theme = 'dark', canvas = false, current, page, band = 'close' } = Astro.props;
 const buildDate = dateInZone(site.timezone);
 const fullTitle = title === site.name ? `${site.name}. ${site.tagline}` : `${title} / ${site.name}`;
 ---
@@ -35,6 +40,7 @@ const fullTitle = title === site.name ? `${site.name}. ${site.tagline}` : `${tit
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    {/* The content is mock until demo mode is off, so it is kept out of search. */}
     {site.demo && <meta name="robots" content="noindex, nofollow" />}
     <meta name="ks-build-date" content={buildDate} />
     <meta name="theme-color" content={theme === 'light' ? '#ffffff' : '#0b0d10'} />
@@ -49,7 +55,20 @@ const fullTitle = title === site.name ? `${site.name}. ${site.tagline}` : `${tit
         var d = document.documentElement;
         var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         d.classList.add(reduce ? 'still' : 'motion');
-        if (!reduce) setTimeout(function () {
+        if (reduce) return;
+        // The homepage hero assembles once per browser session.
+        if (d.getAttribute('data-page') === 'home') {
+          var seen = false;
+          try {
+            seen = sessionStorage.getItem('ks-intro') === '1';
+            sessionStorage.setItem('ks-intro', '1');
+          } catch (e) {}
+          if (!seen) {
+            d.classList.add('intro');
+            setTimeout(function () { d.classList.remove('intro'); }, 1500);
+          }
+        }
+        setTimeout(function () {
           if (!d.classList.contains('run')) { d.classList.remove('motion'); d.classList.add('still'); }
         }, 5000);
       })();
@@ -61,7 +80,8 @@ const fullTitle = title === site.name ? `${site.name}. ${site.tagline}` : `${tit
     <Nav current={current} />
     <main id="main">
       <slot />
+      {band !== 'none' && <ClosingBand mode={band} />}
     </main>
-    <Footer standIn={canvas} />
+    <Footer />
   </body>
 </html>

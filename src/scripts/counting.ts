@@ -4,6 +4,7 @@ import { site, ledger, homepageTotal, rowAccrued } from '../lib/data';
 import { dateInZone } from '../lib/ledger';
 import { dateShort, num } from '../lib/format';
 import { counter } from './counter';
+import { initSite } from './site';
 
 const today = dateInZone(site.timezone);
 const built = document.querySelector<HTMLMetaElement>('meta[name="ks-build-date"]')?.content;
@@ -17,4 +18,5 @@ if (today !== built) {
   const total = document.getElementById('ledger-total');
   if (total) counter(total).show(homepageTotal(today).today);
 }
+initSite();
 document.documentElement.classList.add('run');

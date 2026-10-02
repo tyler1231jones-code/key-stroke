@@ -1,10 +1,12 @@
 # KEYSTROKE website
 
-A scroll-driven site with real-time 3D, built with Astro, three.js, GSAP and
-Lenis, deployed to Cloudflare Workers as static assets.
+A short sales site with one scroll-driven hero and real-time 3D, built with
+Astro, three.js, GSAP and Lenis, deployed to Cloudflare Workers as static
+assets.
 
-The brief is `docs/build-brief.md`. Decisions, open items and the quiz copy
-awaiting approval are in `NOTES.md`. The plan the build followed is `PLAN.md`.
+The brief is `docs/build-brief.md`. `docs/revision-1.md` revised it, and wins
+where the two disagree. Decisions, the copy awaiting approval and the open
+items are in `NOTES.md`.
 
 ## Run
 
@@ -24,20 +26,48 @@ npm run qa         # browser checks: measure, contrast, keyboard, load, 3D memor
 npm run preview    # serve dist/ locally
 ```
 
-`npm run check` fails on: a banned word outside an approved copy bank line; an
-exclamation mark or emoji; `font-style: italic`; a radius above 6px; a colour
-that is not a token; a keystroke or dollar figure that is not in a content
-file or computed from the ledger. It warns on any `TODO` left in `site.json`.
-Text inside `[data-artefact]` is skipped.
+`npm run check` fails on:
+
+- a banned word outside an approved copy bank line, an exclamation mark or an emoji
+- `font-style: italic`, a radius above 6px, or a colour that is not a token
+- a keystroke or dollar figure that is not in a content file or computed from the ledger
+- text written for the builder, not the customer: `TODO`, a demo label, the
+  old "5 to 50 staff" limit, or an internal term (ledger, baseline, a unit,
+  practice or case number) anywhere but the counting page
+- a disabled control
+- a crew card without the tag `AI agent`
+- a page without `noindex` while demo mode is on
+
+It warns on any `TODO` left in `site.json`. Text inside `[data-artefact]` is
+skipped: artefacts show invented sample rows.
 
 Other scripts:
 
 | Script | Does |
 |---|---|
-| `npm run ledger` | Prints the totals the site computes from the ledger, for today or a given date |
-| `npm run shots -- --route=quiz --size=phone` | Screenshots of the built site (see the header of `tools/shots.mjs`) |
+| `npm run ready` | Says whether the content is fit to publish, and lists what is not (see "Go live") |
+| `npm run tour -- --tag=after` | One contact sheet per page and size, top to bottom, in `shots/after/` |
+| `npm run shots -- --route=quiz --size=phone` | Screenshots at chosen scroll positions (see the header of `tools/shots.mjs`) |
 | `npm run stills` | Re-renders the fallback stills in `public/stills/` from the real scenes |
+| `npm run ledger` | Prints the totals the site computes from the ledger, for today or a given date |
 | `npm run check:types` | `astro check` |
+
+## Pages
+
+| Route | Page |
+|---|---|
+| `/` | The homepage: hero, proof, four services, the audit in three steps, three cases, the crew, Savers, the quiz band |
+| `/services`, `/services/[slug]` | The four services: `automation`, `reporting`, `web-software`, `brand-design` |
+| `/cases`, `/cases/[id]` | Every case as a card, and each case in full |
+| `/audit` | The audit. Its last block, `/audit#book`, is where every "Book the audit" control goes |
+| `/crew` | The five AI agents |
+| `/savers` | Keystroke Savers |
+| `/quiz` | Nine questions |
+| `/counting` | The counting method and the ledger. Linked from the footer |
+
+The old `/practice/*` addresses redirect to the service pages: Cloudflare
+reads `public/_redirects`, and `astro.config.mjs` writes fallback pages for
+any other host.
 
 ## Deploy to Cloudflare
 
@@ -47,75 +77,92 @@ unknown addresses. There is no Worker script.
 
 ```bash
 npx wrangler login     # once, in your own browser
-npm run deploy         # build, check, then wrangler deploy
+npm run deploy         # ready check, build, check, then wrangler deploy
 ```
 
-Nobody has run `wrangler login` or `wrangler deploy` on this repo yet. After
-the first deploy, attach the domain in the Cloudflare dashboard and set
-`domain` in `src/content/site.json`.
+Nobody has run `wrangler login` or `wrangler deploy` on this repo yet.
 
-`public/_headers` sets long-lived caching for the fingerprinted files in
-`/_astro/`.
+### Go live
+
+Every case, figure, crew total and estimate on the site is **mock**. The
+pages no longer say so, so `npm run deploy` refuses to publish until the mock
+content is gone. It stops, and lists what is left, while any of these is true:
+
+- `site.json` has `"demo": true`
+- any record in any content file has `"demo": true`
+- `email` or `bookingUrl` in `site.json` is still `TODO`
+
+Run `npm run ready` at any time to see the same list without deploying.
+While `site.demo` is true every page also carries `noindex`.
+
+To go live:
+
+1. Set `email` and `bookingUrl` in `src/content/site.json`. Until they are
+   set, the contact details are simply left off the page: nothing is shown
+   disabled and nothing prints `TODO`.
+2. Replace each mock record with a real one and set its `"demo"` to `false`:
+   cases, ledger rows, crew agents, the quiz items and estimates in
+   `products.json`, and the sample report.
+3. Set `"demo": false` in `site.json`. Any record still marked demo then
+   drops off the site and out of every sum.
+4. `npm run deploy`. After the first deploy, attach the domain in the
+   Cloudflare dashboard and set `domain` in `site.json`.
+
+Set `yearsExperience` in `site.json` to a number to show the experience line
+under "Australian owned and operated" on the homepage. While it is `TODO` the
+line is left out.
 
 ## Content
 
 Everything the site states lives in `src/content/*.json`. No figure, case,
-unit or price is written into a template.
+agent or price is written into a template.
 
 | File | Holds |
 |---|---|
-| `site.json` | Demo switch, principals, contact email, booking link, domain, logotype, time zone |
-| `cases.json` | The ten cases |
+| `site.json` | Demo switch, tagline, description, origin line, years of experience, contact email, booking link, domain, the three featured cases, logotype, time zone |
+| `services.json` | The four services: name, one line, what it is, three examples, the practice name kept as a small label, the 3D object |
+| `cases.json` | The twelve cases. `service` files a case under a service; `summary` is the one sentence on its card |
 | `ledger.json` | One row per cleared task. Every counter is computed from this |
-| `crew.json` | The five units |
-| `products.json` | The audit, the three build ranges, the quiz items, the estimate bands, Keystroke Savers |
-| `shiftReport.json` | The sample shift report in the audit section |
-| `quiz.json` | The nine questions, the rules, the read templates and the five closing paragraphs |
-| `practices.json` | The four practices: field, sells line, capabilities, page headline |
-| `artefacts.json` | Invented sample rows for the case artefacts |
+| `crew.json` | The five AI agents: name, role, character, schedule |
+| `products.json` | The audit and its three steps, the three build ranges, the quiz items, the estimate bands, Keystroke Savers |
+| `shiftReport.json` | The sample report on the audit page |
+| `quiz.json` | The nine questions, the rules, the read templates and the five closing lines |
+| `artefacts.json` | Invented sample rows for the illustration on each case page |
 | `assets.json` | Offline renders and GLB models that replace built 3D objects |
-
-### Set the contact details
-
-`site.json` has `email`, `bookingUrl` and `domain` as `TODO`. While a value is
-`TODO`, the control that needs it renders disabled with no link target, and
-`npm run check` prints a warning. Replace the three values and rebuild.
-
-### Turn demo mode off
-
-Every record in the content files is mock and carries `"demo": true`.
-`site.json` carries `"demo": true` for the whole site.
-
-1. Replace mock rows with real ones, and set `"demo": false` on each real
-   record (cases, ledger rows, crew units, product items, the estimates block,
-   the shift report).
-2. While `site.demo` is still `true`, real and demo rows show together and
-   every counter fed by a demo row is labelled `DEMONSTRATION FIGURE`.
-3. Set `"demo": false` in `site.json`. Every remaining demo record is then
-   removed from the site and from every sum, the footer notice goes, and the
-   pages stop carrying `noindex`. A section with nothing real in it does not
-   render.
-
-Real and demo figures are never added together in a figure presented as real.
 
 ### Replace mock rows
 
-- **A case**: add or edit an entry in `cases.json`. `artefact` and `object`
-  pick the mock and the 3D object (`drum`, `key-field`, `numpad`,
-  `forms-stack`, `mouse`, `sheet`). Add its sample rows to `artefacts.json`
-  under the case id. Keep the cost range inside one of the three published
-  build ranges.
+- **A case**: add or edit an entry in `cases.json`. Give it a `service`
+  (`automation`, `reporting`, `web-software` or `brand-design`) and a
+  one-sentence `summary`. Add its sample rows to `artefacts.json` under the
+  case id. Keep the cost range inside one of the three published build ranges.
+- **The featured three** on the homepage are named in `site.json`,
+  `featuredCases`. Keep them from different services.
 - **A ledger row**: add it to `ledger.json` with its `caseId` and `crewUnit`.
   `confirmed` is four weeks after `goLive`. Set `stopped` to a date when a
   client stops using the process. Run `npm run ledger` to see the totals.
-- **A crew unit**: edit `crew.json`. `runDays` uses 0 for Sunday. The running
-  mark shows only for a unit that is not demo, inside its window, in the site
-  time zone. `src/lib/crew.ts` has the one function, `isRunning`, that
+- **A crew agent**: edit `crew.json`. `runDays` uses 0 for Sunday. The running
+  mark shows only for an agent that is not demo, inside its window, in the
+  site time zone. `src/lib/crew.ts` has the one function, `isRunning`, that
   decides it; point it at a real status source there.
 - **Quiz items and copy**: `products.json` (`items`, `estimates`) and
   `quiz.json`. The rules are data; `src/lib/quiz.ts` only evaluates them.
 
 The counting maths is in `src/lib/ledger.ts` and nowhere else.
+
+## Crew avatars
+
+The five avatars are SVG files in `src/assets/crew/`, named by the agent's
+name in lower case (`tilly.svg`, `ivy.svg`, `paige.svg`, `drew.svg`,
+`link.svg`). They are inlined, so they take the site's colour tokens.
+
+To use supplied artwork, put a file with the same name in that folder (svg,
+png, jpg, webp or avif) and delete the drawn one. `src/components/Avatar.astro`
+is the only place that loads them.
+
+Whatever the artwork, the crew must never read as human staff: no photographs
+and no photorealistic faces. Every crew card carries the tag `AI agent`, and
+`npm run check` fails if one does not.
 
 ## Swap the logotype
 
@@ -137,13 +184,15 @@ licensed:
    point the three `<link rel="preload">` tags at the new files.
 
 The token block already lists the licensed families first, so nothing else
-changes. The 3D textures (key legends, drum digits) read the same stacks.
+changes. The 3D textures (the key legend, drum digits) read the same stacks.
 
 ## Renders and models
 
-Every 3D object is built in code, in `src/three/objects/`. Two hooks let
-offline work replace them without touching scene code. Both are driven by
-`src/content/assets.json`:
+Every 3D object is built in code, in `src/three/objects/`. Three kinds of
+page use the canvas: the homepage (the worn K key and its field), the audit
+page (the stack of forms) and the service pages (one object each, named in
+`services.json`). Two hooks let offline work replace the service objects
+without touching scene code, both driven by `src/content/assets.json`:
 
 - **Renders** go in `public/renders/` and are named under `"renders"`. A
   render is drawn as a flat plane in place of the mesh.
@@ -161,30 +210,35 @@ so the no-WebGL stills match.
 ```
 src/
   content/      all copy that is data, and every figure
-  lib/          ledger maths, demo mode, quiz rules, tape encoding, crew schedule
-  layouts/      Base.astro: head, bar, footer, the one canvas
-  components/   counter, case, artefacts, crew card, shift report, logotype...
-  pages/        /, /practice/[key], /counting, /quiz, /404
-  styles/       tokens.css (pasted from the design system), base, home, pages
-  scripts/      scroll choreography (GSAP, ScrollTrigger, Lenis), counter, quiz
+  assets/crew/  the five avatars
+  lib/          ledger maths, demo mode, quiz rules, crew schedule, formatting
+  layouts/      Base.astro: head, header, closing band, footer, the one canvas
+  components/   counter, cards (service, case, tier, crew), report, artefact, logotype
+  pages/        /, /services, /cases, /audit, /crew, /savers, /quiz, /counting, /404
+  styles/       tokens.css (pasted from the design system), base, parts, home, pages
+  scripts/      hero choreography, reveals and rolling figures, quiz, case filter
   three/        stage.ts (scene manager), still.ts, objects/, scenes/
-tools/          check, qa, shots, stills, probe, ledger, blender/
-public/         favicon, stills, _headers, renders/, models/
+tools/          check, predeploy, qa, tour, shots, stills, probe, ledger, blender/
+public/         favicon, stills, _headers, _redirects, renders/, models/
 ```
 
 - **First paint does not wait for 3D.** HTML, CSS and fonts come first; three.js
   is a separate chunk loaded when the browser is idle. Until the canvas is
   ready the hero shows a token-drawn SVG key in the same place.
+- **One large set piece.** The homepage hero is driven by scroll: cameras and
+  objects follow it directly, and mechanisms (a digit rolling, a key being
+  struck) fire at a scroll position and undo on the way back up. The audit
+  page and each service page have one smaller scroll moment in their hero.
+- **Everything else is quiet.** The hero assembles once per browser session,
+  in about 1.2 seconds. Inner pages bring in their heading and first block.
+  Below that, blocks rise in once as they are reached and figures roll into
+  place once. `src/scripts/site.ts` does both.
 - **One canvas, one clock.** `src/three/stage.ts` keeps one renderer behind
-  the document. Each section registers a scene; only the scene under the
-  middle of the viewport renders; scenes are built as they come near and
-  disposed as they leave. Scroll position is the only input.
-- **Scrubbed or triggered.** Cameras, objects and layout moves follow scroll
-  directly. Mechanisms (a digit rolling, a tally striking, a key being struck)
-  fire at a scroll position, play in real time, and undo on the way back up.
-- **Fallbacks.** With reduced motion every section renders in its resting
-  state and each scene is drawn once into its slot. Without WebGL, or on a
-  device that cannot hold frame rate, the slots show stills.
+  the document. Scenes are built as they come near and disposed as they leave.
+- **Fallbacks.** With reduced motion nothing animates: every page renders in
+  its resting state and each scene is drawn once into its slot. Without
+  WebGL, or on a device that cannot hold frame rate, the slots show stills.
+  Without JavaScript every page still reads in full, apart from the quiz.
 
 ## Licences
 

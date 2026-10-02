@@ -1,0 +1,33 @@
+---
+// The four services, at equal size and weight.
+import Base from '../../layouts/Base.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import { services } from '../../lib/data';
+import { words } from '../../lib/format';
+import '../../styles/pages.css';
+---
+<Base
+  title="Services"
+  description="Automation and AI agents, reporting and dashboards, websites and software, branding and graphic design."
+  current="services"
+  page="services"
+>
+  <section class="page-head">
+    <div class="wrap">
+      <h1 class="display-xl load-in">Services.</h1>
+      <p class="lede load-in" style="--i:1">We do {words(services.length)} things. Pick the one that sounds like your problem.</p>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="wrap">
+      <div class="cards cards-2">
+        {services.map((s, i) => <ServiceCard item={s} full level="h2" index={i % 2} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../../scripts/page.ts';
+</script>

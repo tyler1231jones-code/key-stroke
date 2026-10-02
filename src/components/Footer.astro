@@ -1,29 +1,57 @@
 ---
-import { site, crew } from '../lib/data';
+// The footer: what KEYSTROKE is, where everything lives, and how to reach it.
+// A contact detail that is not set yet in site.json is left out.
+import Logotype from './Logotype.astro';
+import { site, services, has, BOOK_HREF } from '../lib/data';
 
-interface Props {
-  /** The stand-in notice is said once, on pages that show the 3D objects. */
-  standIn?: boolean;
-}
-const { standIn = false } = Astro.props;
 const year = new Date().getFullYear();
+const company = [
+  { label: 'Cases', href: '/cases' },
+  { label: 'Audit', href: '/audit' },
+  { label: 'Crew', href: '/crew' },
+  { label: 'Savers', href: '/savers' },
+  { label: 'Quiz', href: '/quiz' },
+  { label: 'Counting method', href: '/counting' },
+];
 ---
 <footer class="foot">
   <div class="wrap">
-    <div class="foot-top">
-      <p class="lede tagline">{site.tagline}</p>
-      <ul class="foot-nav plate">
-        <li><a href="/#cases">Cases</a></li>
-        <li><a href="/#audit">Audit</a></li>
-        <li><a href="/quiz">The quiz</a></li>
-        <li><a href="/counting">The counting method</a></li>
-      </ul>
+    <div class="foot-grid">
+      <div class="foot-about">
+        <a class="foot-logo" href="/" aria-label={`${site.name}, home`}><Logotype variant="lockup" reversed /></a>
+        <p class="body-s">{site.description}</p>
+      </div>
+      <nav aria-label="Services">
+        <h2 class="plate">Services</h2>
+        <ul>
+          {services.map((s) => <li><a href={`/services/${s.slug}`}>{s.name}</a></li>)}
+        </ul>
+      </nav>
+      <nav aria-label="Company">
+        <h2 class="plate">Company</h2>
+        <ul>
+          {company.map((c) => <li><a href={c.href}>{c.label}</a></li>)}
+        </ul>
+      </nav>
+      <div>
+        <h2 class="plate">Contact</h2>
+        <ul>
+          {has('email') && <li><a href={`mailto:${site.email}`}>{site.email}</a></li>}
+          <li><a href={BOOK_HREF}>Book the audit</a></li>
+        </ul>
+      </div>
     </div>
-    <div class="foot-line plate">
-      <p>{site.name} / {site.principals.join(' and ')} / {site.principals.length} principals{crew.length > 0 && <> / {crew.length} units</>} / Australia / {year}</p>
-      {site.demo && <p>Figures on this site are illustrative until the ledger opens.</p>}
-      {standIn && <p>The 3D objects stand in for a photo shoot that has not happened.</p>}
-      <p>Keystroke totals are rounded down to the nearest hundred. <a href="/counting">The counting method</a></p>
+    <div class="foot-line">
+      <p>{site.origin}</p>
+      <p>&copy; <span class="fig" data-copy-year>{year}</span> {site.name}</p>
     </div>
   </div>
 </footer>
+
+<script is:inline>
+  // A page built last year still states this year.
+  (function () {
+    var el = document.querySelector('[data-copy-year]');
+    if (el) el.textContent = String(new Date().getFullYear());
+  })();
+</script>

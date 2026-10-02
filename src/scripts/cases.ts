@@ -1,103 +1,92 @@
-// A case entering the viewport: the counter rolls from the before figure to
-// the after figure, the before/after line appears with its baseline struck,
-// the tally bar strikes from the left at 60ms a segment, and the artefact
-// runs. Scrolling back above the line undoes all of it.
-import { ScrollTrigger, reduced, onPass, stepper, STROKE } from './motion';
-import { counter } from './counter';
-import { bus } from './bus';
+// The cases pages. On the list: one row of filters by service. On a case:
+// the artefact runs once, as it comes into view.
+import { gsap } from 'gsap';
+import { refreshFigures } from './live';
+import { initSite } from './site';
 
-const STEP = 0.07;
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function typeOn(el: HTMLElement): void {
-  const chars = Math.max(1, (el.textContent ?? '').length);
-  el.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], {
-    duration: chars * 24,
-    easing: `steps(${chars})`,
+/* ---------- Filter ---------- */
+function initFilter(): void {
+  const bar = document.getElementById('case-filter');
+  const list = document.getElementById('case-list');
+  if (!bar || !list) return;
+  const cards = Array.from(list.querySelectorAll<HTMLElement>('[data-service]'));
+  const chips = Array.from(bar.querySelectorAll<HTMLButtonElement>('[data-value]'));
+  const status = document.getElementById('filter-status');
+
+  function show(value: string, announce: boolean): void {
+    let shown = 0;
+    cards.forEach((card) => {
+      const on = value === 'all' || card.dataset.service === value;
+      card.hidden = !on;
+      if (on) shown++;
+    });
+    chips.forEach((chip) => chip.setAttribute('aria-pressed', String(chip.dataset.value === value)));
+    if (announce && status) status.textContent = `${shown} ${shown === 1 ? 'case' : 'cases'} shown.`;
+  }
+
+  bar.addEventListener('click', (event) => {
+    const chip = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-value]');
+    if (!chip) return;
+    const value = chip.dataset.value ?? 'all';
+    show(value, true);
+    const url = new URL(location.href);
+    if (value === 'all') url.searchParams.delete('service');
+    else url.searchParams.set('service', value);
+    history.replaceState(null, '', url);
   });
+
+  // Service pages link here with their service already chosen.
+  const wanted = new URLSearchParams(location.search).get('service');
+  if (wanted && chips.some((chip) => chip.dataset.value === wanted)) show(wanted, false);
 }
 
-/** Reveal an artefact's steps in order: the thing running. */
-export function initArtefact(art: HTMLElement | null): void {
-  if (!art || reduced) return;
+/* ---------- Artefact ---------- */
+function typeOn(el: HTMLElement): void {
+  const chars = Math.max(1, (el.textContent ?? '').length);
+  el.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: chars * 24, easing: `steps(${chars})` });
+}
+
+/** Reveal an artefact's steps in order: the thing running. Once. */
+function initArtefact(art: HTMLElement): void {
+  if (reduced || !('IntersectionObserver' in window)) return;
   const els = Array.from(art.querySelectorAll<HTMLElement>('[data-step]'));
   if (!els.length) return;
   const steps = els.map((el) => Number(el.dataset.step));
   const max = Math.max(...steps);
   els.forEach((el) => el.classList.add('is-off'));
-  const run = stepper(max, STEP, (n) => {
-    els.forEach((el, i) => {
-      const show = steps[i] <= n;
-      if (show && el.classList.contains('is-off') && el.hasAttribute('data-type')) typeOn(el);
-      el.classList.toggle('is-off', !show);
-    });
-  });
-  onPass(art, '74%', () => run.play(), () => run.reverse());
-}
-
-export function initCase(el: HTMLElement): void {
-  const id = el.dataset.case ?? '';
-  // Scene progress: the case's pass through the viewport, for the object behind it.
-  ScrollTrigger.create({
-    trigger: el,
-    start: 'top bottom',
-    end: 'bottom top',
-    onUpdate: (self) => {
-      bus.cases[id] = self.progress;
-      bus.invalidate();
-    },
-    onRefresh: (self) => {
-      bus.cases[id] = self.progress;
-    },
-  });
-  if (reduced) {
-    bus.cases[id] = 0.5;
-    return;
-  }
-
-  const before = Number(el.dataset.before);
-  const after = Number(el.dataset.after);
-  const ctrEl = el.querySelector<HTMLElement>('.ctr[data-roll="case"]');
-  const line = el.querySelector<HTMLElement>('.case-ba');
-  const notes = el.querySelector<HTMLElement>('.case-notes');
-  const bar = el.querySelector<HTMLElement>('.tally-bar');
-  const count = el.querySelector<HTMLElement>('.case-count');
-  if (!ctrEl || !count) return;
-
-  const c = counter(ctrEl);
-  const segs = bar ? Array.from(bar.children) : [];
-  const struck = Number(bar?.dataset.struck ?? 0);
-  const tally = stepper(struck, STROKE, (n) => segs.forEach((s, i) => s.classList.toggle('on', i < n)));
-
-  c.show(before);
-  line?.classList.add('is-off');
-  notes?.classList.add('is-before');
-  segs.forEach((s) => s.classList.remove('on'));
-
-  onPass(
-    count,
-    '70%',
-    () => {
-      c.roll(after, {
-        dir: 1,
-        onSettle: () => {
-          if (c.value !== after) return;
-          line?.classList.remove('is-off');
-          notes?.classList.remove('is-before');
-          tally.play();
-        },
+  const o = { n: 0 };
+  let last = 0;
+  const run = gsap.to(o, {
+    n: max,
+    duration: max * 0.07,
+    ease: `steps(${max})`,
+    paused: true,
+    onUpdate: () => {
+      const n = Math.round(o.n);
+      if (n === last) return;
+      last = n;
+      els.forEach((el, i) => {
+        if (steps[i] > n || !el.classList.contains('is-off')) return;
+        el.classList.remove('is-off');
+        if (el.hasAttribute('data-type')) typeOn(el);
       });
     },
-    () => {
-      tally.reverse();
-      line?.classList.add('is-off');
-      notes?.classList.add('is-before');
-      c.roll(before, { dir: -1 });
+  });
+  const seen = new IntersectionObserver(
+    (records) => {
+      if (!records.some((r) => r.isIntersecting)) return;
+      run.play();
+      seen.disconnect();
     },
+    { rootMargin: '0px 0px -20% 0px' },
   );
-
-  initArtefact(el.querySelector<HTMLElement>('.artefact'));
+  seen.observe(art);
 }
 
-export function initCases(root: ParentNode = document): void {
-  root.querySelectorAll<HTMLElement>('.case').forEach(initCase);
-}
+refreshFigures();
+initFilter();
+document.querySelectorAll<HTMLElement>('.artefact').forEach(initArtefact);
+initSite();
+document.documentElement.classList.add('run');

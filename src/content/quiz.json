@@ -5,14 +5,46 @@
       "text": "What kind of business?",
       "type": "single",
       "options": [
-        { "id": "trades", "label": "Trades and construction", "businessType": "Trades and construction" },
-        { "id": "professional", "label": "Professional services", "businessType": "Professional services" },
-        { "id": "transport", "label": "Transport and logistics", "businessType": "Transport and logistics" },
-        { "id": "manufacturing", "label": "Manufacturing", "businessType": "Manufacturing" },
-        { "id": "property", "label": "Property", "businessType": "Property" },
-        { "id": "wholesale", "label": "Wholesale", "businessType": "Wholesale" },
-        { "id": "health", "label": "Health", "businessType": "Health" },
-        { "id": "other", "label": "Something else", "businessType": null }
+        {
+          "id": "trades",
+          "label": "Trades and construction",
+          "businessType": "Trades and construction"
+        },
+        {
+          "id": "professional",
+          "label": "Professional services",
+          "businessType": "Professional services"
+        },
+        {
+          "id": "transport",
+          "label": "Transport and logistics",
+          "businessType": "Transport and logistics"
+        },
+        {
+          "id": "manufacturing",
+          "label": "Manufacturing",
+          "businessType": "Manufacturing"
+        },
+        {
+          "id": "property",
+          "label": "Property",
+          "businessType": "Property"
+        },
+        {
+          "id": "wholesale",
+          "label": "Wholesale",
+          "businessType": "Wholesale"
+        },
+        {
+          "id": "health",
+          "label": "Health",
+          "businessType": "Health"
+        },
+        {
+          "id": "other",
+          "label": "Something else",
+          "businessType": null
+        }
       ]
     },
     {
@@ -20,11 +52,31 @@
       "text": "How many people?",
       "type": "single",
       "options": [
-        { "id": "under5", "label": "Under 5", "band": null },
-        { "id": "5-10", "label": "5–10", "band": "5–10" },
-        { "id": "11-25", "label": "11–25", "band": "11–25" },
-        { "id": "26-50", "label": "26–50", "band": "26–50" },
-        { "id": "over50", "label": "Over 50", "band": null }
+        {
+          "id": "under5",
+          "label": "Under 5",
+          "band": null
+        },
+        {
+          "id": "5-10",
+          "label": "5–10",
+          "band": "5–10"
+        },
+        {
+          "id": "11-25",
+          "label": "11–25",
+          "band": "11–25"
+        },
+        {
+          "id": "26-50",
+          "label": "26–50",
+          "band": "26–50"
+        },
+        {
+          "id": "over50",
+          "label": "Over 50",
+          "band": null
+        }
       ]
     },
     {
@@ -34,12 +86,36 @@
       "type": "multi",
       "exclusive": "none",
       "options": [
-        { "id": "twice", "label": "The same details get typed twice", "evidence": "the same details typed twice" },
-        { "id": "late", "label": "Reports arrive too late to act on", "evidence": "reports that arrive too late to act on" },
-        { "id": "spreadsheet", "label": "One spreadsheet only one person understands", "evidence": "one spreadsheet only one person understands" },
-        { "id": "inbox", "label": "Things wait in an inbox for approval", "evidence": "things waiting in an inbox for approval" },
-        { "id": "unused", "label": "We pay for a tool nobody uses", "evidence": "a tool you pay for and nobody uses" },
-        { "id": "none", "label": "None of these", "evidence": null }
+        {
+          "id": "twice",
+          "label": "The same details get typed twice",
+          "evidence": "the same details typed twice"
+        },
+        {
+          "id": "late",
+          "label": "Reports arrive too late to act on",
+          "evidence": "reports that arrive too late to act on"
+        },
+        {
+          "id": "spreadsheet",
+          "label": "One spreadsheet only one person understands",
+          "evidence": "one spreadsheet only one person understands"
+        },
+        {
+          "id": "inbox",
+          "label": "Things wait in an inbox for approval",
+          "evidence": "things waiting in an inbox for approval"
+        },
+        {
+          "id": "unused",
+          "label": "We pay for a tool nobody uses",
+          "evidence": "a tool you pay for and nobody uses"
+        },
+        {
+          "id": "none",
+          "label": "None of these",
+          "evidence": null
+        }
       ]
     },
     {
@@ -47,11 +123,31 @@
       "text": "How long does month-end take?",
       "type": "single",
       "options": [
-        { "id": "under1", "label": "Under a day", "evidence": null },
-        { "id": "1-2", "label": "1–2 days", "evidence": null },
-        { "id": "3-5", "label": "3–5 days", "evidence": "a month-end that takes 3–5 days" },
-        { "id": "week", "label": "More than a week", "evidence": "a month-end that takes more than a week" },
-        { "id": "nomonthend", "label": "We do not really do one", "evidence": "no real month-end at all" }
+        {
+          "id": "under1",
+          "label": "Under a day",
+          "evidence": null
+        },
+        {
+          "id": "1-2",
+          "label": "1–2 days",
+          "evidence": null
+        },
+        {
+          "id": "3-5",
+          "label": "3–5 days",
+          "evidence": "a month-end that takes 3–5 days"
+        },
+        {
+          "id": "week",
+          "label": "More than a week",
+          "evidence": "a month-end that takes more than a week"
+        },
+        {
+          "id": "nomonthend",
+          "label": "We do not really do one",
+          "evidence": "no real month-end at all"
+        }
       ]
     },
     {
@@ -59,10 +155,26 @@
       "text": "Can you see what a job made while it is running?",
       "type": "single",
       "options": [
-        { "id": "yes", "label": "Yes, any day", "evidence": null },
-        { "id": "roughly", "label": "Roughly, at month-end", "evidence": null },
-        { "id": "finished", "label": "Only when it is finished", "evidence": "no view of what a job made until it is finished" },
-        { "id": "no", "label": "No", "evidence": "no view of what a job made" }
+        {
+          "id": "yes",
+          "label": "Yes, any day",
+          "evidence": null
+        },
+        {
+          "id": "roughly",
+          "label": "Roughly, at month-end",
+          "evidence": null
+        },
+        {
+          "id": "finished",
+          "label": "Only when it is finished",
+          "evidence": "no view of what a job made until it is finished"
+        },
+        {
+          "id": "no",
+          "label": "No",
+          "evidence": "no view of what a job made"
+        }
       ]
     },
     {
@@ -70,10 +182,26 @@
       "text": "How many systems do not talk to each other?",
       "type": "single",
       "options": [
-        { "id": "0", "label": "None", "evidence": null },
-        { "id": "1-2", "label": "1–2", "evidence": null },
-        { "id": "3-4", "label": "3–4", "evidence": "3–4 systems that do not talk to each other" },
-        { "id": "5plus", "label": "5 or more", "evidence": "5 or more systems that do not talk to each other" }
+        {
+          "id": "0",
+          "label": "None",
+          "evidence": null
+        },
+        {
+          "id": "1-2",
+          "label": "1–2",
+          "evidence": null
+        },
+        {
+          "id": "3-4",
+          "label": "3–4",
+          "evidence": "3–4 systems that do not talk to each other"
+        },
+        {
+          "id": "5plus",
+          "label": "5 or more",
+          "evidence": "5 or more systems that do not talk to each other"
+        }
       ]
     },
     {
@@ -81,10 +209,26 @@
       "text": "When did you last update how the business looks?",
       "type": "single",
       "options": [
-        { "id": "thisyear", "label": "This year", "evidence": null },
-        { "id": "1-3", "label": "1–3 years ago", "evidence": null },
-        { "id": "4-10", "label": "4–10 years ago", "evidence": "a look last updated 4–10 years ago" },
-        { "id": "forgot", "label": "Cannot remember", "evidence": "a look nobody can remember updating" }
+        {
+          "id": "thisyear",
+          "label": "This year",
+          "evidence": null
+        },
+        {
+          "id": "1-3",
+          "label": "1–3 years ago",
+          "evidence": null
+        },
+        {
+          "id": "4-10",
+          "label": "4–10 years ago",
+          "evidence": "a look last updated 4–10 years ago"
+        },
+        {
+          "id": "forgot",
+          "label": "Cannot remember",
+          "evidence": "a look nobody can remember updating"
+        }
       ]
     },
     {
@@ -92,10 +236,26 @@
       "text": "If you got fifteen hours a month back, where would it go?",
       "type": "single",
       "options": [
-        { "id": "sales", "label": "Sales", "payoff": "Fix it and the hours go to sales." },
-        { "id": "delivery", "label": "Delivery", "payoff": "Fix it and the hours go to delivery." },
-        { "id": "home", "label": "The owner goes home on time", "payoff": "Fix it and the owner goes home on time." },
-        { "id": "next", "label": "Fixing the next thing", "payoff": "Fix it and the hours go to fixing the next thing." }
+        {
+          "id": "sales",
+          "label": "Sales",
+          "payoff": "Fix it and the hours go to sales."
+        },
+        {
+          "id": "delivery",
+          "label": "Delivery",
+          "payoff": "Fix it and the hours go to delivery."
+        },
+        {
+          "id": "home",
+          "label": "The owner goes home on time",
+          "payoff": "Fix it and the owner goes home on time."
+        },
+        {
+          "id": "next",
+          "label": "Fixing the next thing",
+          "payoff": "Fix it and the hours go to fixing the next thing."
+        }
       ]
     },
     {
@@ -103,47 +263,141 @@
       "text": "What is stopping you fixing this today?",
       "type": "single",
       "options": [
-        { "id": "trust", "label": "Do not know who to trust" },
-        { "id": "cost", "label": "Cost" },
-        { "id": "time", "label": "Time" },
-        { "id": "failed", "label": "Tried before and it failed" },
-        { "id": "unsure", "label": "Not sure it is a real problem" }
+        {
+          "id": "trust",
+          "label": "Do not know who to trust"
+        },
+        {
+          "id": "cost",
+          "label": "Cost"
+        },
+        {
+          "id": "time",
+          "label": "Time"
+        },
+        {
+          "id": "failed",
+          "label": "Tried before and it failed"
+        },
+        {
+          "id": "unsure",
+          "label": "Not sure it is a real problem"
+        }
       ]
     }
   ],
   "rules": [
-    { "item": "reporting-pack", "any": [{ "q": "q3", "includes": ["late", "spreadsheet"] }, { "q": "q4", "in": ["3-5", "week", "nomonthend"] }] },
-    { "item": "job-costing", "any": [{ "q": "q5", "in": ["finished", "no"] }] },
-    { "item": "re-entry", "any": [{ "q": "q3", "includes": ["twice", "inbox"] }] },
-    { "item": "integration", "any": [{ "q": "q6", "in": ["3-4", "5plus"] }] },
-    { "item": "application", "any": [{ "q": "q3", "includes": ["unused"] }] },
-    { "item": "identity", "any": [{ "q": "q7", "in": ["4-10", "forgot"] }] }
+    {
+      "item": "reporting-pack",
+      "any": [
+        {
+          "q": "q3",
+          "includes": [
+            "late",
+            "spreadsheet"
+          ]
+        },
+        {
+          "q": "q4",
+          "in": [
+            "3-5",
+            "week",
+            "nomonthend"
+          ]
+        }
+      ]
+    },
+    {
+      "item": "job-costing",
+      "any": [
+        {
+          "q": "q5",
+          "in": [
+            "finished",
+            "no"
+          ]
+        }
+      ]
+    },
+    {
+      "item": "re-entry",
+      "any": [
+        {
+          "q": "q3",
+          "includes": [
+            "twice",
+            "inbox"
+          ]
+        }
+      ]
+    },
+    {
+      "item": "integration",
+      "any": [
+        {
+          "q": "q6",
+          "in": [
+            "3-4",
+            "5plus"
+          ]
+        }
+      ]
+    },
+    {
+      "item": "application",
+      "any": [
+        {
+          "q": "q3",
+          "includes": [
+            "unused"
+          ]
+        }
+      ]
+    },
+    {
+      "item": "identity",
+      "any": [
+        {
+          "q": "q7",
+          "in": [
+            "4-10",
+            "forgot"
+          ]
+        }
+      ]
+    }
   ],
-  "sizing": { "tooSmall": "under5", "tooLarge": "over50", "estimateItem": "re-entry", "maxItems": 3 },
+  "sizing": {
+    "estimateItem": "re-entry",
+    "maxItems": 3
+  },
   "read": {
-    "evidenceOrder": ["q6", "q4", "q5", "q3", "q7"],
+    "evidenceOrder": [
+      "q6",
+      "q4",
+      "q5",
+      "q3",
+      "q7"
+    ],
     "lead": "You told us about {evidence}.",
     "one": "That is one problem, and it can be counted.",
     "many": "That is not {n} problems. It is one problem showing up in {n} places.",
     "none": "Nothing in your answers points to work being done twice, late or by hand.",
-    "tooSmall": "With fewer than 5 people, the audit is unlikely to repay what it costs.",
-    "tooLarge": "KEYSTROKE works with businesses of 5–50 staff. Yours is larger, so read this as a first look, not a scope.",
     "buyNothing": "Our recommendation is to buy nothing yet."
   },
   "estimate": {
-    "label": "Estimate",
-    "text": "Businesses of {band} people with this symptom typically lose {hours} hours a year to re-entry alone.",
-    "admission": "We would have to count yours to be sure."
+    "label": "hours a year a business your size typically loses to typing things twice",
+    "admission": "An estimate. We would count yours to be sure."
   },
   "order": {
     "one": "Start there.",
     "many": "Start with number 1. The rest is cheaper once it exists."
   },
   "closing": {
-    "trust": "You do not have to trust us yet. The audit is one process, counted from a recording you watch being made, and it ends with a figure you can check against your own records. If the count is wrong, you will know before you spend anything else.",
-    "cost": "The audit is $1,500, fixed, and includes an initial tool. What follows is quoted on hours, inside a range that is published before you ask. We quote the build. We don't quote the transformation, because there isn't one.",
-    "time": "The audit takes one process and 1–2 weeks. Your part is to do the task once, the usual way, while it is recorded. The counting is ours.",
-    "failed": "Most attempts that fail start with a platform and then try to fit the business to it. We count one process first, then build for the business as it is. If the count says there is nothing worth building, the report says so.",
-    "unsure": "Then count it before deciding. The audit returns the annual figure and its cost in hours for one process. If the number is small, you will know, and you can stop there."
+    "trust": "You do not have to trust us yet. The audit ends with a figure you can check against your own records.",
+    "cost": "The audit is $1,500, fixed. What follows is quoted inside a range we publish before you ask.",
+    "time": "The audit takes 1–2 weeks. Your part is to do the task once while we record it.",
+    "failed": "Most attempts fail by fitting the business to a platform. We count one process first, then build for the business as it is.",
+    "unsure": "Then count it before deciding. If the number is small, you can stop there."
   }
 }

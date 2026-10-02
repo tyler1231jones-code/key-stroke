@@ -1,21 +1,21 @@
 ---
 import Logotype from './Logotype.astro';
+import { BOOK_HREF } from '../lib/data';
 
 interface Props {
-  /** The key of the current page, if it is one of the nav items. */
+  /** The key of the header item the current page belongs to. */
   current?: string;
 }
 const { current } = Astro.props;
 
-// The first five are anchors on the homepage. The live underline marks the
-// current page only, so on the homepage no item carries it. No scroll-spy.
+// Each item is its own page. The live underline marks the one the visitor is on.
 const items = [
-  { key: 'cases', label: 'Cases', href: '/#cases' },
-  { key: 'audit', label: 'Audit', href: '/#audit' },
-  { key: 'practices', label: 'Practices', href: '/#practices' },
-  { key: 'crew', label: 'Crew', href: '/#crew' },
-  { key: 'savers', label: 'Savers', href: '/#savers' },
-  { key: 'counting', label: 'Counting', href: '/counting' },
+  { key: 'services', label: 'Services', href: '/services' },
+  { key: 'cases', label: 'Cases', href: '/cases' },
+  { key: 'audit', label: 'Audit', href: '/audit' },
+  { key: 'crew', label: 'Crew', href: '/crew' },
+  { key: 'savers', label: 'Savers', href: '/savers' },
+  { key: 'quiz', label: 'Quiz', href: '/quiz' },
 ];
 ---
 <header class="bar">
@@ -24,21 +24,18 @@ const items = [
       <Logotype variant="lockup" />
       <Logotype variant="mark" />
     </a>
-    <nav aria-label="Site">
+    <nav class="bar-nav" aria-label="Site">
       <ul class="nav-list plate">
         {items.map((item) => (
           <li><a href={item.href} aria-current={current === item.key ? 'page' : undefined}>{item.label}</a></li>
         ))}
       </ul>
+      <a class="key bar-book" href={BOOK_HREF}>Book the audit</a>
       <details class="menu">
         <summary class="plate">Menu</summary>
         <ul class="menu-list">
-          {items.map((item, i) => (
-            <li>
-              <a href={item.href} aria-current={current === item.key ? 'page' : undefined}>
-                {item.label}<span class="plate">{String(i + 1).padStart(2, '0')}</span>
-              </a>
-            </li>
+          {items.map((item) => (
+            <li><a href={item.href} aria-current={current === item.key ? 'page' : undefined}>{item.label}</a></li>
           ))}
         </ul>
       </details>

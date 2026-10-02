@@ -7,8 +7,14 @@
 //   - font-style: italic, a radius above 6px, or a colour value that is not a token
 //   - a keystroke or dollar figure in text that does not match a value in a
 //     content file or one computed from the ledger
+//   - text written for the builder, not the customer: TODO, demo labels, the
+//     old audience limit, internal terms (ledger, baseline, unit and practice
+//     numbers) anywhere but the counting page
+//   - a disabled control
+//   - a crew card without the tag "AI agent"
 // Text inside [data-artefact] is skipped: artefacts show invented sample rows.
-// Warns, without failing, on any TODO left in site.json.
+// Warns, without failing, on any TODO left in site.json. Whether the content
+// is fit to publish is a separate question, answered by tools/predeploy.mjs.
 //
 // Run after `npm run build`.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
@@ -56,6 +62,27 @@ const BANNED = [
   /\bstreamlin/i, /\bsupercharg/i, /\brevolutioni[sz]/i, /\breimagin/i,
 ];
 
+// Wording that was for the builder or the principals, not for a customer.
+const NOT_FOR_CUSTOMERS = [
+  [/\bTODO\b/, 'prints TODO'],
+  [/demonstration (figure|build)/i, 'carries a demo label'],
+  [/figures illustrative/i, 'carries a demo label'],
+  [/not a person/i, 'carries the old "Not a person." line'],
+  [/stand in for a photo shoot/i, 'carries the stand-in notice'],
+  [/not connected yet/i, 'says a control is not connected'],
+  [/\b5\s*(?:–|-|to)\s*50\b/, 'limits who the service is for (5 to 50 staff)'],
+];
+// Internal terms stay off customer pages. The counting page is where they are explained.
+const INTERNAL = [
+  [/\bledger\b/i, 'ledger'],
+  [/\bbaseline\b/i, 'baseline'],
+  [/\bUnit \d\d\b/, 'a unit number'],
+  [/\bPractice \d\d\b/i, 'a practice number'],
+  [/\bCase \d{3}\b/, 'a case number'],
+];
+// The service is called this, so the word is not rationed inside its name.
+const SERVICE_NAMES = ['Automation and AI agents'];
+
 // Example figures quoted in the published counting method. They illustrate the method; they are not claims.
 const METHOD_EXAMPLES = [1920, 14600];
 
@@ -82,7 +109,7 @@ const casesAll = json('cases.json');
 const live = (rows) => (site.demo ? rows : rows.filter((r) => !r.demo));
 const ledger = live(ledgerAll);
 const cases = live(casesAll);
-const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'shiftReport.json', 'quiz.json', 'practices.json'].map(json);
+const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'shiftReport.json', 'quiz.json', 'services.json'].map(json);
 
 function allowedFor(date) {
   const numbers = new Set([0]);
@@ -97,8 +124,8 @@ function allowedFor(date) {
   const weekAgo = totalWeekAgo(ledger, date);
   numbers.add(today).add(weekAgo).add(today - weekAgo);
   for (const unit of new Set(ledger.map((r) => r.crewUnit))) numbers.add(total(ledger.filter((r) => r.crewUnit === unit), date));
-  for (const practice of new Set(cases.map((c) => c.practice))) {
-    const rows = ledger.filter((r) => cases.find((c) => c.id === r.caseId)?.practice === practice);
+  for (const service of new Set(cases.map((c) => c.service))) {
+    const rows = ledger.filter((r) => cases.find((c) => c.id === r.caseId)?.service === service);
     numbers.add(rows.reduce((t, r) => t + clearedPerYear(r), 0));
     numbers.add(rows.reduce((t, r) => t + r.baselinePerYear, 0));
     numbers.add(rows.reduce((t, r) => t + r.remainingPerYear, 0));
@@ -129,7 +156,7 @@ const hasClass = (node, cls) => (attr(node, 'class') ?? '').split(/\s+/).include
 
 function readPage(html) {
   const doc = parse(html, { scriptingEnabled: false });
-  const page = { text: '', counters: [], h1: 0, robots: null, buildDate: null, crewCards: 0, crewCardsMarked: 0, styles: [], inline: [] };
+  const page = { text: '', counters: [], h1: 0, robots: null, buildDate: null, redirect: false, disabled: 0, crewCards: 0, crewCardsMarked: 0, styles: [], inline: [] };
   const textOf = (node) => {
     if (node.nodeName === '#text') return node.value;
     return (node.childNodes ?? []).map(textOf).join('');
@@ -141,11 +168,13 @@ function readPage(html) {
       if (attr(node, 'name') === 'robots') page.robots = attr(node, 'content');
       if (attr(node, 'name') === 'ks-build-date') page.buildDate = attr(node, 'content');
       if (attr(node, 'name') === 'description') page.text += `\n${attr(node, 'content')}\n`;
+      if ((attr(node, 'http-equiv') ?? '').toLowerCase() === 'refresh') page.redirect = true;
     }
     if (node.attrs) {
       for (const a of node.attrs) {
         if (a.name === 'style' || a.name === 'fill' || a.name === 'stroke') page.inline.push(`${a.name}:${a.value}`);
         if (a.name === 'aria-label' || a.name === 'alt') page.text += `\n${a.value}\n`;
+        if (a.name === 'disabled' || (a.name === 'aria-disabled' && a.value === 'true')) page.disabled++;
       }
     }
     if (tag && SKIP.has(tag)) return;
@@ -153,7 +182,9 @@ function readPage(html) {
     if (tag === 'h1') page.h1++;
     if (tag && hasClass(node, 'crew-card')) {
       page.crewCards++;
-      if (/Not a person\./.test(textOf(node))) page.crewCardsMarked++;
+      // The tag itself, as its own element: not the words somewhere in the card's copy.
+      const tagged = (n) => (n.tagName && hasClass(n, 'tag') && textOf(n).trim() === 'AI agent') || (n.childNodes ?? []).some(tagged);
+      if (tagged(node)) page.crewCardsMarked++;
     }
     if (tag && hasClass(node, 'ctr') && attr(node, 'data-figure') !== 'other') {
       page.counters.push(textOf(node).replace(/\s+/g, ''));
@@ -173,6 +204,7 @@ const toNumber = (s) => Number(s.replace(/,/g, ''));
 for (const file of walk(dist, '.html')) {
   const where = relative(dist, file).replace(/\\/g, '/');
   const page = readPage(readFileSync(file, 'utf8'));
+  if (page.redirect) continue; // a redirect written by Astro: no content of its own
   const allowed = allowedFor(page.buildDate ?? new Date().toISOString().slice(0, 10));
 
   // Words.
@@ -183,10 +215,23 @@ for (const file of walk(dist, '.html')) {
     const m = text.match(word);
     if (m) fail(where, `banned word "${m[0]}" outside an approved copy bank line`);
   }
-  const automation = text.match(/\bautomation\b/gi) ?? [];
-  if (automation.length > 1) fail(where, `"automation" appears ${automation.length} times; it is permitted once per page`);
+  let rationed = text;
+  for (const name of SERVICE_NAMES) rationed = rationed.split(name).join(' ').split(name.toUpperCase()).join(' ');
+  const automation = rationed.match(/\bautomation\b/gi) ?? [];
+  if (automation.length > 1) fail(where, `"automation" appears ${automation.length} times outside the service's name; it is permitted once per page`);
+  for (const [pattern, what] of NOT_FOR_CUSTOMERS) {
+    const m = page.text.match(pattern);
+    if (m) fail(where, `${what}: "${page.text.split('\n').find((l) => pattern.test(l))?.trim().slice(0, 80)}"`);
+  }
+  if (!where.startsWith('counting')) {
+    for (const [pattern, what] of INTERNAL) {
+      if (pattern.test(page.text)) fail(where, `uses ${what}, an internal term: "${page.text.split('\n').find((l) => pattern.test(l))?.trim().slice(0, 80)}"`);
+    }
+  }
+  if (page.disabled) fail(where, `${page.disabled} disabled control(s); a control that cannot be used is left off the page`);
   if (text.includes('!')) fail(where, `exclamation mark in text: "${text.split('\n').find((l) => l.includes('!'))?.trim().slice(0, 80)}"`);
-  const emoji = text.match(/\p{Extended_Pictographic}/u);
+  // The copyright, registered and trade mark signs are text, not emoji.
+  const emoji = text.replace(/[©®™]/g, '').match(/\p{Extended_Pictographic}/u);
   if (emoji) fail(where, `emoji in text: ${emoji[0]}`);
 
   // Figures.
@@ -197,7 +242,8 @@ for (const file of walk(dist, '.html')) {
     if (!allowed.has(toNumber(m[1]))) fail(where, `figure ${m[1]} is not in a content file and is not computed from the ledger`);
   }
   // Same line only: a year at the end of one block is not a figure for the next.
-  for (const m of page.text.matchAll(/(?<![$\d,.])(\d[\d,]*) +keystrokes?\b/gi)) {
+  // Not in capitals: "2026 KEYSTROKE" in the copyright line is the firm's name.
+  for (const m of page.text.matchAll(/(?<![$\d,.])(\d[\d,]*) +[kK]eystrokes?\b/g)) {
     if (!allowed.has(toNumber(m[1]))) fail(where, `keystroke figure ${m[1]} is not in a content file and is not computed from the ledger`);
   }
   for (const c of page.counters) {
@@ -207,7 +253,7 @@ for (const file of walk(dist, '.html')) {
   // Structure the brief asks for.
   if (page.h1 !== 1) fail(where, `${page.h1} h1 elements; there must be one`);
   if (site.demo && !/noindex/.test(page.robots ?? '')) fail(where, 'demo mode is on but the page does not carry noindex');
-  if (page.crewCards !== page.crewCardsMarked) fail(where, 'a crew card is missing "Not a person."');
+  if (page.crewCards !== page.crewCardsMarked) fail(where, 'a crew card is missing the tag "AI agent"');
 
   checkCss(where, page.styles.join('\n'));
   checkCss(`${where} (inline)`, page.inline.map((d) => `x{${d}}`).join('\n'));
@@ -245,7 +291,7 @@ for (const file of walk(dist, '.css')) checkCss(relative(dist, file).replace(/\\
 /* ---------- Config ---------- */
 
 for (const [key, value] of Object.entries(site)) {
-  if (value === 'TODO') warnings.push(`site.json: "${key}" is still TODO. The control that needs it renders disabled.`);
+  if (value === 'TODO') warnings.push(`site.json: "${key}" is still TODO. Whatever needs it is left off the page.`);
 }
 
 for (const w of warnings) console.warn(`warn  ${w}`);

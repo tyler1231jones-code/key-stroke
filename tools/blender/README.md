@@ -2,9 +2,8 @@
 
 Blender was not on the machine when the site was built, so every 3D object is
 built real-time in three.js (`src/three/objects/`). This folder is where the
-offline renders come from once Blender is installed. The three objects worth
-rendering are the ones with wear: the worn `V` key, the numeric keypad and the
-mouse.
+offline renders come from once Blender is installed. The object most worth
+rendering is the one with wear: the worn `K` key in the homepage hero.
 
 ## What is here
 
@@ -43,8 +42,8 @@ mouse.
    {
      "models": {},
      "renders": {
-       "numpad": { "still": "/renders/numpad.webp", "width": 4, "height": 5 },
-       "mouse": { "frames": ["/renders/mouse/0001.webp", "/renders/mouse/0002.webp"], "width": 1.24, "height": 2 }
+       "sheet": { "still": "/renders/sheet.webp", "width": 210, "height": 297 },
+       "key-field": { "frames": ["/renders/key-field/0001.webp", "/renders/key-field/0002.webp"], "width": 8.75, "height": 4 }
      }
    }
    ```
@@ -54,8 +53,9 @@ mouse.
    list is scrubbed by scroll: one frame is requested when the scene is built
    and the rest when the object is first driven.
 
-Object names: `drum`, `key-field`, `numpad`, `forms-stack`, `mouse`, `sheet`,
-`key-worn`. The hero's worn key is drawn by its own scene
+Object names: `drum`, `key-field`, `forms-stack`, `sheet`. These are the
+objects on the four service pages, named in `src/content/services.json`. The
+hero's worn key is drawn by its own scene
 (`src/three/scenes/hero.ts`) and is not replaced by `assets.json`; a rendered
 hero key would go in as a frame sequence using
 `.claude/skills/scroll-storytelling/recipes/image-sequence.js`.
@@ -67,7 +67,7 @@ it with the project's `@gltf-transform/cli` (`npx @gltf-transform/cli --help`),
 put it in `public/models/`, and name it in `assets.json`:
 
 ```json
-{ "models": { "numpad": "/models/numpad.glb" }, "renders": {} }
+{ "models": { "sheet": "/models/sheet.glb" }, "renders": {} }
 ```
 
 The loader is only fetched when a model is named.

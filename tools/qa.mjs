@@ -10,7 +10,7 @@
 // Prints a report. Exits 1 if a hard limit is broken.
 import { serve, launch } from './shots.mjs';
 
-const routes = ['/', '/practice/count', '/practice/clear', '/practice/build', '/practice/face', '/counting', '/quiz', '/quiz#r=a.c.ab.c.d.c.c.a.b', '/missing'];
+const routes = ['/', '/services', '/services/automation', '/services/reporting', '/services/web-software', '/services/brand-design', '/cases', '/cases/002', '/cases/011', '/audit', '/crew', '/savers', '/counting', '/quiz', '/quiz#r=a.c.ab.c.d.c.c.a.b', '/missing'];
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } };
 const problems = [];
 const note = (s) => console.log(s);
@@ -116,7 +116,7 @@ for (const [sizeName, viewport] of Object.entries(sizes)) {
 }
 
 /* ---------- Keyboard ---------- */
-for (const route of ['/', '/quiz', '/counting']) {
+for (const route of ['/', '/cases', '/audit', '/quiz', '/counting']) {
   const context = await browser.newContext({ viewport: sizes.desktop });
   const page = await context.newPage();
   await page.goto(url + route, { waitUntil: 'networkidle' });
