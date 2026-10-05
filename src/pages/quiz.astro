@@ -46,7 +46,7 @@ const available = products.items.length > 0;
                   {q.options.map((o) => (
                     <label class="quiz-option">
                       <input type={q.type === 'multi' ? 'checkbox' : 'radio'} name={q.id} value={o.id} />
-                      <span><Fig text={o.label} /></span>
+                      <span><span class="quiz-label"><Fig text={o.label} /></span></span>
                     </label>
                   ))}
                 </div>
