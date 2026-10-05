@@ -89,7 +89,10 @@ async function human(token: string, secret: string, ip: string | null): Promise<
     console.warn('reCAPTCHA refused the token:', verdict['error-codes']);
     return false;
   }
-  return verdict.action === QUIZ_ACTION && (verdict.score ?? 0) >= MIN_SCORE;
+  const passed = verdict.action === QUIZ_ACTION && (verdict.score ?? 0) >= MIN_SCORE;
+  // Why a visitor was turned away, for the Worker's logs.
+  if (!passed) console.warn(`reCAPTCHA turned a visitor away: score ${verdict.score}, action "${verdict.action}" (needs ${MIN_SCORE} and "${QUIZ_ACTION}").`);
+  return passed;
 }
 
 /* ---------- 3. Claude ---------- */
