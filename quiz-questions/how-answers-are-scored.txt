@@ -1,0 +1,66 @@
+KEYSTROKE QUIZ: WHAT EACH ANSWER LEADS TO
+Taken from src/content/quiz.json. This is how the quiz picks its
+recommendations today, before any Claude step is added.
+
+
+WHICH ANSWERS RECOMMEND WHICH PRODUCT
+At most 3 products are recommended.
+
+Reporting pack
+   Q3: "Reports arrive too late to act on" or "One spreadsheet only one person understands"
+   Q4: "3–5 days", "More than a week" or "We do not really do one"
+
+Job costing
+   Q5: "Only when it is finished" or "No"
+
+Re-entry (typing things twice)
+   Q3: "The same details get typed twice" or "Things wait in an inbox for approval"
+
+Integration
+   Q6: "3–4" or "5 or more"
+
+Application
+   Q3: "We pay for a tool nobody uses"
+
+Identity (brand)
+   Q7: "4–10 years ago" or "Cannot remember"
+
+
+ANSWERS THAT RECOMMEND NOTHING
+   Q1 (kind of business) and Q2 (how many people) set the business type and
+   size used for the hours estimate. "Something else", "Under 5" and
+   "Over 50" have no size or type on record.
+   Q8 only changes the payoff line.
+   Q9 only changes the closing line.
+   If nothing is triggered the result says:
+   "Nothing in your answers points to work being done twice, late or by hand."
+   "Our recommendation is to buy nothing yet."
+
+
+THE RESULT'S WORDING
+
+Opening
+   "You told us about {what they chose}."
+   One problem:   "That is one problem, and it can be counted."
+   Several:       "That is not {n} problems. It is one problem showing up in {n} places."
+
+Estimate
+   "hours a year a business your size typically loses to typing things twice"
+   "An estimate. We would count yours to be sure."
+
+Order
+   One product:   "Start there."
+   Several:       "Start with number 1. The rest is cheaper once it exists."
+
+Payoff line, from Q8
+   Sales                          "Fix it and the hours go to sales."
+   Delivery                       "Fix it and the hours go to delivery."
+   The owner goes home on time    "Fix it and the owner goes home on time."
+   Fixing the next thing          "Fix it and the hours go to fixing the next thing."
+
+Closing line, from Q9
+   Do not know who to trust       "You do not have to trust us yet. The audit is free, and it ends with a figure you can check against your own records."
+   Cost                           "The first conversation and the audit are free. Every job after that is quoted individually."
+   Time                           "The audit takes 1–2 weeks. Your part is to do the task once while we record it."
+   Tried before and it failed     "Most attempts fail by fitting the business to a platform. We count one process first, then build for the business as it is."
+   Not sure it is a real problem  "Then count it before deciding. If the number is small, you can stop there."

@@ -1,6 +1,7 @@
 [
   {
     "id": "001",
+    "mark": "fan",
     "practice": "count",
     "service": "reporting",
     "businessType": "Trades and construction",
@@ -29,6 +30,7 @@
   },
   {
     "id": "002",
+    "mark": "bolt",
     "practice": "clear",
     "service": "automation",
     "businessType": "Trades and construction",
@@ -57,6 +59,7 @@
   },
   {
     "id": "003",
+    "mark": "ledger",
     "practice": "count",
     "service": "reporting",
     "businessType": "Professional services",
@@ -85,6 +88,7 @@
   },
   {
     "id": "004",
+    "mark": "truck",
     "practice": "clear",
     "service": "automation",
     "businessType": "Transport and logistics",
@@ -113,6 +117,7 @@
   },
   {
     "id": "005",
+    "mark": "joint",
     "practice": "build",
     "service": "web-software",
     "businessType": "Manufacturing",
@@ -141,6 +146,7 @@
   },
   {
     "id": "006",
+    "mark": "house",
     "practice": "build",
     "service": "web-software",
     "businessType": "Property",
@@ -169,6 +175,7 @@
   },
   {
     "id": "007",
+    "mark": "bridge",
     "practice": "count",
     "service": "reporting",
     "businessType": "Professional services",
@@ -197,6 +204,7 @@
   },
   {
     "id": "008",
+    "mark": "boxes",
     "practice": "clear",
     "service": "automation",
     "businessType": "Wholesale",
@@ -225,6 +233,7 @@
   },
   {
     "id": "009",
+    "mark": "truss",
     "practice": "face",
     "service": "brand-design",
     "businessType": "Trades and construction",
@@ -253,6 +262,7 @@
   },
   {
     "id": "010",
+    "mark": "cross",
     "practice": "face",
     "service": "brand-design",
     "businessType": "Health",
@@ -281,6 +291,7 @@
   },
   {
     "id": "011",
+    "mark": "leaf",
     "practice": "build",
     "service": "web-software",
     "businessType": "Trades and construction",
@@ -309,6 +320,7 @@
   },
   {
     "id": "012",
+    "mark": "road",
     "practice": "face",
     "service": "brand-design",
     "businessType": "Trades and construction",

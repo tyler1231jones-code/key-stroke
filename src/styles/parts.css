@@ -45,7 +45,10 @@ html:not(.motion):not(.still) .slot-still, .no-webgl .slot-still { display: bloc
 
 /* Case card: who, the problem, what we did, the result, a service tag. */
 .ccard { grid-template-rows: auto auto auto 1fr auto; }
-.ccard-who { color: var(--ink-muted); font-size: 14px; line-height: 21px; }
+.ccard-who { display: flex; align-items: center; gap: var(--space-3); color: var(--ink-muted); font-size: 14px; line-height: 21px; }
+.case-mark { flex: none; width: 40px; height: 40px; }
+.case-who { display: flex; align-items: center; gap: var(--space-4); max-width: none; }
+.case-who .case-mark { width: 56px; height: 56px; }
 .ccard .display-m { font-size: 28px; line-height: 30px; text-wrap: balance; }
 .ccard-result { display: grid; gap: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--hairline); align-self: end; }
 .ccard-result > div { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: var(--space-3); }

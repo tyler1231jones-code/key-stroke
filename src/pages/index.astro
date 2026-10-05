@@ -15,7 +15,7 @@ import Fig from '../components/Fig.astro';
 import { site, crew, ledger, services, products, featuredCases, homepageTotal, proofFigures, experienceLine } from '../lib/data';
 import { professionalService } from '../lib/seo';
 import { dateInZone } from '../lib/ledger';
-import { num, words, withArticle } from '../lib/format';
+import { words, withArticle } from '../lib/format';
 import '../styles/home.css';
 
 const today = dateInZone(site.timezone);
@@ -60,7 +60,6 @@ const crewCount = words(crew.length);
               <div class="hero-counter">
                 <div class="hero-ctr-row">
                   <Counter value={home.today} size="xl" id="home-counter" data-week-ago={home.weekAgo} />
-                  <span class="delta figure struck" id="home-delta" hidden>&minus; {num(home.today - home.weekAgo)}</span>
                 </div>
                 <p class="hero-label">
                   <span class="crew-live" data-any-unit></span>keystrokes our clients have not had to type in <span class="fig" data-year>{year}</span>

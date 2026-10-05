@@ -4,7 +4,6 @@
 // mark, which is never shown while an agent's data is demo.
 import { site, crew, ledger, homepageTotal, agentTotal } from '../lib/data';
 import { dateInZone } from '../lib/ledger';
-import { num } from '../lib/format';
 import { isRunning } from '../lib/crew';
 import { counter } from './counter';
 
@@ -38,8 +37,6 @@ export function refreshFigures(): LiveFigures | null {
   if (today !== built) {
     counter(home).show(figures.today);
     home.dataset.weekAgo = String(figures.weekAgo);
-    const delta = document.getElementById('home-delta');
-    if (delta) delta.textContent = `− ${num(figures.today - figures.weekAgo)}`;
   }
   return { today: figures.today, weekAgo: figures.weekAgo };
 }

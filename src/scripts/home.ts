@@ -1,7 +1,7 @@
 // The homepage. HTML first: every section is already in its resting state.
 // This script wires the hero to scroll, lets the sections below it arrive as
 // they are reached, and then loads the 3D stage as its own chunk.
-import { gsap, ScrollTrigger, reduced, initSmooth, span, easeInOut, ROLL, HOLD } from './motion';
+import { gsap, ScrollTrigger, reduced, initSmooth, span, easeInOut } from './motion';
 import { driver } from './driver';
 import { counter } from './counter';
 import { refreshFigures } from './live';
@@ -26,7 +26,6 @@ function initHero(figures: { today: number; weekAgo: number } | null): void {
   }
   const d = driver([{ host: section, pin }, { host: track, pin: stage }], stage);
   const ctrEl = $('#home-counter');
-  const delta = $('#home-delta');
   const c = ctrEl ? counter(ctrEl) : null;
   const rolls = Boolean(c && figures && figures.today !== figures.weekAgo);
   if (c && figures && rolls) c.show(figures.weekAgo);
@@ -53,23 +52,15 @@ function initHero(figures: { today: number; weekAgo: number } | null): void {
     () => {},
   );
 
-  // Last week's total rolls to today's. The delta stamps once, holds, and is gone.
-  let stamp: gsap.core.Tween | null = null;
+  // Last week's total rolls to today's.
   d.beat(
     HERO.roll,
     () => {
       if (!c || !figures || !rolls) return;
       c.roll(figures.today, { dir: 1 });
-      if (delta) {
-        delta.hidden = false;
-        stamp?.kill();
-        stamp = gsap.delayedCall(HOLD + ROLL, () => (delta.hidden = true));
-      }
     },
     () => {
       if (!c || !figures || !rolls) return;
-      stamp?.kill();
-      if (delta) delta.hidden = true;
       c.roll(figures.weekAgo, { dir: -1 });
     },
   );

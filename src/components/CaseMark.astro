@@ -1,0 +1,45 @@
+---
+// The mark on a case: the client's trade, drawn in the housing of our own
+// mark. Clients are not named, so this is a sign for the kind of business
+// and not anybody's logo. The name comes from "mark" in cases.json.
+interface Props {
+  name?: string;
+  class?: string;
+}
+const { name, class: cls } = Astro.props;
+
+// Drawn on a 32 grid inside the 2px housing, in 2px square strokes.
+const GLYPHS: Record<string, string> = {
+  // mechanical contractor: a valve wheel
+  fan: 'M16 8a8 8 0 1 0 0 16a8 8 0 1 0 0-16z M10.3 10.3l11.4 11.4 M21.7 10.3L10.3 21.7',
+  // electrical contractor
+  bolt: 'M18 6l-8 11h6l-2 9l8-11h-6z',
+  // accounting practice: a ruled ledger
+  ledger: 'M8 7h16v18H8z M8 12h16 M19 12v13 M11 16h5 M11 20h5',
+  // freight operator
+  truck: 'M5 11h12v10H5z M17 14h6l4 4v3h-10 M10 23a2 2 0 1 0 0.01 0 M22 23a2 2 0 1 0 0.01 0',
+  // joinery manufacturer: a dovetail
+  joint: 'M6 9h20v14H6z M6 16h6l-2-7 M26 16h-6l2-7 M12 16h8',
+  // property manager
+  house: 'M6 16L16 7l10 9 M9 14v11h14V14 M14 25v-6h4v6',
+  // civil engineering consultancy
+  bridge: 'M5 13h22 M7 13v11 M25 13v11 M7 24a9 9 0 0 1 18 0 M16 13v2',
+  // wholesale distributor: stock, stacked
+  boxes: 'M6 16h10v9H6z M16 16h10v9H16z M11 7h10v9H11z',
+  // builder: a roof truss
+  truss: 'M5 23h22 M5 23L16 9l11 14 M16 9v14 M10.5 16v7 M21.5 16v7',
+  // allied health clinic
+  cross: 'M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z',
+  // landscape supplier
+  leaf: 'M16 26V15 M16 15c-6 0-8-4-8-8c6 0 8 4 8 8z M16 20c5 0 7-3 7-7c-5 0-7 3-7 7z',
+  // civil contractor: a road
+  road: 'M9 26L13 6 M23 26L19 6 M16 7v3 M16 14v4 M16 22v4',
+};
+const d = name ? GLYPHS[name] : undefined;
+---
+{d && (
+  <svg class:list={['case-mark', cls]} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <rect x="1" y="1" width="30" height="30" fill="none" stroke="var(--rule)" stroke-width="1" />
+    <path d={d} fill="none" stroke="var(--readout)" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" />
+  </svg>
+)}

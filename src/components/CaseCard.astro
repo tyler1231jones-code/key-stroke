@@ -4,6 +4,7 @@
 // result rolls from the before figure to the after figure as the card enters.
 import Counter from './Counter.astro';
 import Fig from './Fig.astro';
+import CaseMark from './CaseMark.astro';
 import { service, type Case } from '../lib/data';
 import { num } from '../lib/format';
 
@@ -17,7 +18,7 @@ const H = level;
 const s = service(item.service);
 ---
 <article class="card ccard" data-service={item.service}>
-  <p class="ccard-who">{item.descriptor}</p>
+  <p class="ccard-who"><CaseMark name={item.mark} />{item.descriptor}</p>
   <H class="display-m"><a class="card-link" href={`/cases/${item.id}`}><Fig text={item.headline} /></a></H>
   <p class="body-s"><Fig text={item.summary} /></p>
   <dl class="ccard-result">
