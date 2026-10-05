@@ -26,7 +26,7 @@
     "goLive": "2026-02-09",
     "artefact": "report-table",
     "object": "drum",
-    "demo": true
+    "demo": false
   },
   {
     "id": "002",
@@ -55,7 +55,7 @@
     "goLive": "2026-03-02",
     "artefact": "form-writes-invoice",
     "object": "key-field",
-    "demo": true
+    "demo": false
   },
   {
     "id": "003",
@@ -67,7 +67,7 @@
     "headline": "MONTH-END TAKES FOUR DAYS.",
     "summary": "Bank lines are matched overnight and the client packs build from the result.",
     "wrong": "Bank lines were matched by eye and client packs were assembled by copying between workbooks.",
-    "built": "A reconciliation agent, an Excel system built to hold, and a pack generator that reads from both.",
+    "built": "A reconciliation agent, an Excel workbook built to last, and a pack generator that reads from both.",
     "before": {
       "value": 33600,
       "unit": "keystrokes a year",
@@ -84,7 +84,7 @@
     "goLive": "2026-03-23",
     "artefact": "reconcile-list",
     "object": "numpad",
-    "demo": true
+    "demo": false
   },
   {
     "id": "004",
@@ -113,7 +113,7 @@
     "goLive": "2026-04-13",
     "artefact": "one-record-three-targets",
     "object": "forms-stack",
-    "demo": true
+    "demo": false
   },
   {
     "id": "005",
@@ -142,7 +142,7 @@
     "goLive": "2026-05-04",
     "artefact": "timesheet-app",
     "object": "mouse",
-    "demo": true
+    "demo": false
   },
   {
     "id": "006",
@@ -171,7 +171,7 @@
     "goLive": "2026-05-25",
     "artefact": "request-to-three",
     "object": "key-field",
-    "demo": true
+    "demo": false
   },
   {
     "id": "007",
@@ -200,7 +200,7 @@
     "goLive": "2026-06-15",
     "artefact": "report-table",
     "object": "drum",
-    "demo": true
+    "demo": false
   },
   {
     "id": "008",
@@ -229,7 +229,7 @@
     "goLive": "2026-07-06",
     "artefact": "three-system-sync",
     "object": "forms-stack",
-    "demo": true
+    "demo": false
   },
   {
     "id": "009",
@@ -258,7 +258,7 @@
     "goLive": "2026-06-01",
     "artefact": "tender-pages",
     "object": "sheet",
-    "demo": true
+    "demo": false
   },
   {
     "id": "010",
@@ -287,7 +287,7 @@
     "goLive": "2026-07-20",
     "artefact": "letterhead-system",
     "object": "sheet",
-    "demo": true
+    "demo": false
   },
   {
     "id": "011",
@@ -316,7 +316,7 @@
     "goLive": "2026-08-10",
     "artefact": "site-editor",
     "object": "sheet",
-    "demo": true
+    "demo": false
   },
   {
     "id": "012",
@@ -345,6 +345,6 @@
     "goLive": "2026-08-24",
     "artefact": "collateral-set",
     "object": "sheet",
-    "demo": true
+    "demo": false
   }
 ]
