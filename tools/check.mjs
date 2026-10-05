@@ -115,7 +115,7 @@ const casesAll = json('cases.json');
 const live = (rows) => (site.demo ? rows : rows.filter((r) => !r.demo));
 const ledger = live(ledgerAll);
 const cases = live(casesAll);
-const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'shiftReport.json', 'quiz.json', 'services.json', 'faqs.json'].map(json);
+const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'prices.json', 'shiftReport.json', 'quiz.json', 'services.json', 'faqs.json'].map(json);
 
 function allowedFor(date) {
   const numbers = new Set([0]);
