@@ -4,7 +4,7 @@
 // Deploy with `npm run deploy` after `npx wrangler login` (done by a person).
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "keystroke-site",
+  "name": "key-stroke",
   "compatibility_date": "2026-10-02",
   "main": "src/worker.ts",
   "assets": {

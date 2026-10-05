@@ -4,5 +4,5 @@
     { "id": "tyler", "name": "Tyler Jones", "legend": "T", "role": "Principal", "mobile": "0400 000 000", "email": "tyler@keystroke.example" }
   ],
   "fallbackDomain": "keystroke.example",
-  "imageBase": "TODO"
+  "imageBase": "https://key-stroke.tyler1231-jones.workers.dev/email"
 }
