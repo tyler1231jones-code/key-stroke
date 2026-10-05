@@ -1,7 +1,9 @@
 ---
 // The audit, in four short blocks: what it is, how it works, what you get,
-// and what it costs, which is nothing. The stack of forms at the top is the
-// page's one set piece. The page ends on the consultation form.
+// and what it costs: a fixed price, shown on /savers with the other prices.
+// The first conversation and a quick initial audit are free. The stack of
+// forms at the top is the page's one set piece. The page ends on the
+// consultation form.
 import Base from '../layouts/Base.astro';
 import ShiftReport from '../components/ShiftReport.astro';
 import BookButton from '../components/BookButton.astro';
@@ -15,8 +17,8 @@ const audit = products.audit;
 const show = products.display;
 ---
 <Base
-  title="Free Keystroke Audit: we count one process"
-  description="A free audit of one process in your business. We watch it, count every keystroke, and tell you what it costs and what to fix. No obligation."
+  title="The Keystroke Audit: we count one process"
+  description="We watch one process in your business, count every keystroke, and tell you what it costs and what to fix. Start with a free conversation."
   canvas
   current="audit"
   page="audit"
@@ -85,6 +87,7 @@ const show = products.display;
           <div class="offer" data-reveal>
             <p class="display-xl offer-word">{audit.offer}.</p>
             <p class="lede"><Fig text={`We watch one process, count it and send you the report in ${audit.delivery}. ${audit.note}`} /></p>
+            <a class="more offer-more" href="/savers#audits">See the price</a>
           </div>
         )}
         <div class="after-list" data-reveal><BookButton href="#book" /></div>
@@ -114,7 +117,7 @@ const show = products.display;
     <div class="wrap band-form">
       <header class="section-head" data-reveal>
         <h2 class="display-l" id="book-h">{BOOK_LABEL}.</h2>
-        <p class="lede">Tell us what you need. The first conversation and the audit are free.</p>
+        <p class="lede">Tell us what you need. {audit.free}</p>
       </header>
       <EnquiryForm kind="consultation" id="audit-form" submit={BOOK_LABEL} />
     </div>

@@ -126,6 +126,7 @@
 /* ============ Audit: the offer ============ */
 .offer { display: grid; gap: var(--space-4); }
 .offer-word { color: var(--readout); }
+.offer-more { margin-top: 0; justify-self: start; }
 
 /* ============ Contact ============ */
 .contact-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-19); align-items: start; }

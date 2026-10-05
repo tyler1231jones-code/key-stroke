@@ -1,0 +1,9 @@
+{
+  "_note": "Copy this file to signatures.json and fill in the real details. signatures.json is kept out of git because it holds personal phone numbers; npm run signatures reads it.",
+  "people": [
+    { "id": "person-1", "name": "First Last", "legend": "K", "role": "Role", "mobile": "TODO", "email": "TODO" },
+    { "id": "person-2", "name": "First Last", "legend": "T", "role": "Role", "mobile": "TODO", "email": "TODO" }
+  ],
+  "fallbackDomain": "key-stroke.com.au",
+  "imageBase": "TODO"
+}

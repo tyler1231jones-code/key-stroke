@@ -10,8 +10,10 @@
   "audit": {
     "name": "The Keystroke Audit",
     "what": "We watch one of your processes from start to finish, count every keystroke in it, and tell you what it costs and what to fix.",
-    "offer": "Free",
-    "note": "No cost and no obligation.",
+    "offer": "Fixed price",
+    "note": "The price is published with our plans. The first conversation and a quick initial audit are free, with no obligation.",
+    "free": "The first conversation and a quick initial audit are free.",
+    "lead": "The Keystroke Audit then counts one process in full, at a fixed price.",
     "price": "$1,500",
     "terms": "Fixed",
     "delivery": "1–2 weeks",

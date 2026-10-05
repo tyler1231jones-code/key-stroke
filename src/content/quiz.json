@@ -394,8 +394,8 @@
     "many": "Start with number 1. The rest is cheaper once it exists."
   },
   "closing": {
-    "trust": "You do not have to trust us yet. The audit is free, and it ends with a figure you can check against your own records.",
-    "cost": "The first conversation and the audit are free. Every job after that is quoted individually.",
+    "trust": "You do not have to trust us yet. Start with a free conversation and a quick initial audit. When we count a process, the figure is one you can check against your own records.",
+    "cost": "The first conversation and a quick initial audit are free. Every job after that is quoted individually.",
     "time": "The audit takes 1–2 weeks. Your part is to do the task once while we record it.",
     "failed": "Most attempts fail by fitting the business to a platform. We count one process first, then build for the business as it is.",
     "unsure": "Then count it before deciding. If the number is small, you can stop there."

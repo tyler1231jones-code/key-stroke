@@ -110,7 +110,8 @@ const crewCount = words(crew.length);
   <section id="start" class="section-pad">
     <div class="wrap">
       <header class="section-head" data-reveal>
-        <h2 class="display-l">It starts with one audit.</h2>
+        <h2 class="display-l">It starts with a free conversation.</h2>
+        <p class="body">{audit.free} {audit.lead}</p>
       </header>
       <ol class="steps">
         {audit.steps.map((step, i) => (
@@ -120,10 +121,8 @@ const crewCount = words(crew.length);
           </li>
         ))}
       </ol>
-      {products.display.audit ? (
+      {products.display.audit && (
         <p class="price start-price" data-reveal><span class="counter-m">{audit.price}</span><span class="unit">{audit.terms.toLowerCase()} price</span></p>
-      ) : (
-        <p class="price start-price" data-reveal><span class="counter-m">{audit.offer}</span><span class="unit">{audit.note}</span></p>
       )}
       <a class="more" href="/audit">See how the audit works</a>
     </div>

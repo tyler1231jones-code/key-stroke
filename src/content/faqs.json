@@ -1,7 +1,7 @@
 {
   "_note": "Questions people ask before they enquire. An answer of TODO keeps the question off the page (and out of the structured data) until a principal supplies it; `needs` says what is missing. Answers are 50 words or fewer.",
   "audit": [
-    { "q": "Is the audit really free?", "a": "Yes. The first conversation and the audit cost nothing, and there is no obligation to go further. If you want something built afterwards, we quote that job on its own." },
+    { "q": "What does the audit cost?", "a": "The Keystroke Audit is fixed price, published with our plans. The first conversation and a quick initial audit are free, with no obligation. The initial audit is an overview of where the hand work is, not an in-depth count. Anything built afterwards is quoted on its own." },
     { "q": "What do you need from us?", "a": "One process, and someone who does it. That person does the job once, the usual way, while we record it. The counting is ours." },
     { "q": "How long does the audit take?", "a": "1–2 weeks from the recording to the report." },
     { "q": "What is a keystroke?", "a": "One thing a person has to type or click: a character, a click, a copy, a paste or a file attached. We count them from a recording, not from an estimate." },
@@ -23,19 +23,19 @@
   ],
   "automation": [
     { "q": "What kind of work can be automated?", "a": "Work someone does by hand on a schedule: retyping details between systems, chasing approvals, building the same document, copying figures into a report. If it follows the same steps each time, it is a candidate." },
-    { "q": "Will it work with the software we already use?", "a": "We build on what you have, including Microsoft 365 tools such as Power Automate and SharePoint, and we connect systems that do not talk to each other. The free audit shows what is possible before anything is quoted." },
+    { "q": "Will it work with the software we already use?", "a": "We build on what you have, including Microsoft 365 tools such as Power Automate and SharePoint, and we connect systems that do not talk to each other. We check what is possible before anything is quoted." },
     { "q": "What is an AI agent?", "a": "Software that does one set job on a schedule, such as matching bank lines or drafting quotes overnight. Ours are named on the crew page. They are not people, and a person checks their work." },
     { "q": "Do the agents make decisions on their own?", "a": "No. Each agent has one job and stops short of the decision. An agent drafts, matches and lists. A person approves, sends or pays." },
-    { "q": "How do we start with automation?", "a": "With a free consultation, then a free audit of one process. You get the count, what it costs you in hours, and a quote for fixing it." },
+    { "q": "How do we start with automation?", "a": "With a free consultation and a quick initial audit. Then the Keystroke Audit counts one process in full: you get the count, what it costs you in hours, and a quote for fixing it." },
     { "q": "How long does an automation build take?", "a": "TODO", "needs": "A typical build time the principals are willing to publish." },
     { "q": "Is our data used to train AI models?", "a": "TODO", "needs": "The principals' statement on how client data is handled by the AI services they use." }
   ],
   "reporting": [
     { "q": "What do you build reports in?", "a": "Power BI and Excel, fed directly from your own systems so nobody retypes a figure." },
-    { "q": "Can you connect to our accounting or job system?", "a": "If it can export its data or offers a connection we can read, yes. We check that in the free audit, before anything is quoted." },
+    { "q": "Can you connect to our accounting or job system?", "a": "If it can export its data or offers a connection we can read, yes. We check that before anything is quoted." },
     { "q": "What is job costing?", "a": "Seeing what each job is making while it is still running, not after it is finished. We build it from the hours and costs your systems already hold." },
     { "q": "We already have a spreadsheet. Do we have to replace it?", "a": "No. Often the fix is to rebuild it so it holds: one place to enter each figure, checks that catch mistakes, and a layout anyone can follow." },
-    { "q": "How do we start with reporting?", "a": "With a free consultation, then a free audit of one report your team builds by hand. You get the count, what it costs you in hours, and a quote." },
+    { "q": "How do we start with reporting?", "a": "With a free consultation and a quick initial audit. Then the Keystroke Audit counts one report your team builds by hand: you get the count, what it costs you in hours, and a quote." },
     { "q": "Who can see our figures?", "a": "TODO", "needs": "The principals' statement on access to client financial data." }
   ],
   "web-software": [

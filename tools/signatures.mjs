@@ -16,6 +16,9 @@
 // folder, which is good for looking and no good for sending: set the domain,
 // deploy, then run this again. People and their details are in
 // src/content/signatures.json; a detail left as TODO is left off.
+// That file and the signatures/ folder hold personal phone numbers, so both
+// are kept out of git. Copy signatures.example.json to start one.
+import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,6 +30,10 @@ const out = join(root, 'signatures');
 const img = join(root, 'public', 'email');
 const json = async (path) => JSON.parse(await readFile(join(root, path), 'utf8'));
 const site = await json('src/content/site.json');
+if (!existsSync(join(root, 'src/content/signatures.json'))) {
+  console.error('src/content/signatures.json not found. Copy src/content/signatures.example.json to it and fill in the details. It stays out of git.');
+  process.exit(1);
+}
 const { people, fallbackDomain, imageBase } = await json('src/content/signatures.json');
 const isSet = (value) => typeof value === 'string' && value !== '' && value !== 'TODO';
 

@@ -5,7 +5,7 @@ A scroll-driven site with real-time and pre-rendered 3D, built with Astro, three
 ## Where things are
 
 - `docs/build-brief.md` is the brief. It says what to build and what content to use.
-- `docs/KEYSTROKE - Design system.pdf` and `docs/KEYSTROKE - Business plan 2026-27.pdf` are the sources the brief is built on.
+- `docs/KEYSTROKE - Design system.pdf` and `docs/KEYSTROKE - Business plan 2026-27.pdf` are the sources the brief is built on. The GitHub repository is public, so these, `HANDOVER.md` and anything personal stay out of git (see `.gitignore` and the README's "What stays out of git"). Check what is staged before every commit.
 - `docs/stack.md` lists the packages, versions and tools.
 - `docs/skill-corrections.md` lists where the skills in `.claude/skills/` are out of date or wrong. Read it before using any `threejs-*` or `gsap-*` skill.
 - `docs/revision-1.md` is the first revision of the build. Where it disagrees with the build brief or the design system, the revision wins.

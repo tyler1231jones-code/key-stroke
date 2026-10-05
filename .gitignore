@@ -30,3 +30,13 @@ pnpm-debug.log*
 
 # local Worker secrets
 .dev.vars
+
+# The repository is public. These stay on this computer and never go to git:
+# the internal business documents, anything that holds personal details, and
+# notes that describe unpublished pricing.
+*.pdf
+*.docx
+*.zip
+HANDOVER.md
+/src/content/signatures.json
+/signatures/

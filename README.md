@@ -24,7 +24,8 @@ npm run dev        # http://localhost:4321
 npm run build      # static site into dist/
 npm run check      # copy, colour, price and figure rules, read from the built pages
 npm run qa         # browser checks: measure, contrast, keyboard, load, 3D memory
-npm run forms      # fills and sends every form with the keyboard alone
+npm run forms      # fills and sends every form with the keyboard alone. The forms
+                   # are live, so this posts real enquiries: ask the principals first
 npm run preview    # serve dist/ locally
 ```
 
@@ -77,12 +78,13 @@ ignores. All of them need `npm run build` first.
 | `/services/websites-and-software` | Websites and software |
 | `/services/branding-and-graphic-design` | Branding and graphic design |
 | `/cases`, `/cases/[id]` | Every case as a card, and each case in full |
-| `/audit` | The free audit. Ends on the form, `/audit#book` |
+| `/audit` | The Keystroke Audit (fixed price; the price is on `/savers`). Ends on the form, `/audit#book` |
 | `/crew` | The five AI agents |
 | `/savers` | Keystroke Savers: the only page with prices. Ends on the form, `/savers#enquire` |
 | `/quiz` | Nine questions. The form sits under the result |
 | `/contact` | The form. Every "Book a free consultation" button comes here |
-| `/privacy` | What the forms collect and where it goes |
+| `/privacy` | The privacy policy, from `legal.json` |
+| `/terms` | The website terms of use, from `legal.json` |
 | `/counting` | The counting method and the ledger. Linked from the footer |
 
 Old addresses redirect: the four `/practice/*` pages from the first build, and
@@ -110,11 +112,11 @@ All three values go in `src/content/site.json`, under `forms`:
 }
 ```
 
-1. **Formspree.** Create two forms at formspree.io. One receives the
-   consultation and Savers enquiries; the other receives quiz results. Each
-   form's address looks like `https://formspree.io/f/abcdwxyz`: the last part
-   is the id. Put the first in `formspreeContactId` and the second in
-   `formspreeQuizId`.
+1. **Formspree.** Each form's address looks like
+   `https://formspree.io/f/abcdwxyz`: the last part is the id. The live site
+   uses one form for everything, so `formspreeContactId` and
+   `formspreeQuizId` hold the same id. To send quiz results somewhere else,
+   create a second form and put its id in `formspreeQuizId`.
 2. **reCAPTCHA v3.** At google.com/recaptcha/admin, register a new site, type
    "Score based (v3)". Add the live domain to its list of domains. Google
    gives two keys:
@@ -134,8 +136,9 @@ to send, so a visitor always has another way through.
 While any of the three values is `TODO` the forms run in development mode: a
 form checks its fields, prints the payload it would have sent to the browser
 console (`[KEYSTROKE form: development mode]`), and shows the thank-you.
-Nothing is sent anywhere and no Google script is loaded. `npm run forms`
-tests all four forms this way. `npm run deploy` refuses to run in this mode.
+Nothing is sent anywhere and no Google script is loaded. `npm run deploy`
+refuses to run in this mode. All three values are set now, so development
+mode is off and `npm run forms` sends real enquiries.
 
 ### What a form sends
 
@@ -190,8 +193,13 @@ committed.
 
 ## Prices
 
-Prices are shown on `/savers` and nowhere else. `src/content/products.json`
-has the switch:
+Prices are shown on `/savers` and nowhere else. The published price list
+(Keystroke Savers, website care, the two website builds, the free initial
+audit and the Keystroke Audit) is `src/content/prices.json`, which only
+`/savers` reads. Other pages say the Keystroke Audit is fixed price and link
+to it there; the free part is the first conversation and a quick initial
+audit (`products.json`, `audit.free`). `src/content/products.json` also has
+the older switch:
 
 ```json
 "display": { "audit": false, "builds": false, "cases": false, "quiz": false, "savers": true }
@@ -254,14 +262,39 @@ npm run build && npm run og && npm run build
 
 The target is **Cloudflare Workers with static assets**, not Pages.
 `wrangler.jsonc` points `assets.directory` at `dist/` and serves `404.html` for
-unknown addresses. There is no Worker script.
+unknown addresses. The one Worker script, `src/worker.ts`, answers `/api/*`
+only (see "The quiz result").
 
-```bash
-npx wrangler login     # once, in your own browser
-npm run deploy         # ready check, build, check, then wrangler deploy
-```
+**The live site deploys itself.** The Worker `key-stroke` is connected to the
+GitHub repository `tyler1231jones-code/key-stroke`. Every push to `main`
+starts a Cloudflare build (`npm run build`, then `npx wrangler deploy`) and
+the site at key-stroke.com.au updates in about a minute. That build does not
+run `npm run ready`, so nothing stops demo content going live; run
+`npm run build && npm run check` before pushing.
 
-Nobody has run `wrangler login` or `wrangler deploy` on this repo yet.
+`npm run deploy` (ready check, build, check, then `wrangler deploy`) is for a
+deploy from this computer instead. It needs `npx wrangler login` first, done
+by a person in their own browser, and it refuses while any demo content
+remains.
+
+Runtime secrets live in the Cloudflare dashboard, under the Worker's
+Settings, Variables and Secrets (not the Builds section). `wrangler.jsonc`
+has `keep_vars: true`, so a deploy never clears them. Never copy a secret
+into `wrangler.jsonc`.
+
+### What stays out of git
+
+The repository is public. `.gitignore` keeps these on this computer only:
+
+- the business plan and design system PDFs (`docs/` and the top folder), and
+  every other `*.pdf`, `*.docx` and `*.zip`
+- `HANDOVER.md`, which describes unpublished pricing terms
+- `src/content/signatures.json` and the `signatures/` folder, which hold
+  personal phone numbers. Copy `src/content/signatures.example.json` to
+  `signatures.json` and fill it in to run `npm run signatures`.
+
+A fresh clone therefore has no PDFs in `docs/`. Copy them in from the
+principals before starting work that needs them.
 
 ### Go live
 
@@ -288,8 +321,9 @@ To go live:
    `analyticsToken` if you want them shown.
 4. Set `"demo": false` in `site.json`. Any record still marked demo then
    drops off the site and out of every sum.
-5. `npm run build && npm run og && npm run deploy`, then attach the domain in
-   the Cloudflare dashboard.
+5. `npm run ready` to confirm nothing demo is left, then
+   `npm run build && npm run og && npm run build && npm run check`, commit,
+   and push to `main`. The domain is already attached to the Worker.
 
 `domain` has to be known before the first deploy, because canonical addresses
 and the sitemap are built from it.
@@ -307,6 +341,9 @@ agent, price, question or product is written into a template.
 | `ledger.json` | One row per cleared task. Every counter is computed from this |
 | `crew.json` | The five AI agents: name, role, character, schedule |
 | `products.json` | The price switch and the quote line, the audit and its three steps, the build ranges, the quiz items, the estimate bands, Keystroke Savers |
+| `prices.json` | The published price list, read by `/savers` only |
+| `legal.json` | The privacy policy and the website terms of use |
+| `signatures.example.json` | The shape of `signatures.json` (kept out of git), which `npm run signatures` reads |
 | `faqs.json` | The questions and answers on `/audit`, `/savers` and the four service pages |
 | `demos.json` | The invented businesses and sample text in the four demonstrations |
 | `shiftReport.json` | The sample report on the audit page |
