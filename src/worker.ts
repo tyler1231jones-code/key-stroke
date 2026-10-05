@@ -238,13 +238,25 @@ async function quizResult(request: Request, env: Env): Promise<Response> {
 
   try {
     const advice = await advise(answers, env.ANTHROPIC_API_KEY);
-    return advice ? json({ advice }) : json({ error: 'no-advice' }, 502);
+    return advice ? json({ advice }) : json({ error: 'no-advice', reason: 'empty' }, 502);
   } catch (err) {
-    if (err instanceof Anthropic.AuthenticationError) console.error('Claude refused the API key. Check ANTHROPIC_API_KEY.');
-    else if (err instanceof Anthropic.RateLimitError) console.error('Claude is rate limiting this key, or its spend limit is reached.');
-    else if (err instanceof Anthropic.APIError) console.error(`Claude answered ${err.status}:`, err.message);
-    else console.error('The quiz result failed:', err);
-    return json({ error: 'no-advice' }, 502);
+    // The reason goes back with the error so a failure can be told apart
+    // without the logs: which kind it was, never the key.
+    let reason = 'worker';
+    if (err instanceof Anthropic.AuthenticationError) {
+      reason = 'api-key';
+      console.error('Claude refused the API key. Check ANTHROPIC_API_KEY.');
+    } else if (err instanceof Anthropic.RateLimitError) {
+      reason = 'rate-limit';
+      console.error('Claude is rate limiting this key, or its spend limit is reached.');
+    } else if (err instanceof Anthropic.APIError) {
+      reason = `claude-${err.status ?? 'connection'}`;
+      console.error(`Claude answered ${err.status}:`, err.message);
+      if (err.status === 400 || err.status === 404) return json({ error: 'no-advice', reason, detail: err.message.slice(0, 300) }, 502);
+    } else {
+      console.error('The quiz result failed:', err);
+    }
+    return json({ error: 'no-advice', reason }, 502);
   }
 }
 
