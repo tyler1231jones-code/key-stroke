@@ -22,7 +22,7 @@
 //
 // Secrets, set by a person in the Cloudflare dashboard (Settings, Variables
 // and Secrets) and never written in this project:
-//   ANTHROPIC_API_KEY   from the Claude Console
+//   ANTHROPIC_API_KEY   from the Claude Console, made inside a workspace
 //   RECAPTCHA_SECRET    the reCAPTCHA v3 secret key
 import Anthropic from '@anthropic-ai/sdk';
 import quiz from './content/quiz.json';
@@ -33,6 +33,8 @@ import site from './content/site.json';
 interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
   ANTHROPIC_API_KEY?: string;
+  /** Only for an API key that is not tied to one workspace: the workspace to bill. */
+  ANTHROPIC_WORKSPACE_ID?: string;
   RECAPTCHA_SECRET?: string;
   /** Accepted as another name for RECAPTCHA_SECRET. */
   RECAPTCHA_SECRET_KEY?: string;
@@ -173,8 +175,8 @@ function asText(a: Answers): string {
 
 const clip = (text: unknown, max: number) => (typeof text === 'string' ? text.trim().slice(0, max) : '');
 
-async function advise(a: Answers, apiKey: string): Promise<Advice | null> {
-  const client = new Anthropic({ apiKey, maxRetries: 1, timeout: 25_000 });
+async function advise(a: Answers, apiKey: string, workspace?: string): Promise<Advice | null> {
+  const client = new Anthropic({ apiKey, maxRetries: 1, timeout: 25_000, defaultHeaders: workspace ? { 'anthropic-workspace-id': workspace } : undefined });
   const response = await client.beta.messages.create({
     model: MODEL,
     max_tokens: 4000,
@@ -237,7 +239,7 @@ async function quizResult(request: Request, env: Env): Promise<Response> {
   if (!(await human(body.token, secret, ip))) return json({ error: 'recaptcha' }, 403);
 
   try {
-    const advice = await advise(answers, env.ANTHROPIC_API_KEY);
+    const advice = await advise(answers, env.ANTHROPIC_API_KEY, env.ANTHROPIC_WORKSPACE_ID);
     return advice ? json({ advice }) : json({ error: 'no-advice', reason: 'empty' }, 502);
   } catch (err) {
     // The reason goes back with the error so a failure can be told apart

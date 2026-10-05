@@ -1,7 +1,8 @@
 // The 3D stage is its own chunk and starts after first paint, so the page
 // never waits for it. If it cannot start, the page keeps its drawn stand-ins.
 //
-// On a desktop it starts as soon as the browser is idle. On a phone, where
+// On a desktop it starts at once: the download begins with the page's own
+// script, and nothing waits for the browser to go idle. On a phone, where
 // starting it competes with the page for one slow processor, it waits for the
 // first sign of use (a touch, a scroll, a key) or for 3.5 seconds after load,
 // whichever comes first. Until then the hero shows its drawn key, which is in
@@ -23,7 +24,7 @@ export function loadStage(): void {
   const light = window.matchMedia('(max-width: 899px), (pointer: coarse)').matches;
   // ?debug starts at once, so the audit tools measure the stage itself.
   if (!light || new URLSearchParams(location.search).has('debug')) {
-    idle(start, 1200);
+    start();
     return;
   }
   const signs = ['scroll', 'touchstart', 'pointerdown', 'keydown', 'wheel'] as const;

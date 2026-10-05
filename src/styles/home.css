@@ -82,7 +82,7 @@
 .intro .hero-h .line > span { animation: ks-line var(--dur-2) var(--ease-out) both; animation-delay: calc(0.15s + var(--i) * 0.09s); }
 .intro .hero-lede { animation: ks-rise var(--dur-2) var(--ease-out) 0.5s both; }
 .intro .hero-keys > span { animation: ks-rise var(--dur-2) var(--ease-out) both; animation-delay: calc(0.65s + var(--i) * 0.08s); }
-.intro .hero-slot .stand-in, .intro #stage { animation: ks-key var(--dur-3) var(--ease-out) 0.5s backwards; }
+.intro .hero-slot .stand-in, .intro #stage { animation: ks-key var(--dur-3) var(--ease-out) 0.2s backwards; }
 
 /* ============ Below the hero ============ */
 .home-alt { background: var(--base-900); }

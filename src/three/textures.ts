@@ -203,7 +203,15 @@ export async function prepareKeyFace(t: Tokens, legend: string, size: number, we
   const key = wornKey(legend, size, wear, aspect);
   if (worn.has(key)) return;
   const job = startWear(t, legend, size, wear, aspect);
-  while (!wearRows(job, 24)) await new Promise<void>((ok) => setTimeout(ok, 0));
+  // Rows are drawn for about a frame's worth of time, then the page gets a
+  // turn. A fixed handful of rows a turn spent longer waiting than drawing.
+  for (;;) {
+    const until = performance.now() + 12;
+    let done = false;
+    while (!done && performance.now() < until) done = wearRows(job, 16);
+    if (done) break;
+    await new Promise<void>((ok) => setTimeout(ok, 0));
+  }
   worn.set(key, finishWear(job));
 }
 
