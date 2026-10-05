@@ -15,9 +15,9 @@
   "email": "TODO",
   "domain": "TODO",
   "forms": {
-    "formspreeContactId": "TODO",
-    "formspreeQuizId": "TODO",
-    "recaptchaSiteKey": "TODO"
+    "formspreeContactId": "mwlvedpr",
+    "formspreeQuizId": "mwlvedpr",
+    "recaptchaSiteKey": "6LdAft8tAAAAAMZYtWupm-AmQE5m9UU51lMsPAgX"
   },
   "analyticsToken": "TODO",
   "featuredCases": [
