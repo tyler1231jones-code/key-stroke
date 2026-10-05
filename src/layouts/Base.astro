@@ -6,6 +6,7 @@ import '@fontsource/archivo/latin-600.css';
 import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
 import '../styles/tokens.css';
+import '../styles/motion.css';
 import '../styles/base.css';
 import '../styles/parts.css';
 import oswald600 from '@fontsource/oswald/files/oswald-latin-600-normal.woff2?url';
@@ -14,11 +15,15 @@ import archivo400 from '@fontsource/archivo/files/archivo-latin-400-normal.woff2
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import ClosingBand from '../components/ClosingBand.astro';
-import { site } from '../lib/data';
+import StickyCta from '../components/StickyCta.astro';
+import { site, origin, has } from '../lib/data';
 import { dateInZone } from '../lib/ledger';
+import { abs, shareKey, fullTitle, organization, website, breadcrumbs, faqSchema, faqsFor, type Crumb } from '../lib/seo';
 
 interface Props {
+  /** 48 characters or fewer, so the name fits after it inside 60. */
   title: string;
+  /** 155 characters or fewer: a reason to click. */
   description: string;
   theme?: 'dark' | 'light';
   /** Pages with 3D carry the one persistent canvas. */
@@ -26,28 +31,70 @@ interface Props {
   /** The header item this page belongs to, if any. */
   current?: string;
   page: string;
-  /** How the page ends: the closing band, the booking block, or neither. */
-  band?: 'close' | 'book' | 'none';
+  /** How the page ends: the closing band, or nothing when the page ends on its own form. */
+  band?: 'close' | 'none';
+  /** A service id passed to the closing band and the phone bar, so the form opens with it chosen. */
+  service?: string;
+  /** Where the phone bar's button goes, when the page has its own form. */
+  bookHref?: string;
+  /** The trail from the homepage to this page, for BreadcrumbList. */
+  crumbs?: Crumb[];
+  /** The key in faqs.json of the questions on this page, for FAQPage. */
+  faq?: string;
+  /** Further JSON-LD for this page. */
+  schema?: (object | null)[];
+  /** Pages that should never be indexed, whatever demo mode says. */
+  noindex?: boolean;
 }
-const { title, description, theme = 'dark', canvas = false, current, page, band = 'close' } = Astro.props;
+const {
+  title, description, theme = 'dark', canvas = false, current, page, band = 'close',
+  service, bookHref, crumbs = [], faq, schema = [], noindex = false,
+} = Astro.props;
 const buildDate = dateInZone(site.timezone);
-const fullTitle = title === site.name ? `${site.name}. ${site.tagline}` : `${title} / ${site.name}`;
+// "/audit.html" and "/index.html" are served at "/audit" and "/".
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '/').replace(/(.)\/+$/, '$1');
+const canonical = origin ? abs(path) : null;
+const image = abs(`/og/${shareKey(path)}.png`);
+const jsonLd = [organization(), website(), breadcrumbs(crumbs), faq ? faqSchema(faqsFor(faq)) : null, ...schema].filter(Boolean);
 ---
 <!doctype html>
 <html lang="en-AU" data-theme={theme === 'light' ? 'light' : undefined} data-page={page}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{fullTitle}</title>
+    <title>{fullTitle(title)}</title>
     <meta name="description" content={description} />
     {/* The content is mock until demo mode is off, so it is kept out of search. */}
-    {site.demo && <meta name="robots" content="noindex, nofollow" />}
+    {(site.demo || noindex) && <meta name="robots" content="noindex, nofollow" />}
+    {canonical && !noindex && <link rel="canonical" href={canonical} />}
     <meta name="ks-build-date" content={buildDate} />
     <meta name="theme-color" content={theme === 'light' ? '#ffffff' : '#0b0d10'} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    {/* A page that is never indexed (the 404) has no share image and no share tags. */}
+    {!noindex && (
+      <>
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={site.name} />
+        <meta property="og:locale" content="en_AU" />
+        <meta property="og:title" content={fullTitle(title)} />
+        <meta property="og:description" content={description} />
+        {canonical && <meta property="og:url" content={canonical} />}
+        <meta property="og:image" content={image} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={`${site.name}: ${title}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={fullTitle(title)} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={image} />
+      </>
+    )}
+
     <link rel="preload" as="font" type="font/woff2" href={oswald600} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={archivo400} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={plex500} crossorigin />
+    {jsonLd.map((item) => <script type="application/ld+json" is:inline set:html={JSON.stringify(item)} />)}
     <script is:inline>
       // Decide before first paint whether motion runs, so nothing flashes.
       // If the page script never arrives, fall back to the resting state.
@@ -73,6 +120,10 @@ const fullTitle = title === site.name ? `${site.name}. ${site.tagline}` : `${tit
         }, 5000);
       })();
     </script>
+    {/* Cloudflare Web Analytics: no cookies. Nothing is loaded until the token is set in site.json. */}
+    {has('analyticsToken') && (
+      <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: site.analyticsToken })}></script>
+    )}
   </head>
   <body>
     <a class="skip plate" href="#main">Skip to content</a>
@@ -80,8 +131,9 @@ const fullTitle = title === site.name ? `${site.name}. ${site.tagline}` : `${tit
     <Nav current={current} />
     <main id="main">
       <slot />
-      {band !== 'none' && <ClosingBand mode={band} />}
+      {band !== 'none' && <ClosingBand service={service} />}
     </main>
     <Footer />
+    <StickyCta service={service} href={bookHref} />
   </body>
 </html>

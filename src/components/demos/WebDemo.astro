@@ -1,0 +1,80 @@
+---
+// Websites and software. A dated site rebuilds itself section by section, in
+// a desktop frame and a phone frame side by side. The old site is cut off on
+// the phone; the new one fits both. The business is invented.
+import demos from '../../content/demos.json';
+
+const d = demos['web-software'];
+const frames = ['desktop', 'phone'] as const;
+---
+<div class="dw">
+  {frames.map((frame) => (
+    <div class:list={['frame', `dw-${frame}`, { 'frame-phone': frame === 'phone' }]}>
+      {frame === 'desktop' && (
+        <div class="frame-bar"><i></i><i></i><i></i><span class="frame-url">{d.url}</span></div>
+      )}
+      <div class="frame-view">
+        <div class="d-after dw-new">
+          <div class="dw-nav" data-part="0">
+            <p class="dw-logo"><i></i>{d.business}</p>
+            <span>Services</span><span>About</span><span>Contact</span>
+            <p class="dw-btn">Book a plumber</p>
+            <i class="dw-burger"></i>
+          </div>
+          <div class="dw-hero" data-part="1">
+            <div>
+              <p class="dw-h">Blocked drain? We are on the way.</p>
+              <p>Local plumbers, booked online, at your door the same day.</p>
+              <p class="dw-btn">Book a plumber</p>
+            </div>
+            <div class="dw-pic">
+              <svg viewBox="0 0 120 90" preserveAspectRatio="xMidYMid meet">
+                <rect x="10" y="34" width="62" height="16" rx="3" fill="var(--demo-paper)" />
+                <rect x="60" y="18" width="16" height="48" rx="3" fill="var(--demo-paper)" />
+                <rect x="76" y="28" width="26" height="12" rx="3" fill="var(--demo-paper)" />
+                <rect x="92" y="38" width="10" height="16" rx="3" fill="var(--demo-paper)" />
+                <circle cx="97" cy="68" r="5" fill="var(--demo-web-accent)" />
+                <circle cx="97" cy="82" r="3" fill="var(--demo-web-accent)" />
+              </svg>
+            </div>
+          </div>
+          <div class="dw-cards" data-part="2">
+            <p class="dw-card"><i></i>Blocked drains</p>
+            <p class="dw-card"><i></i>Hot water</p>
+            <p class="dw-card"><i></i>Leaks and taps</p>
+          </div>
+        </div>
+
+        <div class="d-before dw-old">
+          <div class="dw-old-inner">
+            <div class="dw-old-head">
+              <svg class="dw-old-star" viewBox="0 0 40 40">
+                <polygon points="20,1 24,13 37,9 29,19 39,27 26,27 27,39 20,29 13,39 14,27 1,27 11,19 3,9 16,13" fill="var(--demo-drab-red)" />
+                <circle cx="20" cy="21" r="7" fill="var(--demo-drab-1)" />
+              </svg>
+              <div>
+                <p class="dw-old-name">{d.business.toUpperCase()}</p>
+                <p class="dw-old-tag">Welcome to our web site. Under construction.</p>
+              </div>
+            </div>
+            <div class="dw-old-nav"><span>Home</span><span>Page 2</span><span>Links</span><span>Guestbook</span><span>Email us</span></div>
+            <div class="dw-old-cols">
+              <div><b>News</b>New phone number coming soon. Please check back. Office hours may change over the holidays. Ask about our specials.</div>
+              <div>
+                <b>About our company</b>We have been plumbing for a long time and offer all types of plumbing services including drains, taps, toilets, hot water, gas, roofs, gutters and more at competitive rates. Call the office during business hours and leave a message if no one answers. We will call you back as soon as we can.
+                <svg class="dw-old-wrench" viewBox="0 0 60 60">
+                  <rect x="26" y="20" width="8" height="34" fill="var(--demo-drab-3)" />
+                  <circle cx="30" cy="16" r="12" fill="var(--demo-drab-3)" />
+                  <rect x="26" y="2" width="8" height="14" fill="var(--demo-drab-0)" />
+                </svg>
+              </div>
+              <div><b>Links</b>Click here for a map. Click here for our old site. Best viewed at a screen size of 800 by 600.</div>
+            </div>
+            <p class="dw-old-foot">Copyright. All rights reserved. This page was last updated a long time ago.</p>
+          </div>
+        </div>
+        <span class="dw-scan"></span>
+      </div>
+    </div>
+  ))}
+</div>

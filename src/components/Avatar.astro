@@ -16,6 +16,8 @@ const key = Object.keys(files).find((path) => path.split('/').pop()?.replace(/\.
 const art = key ? files[key].default : null;
 const Inline = typeof art === 'function' ? (art as any) : null;
 const image = art && typeof art !== 'function' ? (art as ImageMetadata) : null;
+// Each drawn avatar blinks on its own beat (motion.css), so the five never blink together.
+const beat = (name.split('').reduce((t, ch) => t + ch.charCodeAt(0), 0) % 11) / 2;
 ---
-{Inline && <Inline class:list={['avatar', cls]} width={null} height={null} aria-hidden="true" focusable="false" />}
+{Inline && <Inline class:list={['avatar', cls]} width={null} height={null} style={`--beat:${beat}`} aria-hidden="true" focusable="false" />}
 {image && <img class:list={['avatar', cls]} src={image.src} width={image.width} height={image.height} alt="" loading="lazy" decoding="async" />}

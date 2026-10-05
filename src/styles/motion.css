@@ -1,0 +1,78 @@
+/* The motion system. One file, used on every page.
+
+   Three durations, two easings, three standard arrivals:
+     text     rises 12px and fades in        --dur-2, --ease-out
+     cards    rise 24px and fade in          --dur-2, --ease-out, 70ms apart
+     figures  roll to their value            a mechanism: 180ms a digit, linear
+
+   Mechanisms (a digit rolling, a key being struck, a tally stroke, a blink)
+   keep the design system's linear timing. Their durations are ROLL, STROKE
+   and HOLD in src/scripts/motion.ts, and they are never eased.
+
+   A service demonstration is one GSAP timeline (src/scripts/demos.ts). Its
+   tweens use the GSAP equivalents of these two easings (power2.out and
+   power2.inOut); their lengths are set by the scene.
+
+   Nothing here runs under prefers-reduced-motion: every arrival is off and
+   each page shows its resting state. */
+:root {
+  --dur-1: 0.15s; /* a response: hover, press, focus */
+  --dur-2: 0.4s;  /* an arrival: a block entering the viewport */
+  --dur-3: 0.7s;  /* a set piece: the hero load-in, a rule drawing */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);   /* arrives and settles, never past its target */
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1); /* travels between two resting places */
+  --stagger: 70ms;
+}
+
+/* ---------- Arrivals ---------- */
+/* The script marks only blocks still below the fold with .pre, so nothing is
+   hidden without it. Removing .pre plays the arrival, once. */
+[data-reveal] { transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); transition-delay: calc(var(--i, 0) * var(--stagger)); }
+[data-reveal].pre { opacity: 0; transform: translateY(12px); transition: none; }
+[data-reveal="card"].pre { transform: translateY(24px); }
+
+/* Every page: the heading and the first block rise in on load. */
+@keyframes ks-rise { from { opacity: 0; transform: translateY(12px); } }
+.motion .load-in { animation: ks-rise var(--dur-2) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 90ms); }
+
+/* ---------- Responses: hover, focus and tap ---------- */
+.key, .chip, .demo-toggle, .demo-replay, .quiz-option > span, .tag { transition: transform var(--dur-1) var(--ease-out), box-shadow var(--dur-1) var(--ease-out), background-color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out); }
+.card { transition: border-color var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out); }
+a, .faq-item > summary, .field input, .field select, .field textarea { transition: color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out), text-decoration-color var(--dur-1) var(--ease-out); }
+/* A card that is a link lifts a little under the pointer, and sits back when pressed. */
+.card:has(.card-link:hover) { transform: translateY(-2px); }
+.card:has(.card-link:active) { transform: none; }
+/* The mark after a text link steps forward. */
+.more::after, .scard-go::after { display: inline-block; transition: transform var(--dur-1) var(--ease-out); }
+.more:hover::after, .card:has(.card-link:hover) .scard-go::after { transform: translateX(4px); }
+.chip:hover, .quiz-option:hover > span { border-color: var(--ink); }
+.chip:active { box-shadow: none; transform: translateY(2px); }
+.faq-item > summary:hover { color: var(--readout); }
+
+/* ---------- Mechanisms that play on their own ---------- */
+/* As a closing band arrives, its key is pressed once: down in 90ms, back in
+   120ms, linear, like the key in the hero. */
+@keyframes ks-press {
+  0% { transform: none; box-shadow: var(--shadow-rest); }
+  43% { transform: translateY(2px); box-shadow: none; }
+  100% { transform: none; box-shadow: var(--shadow-rest); }
+}
+.motion .band[data-reveal]:not(.pre) .keys > .key:first-child { animation: ks-press 0.21s linear 0.6s 1; }
+
+/* The crew blink, each on its own beat. */
+@keyframes ks-blink { 0%, 95%, 100% { transform: scaleY(1); } 97.5% { transform: scaleY(0.12); } }
+.motion .avatar .eye { transform-box: fill-box; transform-origin: 50% 50%; animation: ks-blink 5.5s linear infinite; animation-delay: calc(var(--beat, 0) * -1s); }
+
+/* ---------- Between pages ---------- */
+/* The browser cross-fades one page into the next, and the header holds still.
+   This is the browser's own cross-document view transition, not a client
+   router: each page still loads in full, so the canvas, the scroll triggers
+   and the page scripts start clean every time. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--dur-1); }
+.bar { view-transition-name: bar; }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  [data-reveal], .key, .chip, .card, a, .demo-toggle, .demo-replay, .more::after, .scard-go::after { transition: none; }
+}

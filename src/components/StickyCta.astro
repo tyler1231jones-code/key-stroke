@@ -1,0 +1,16 @@
+---
+// On phones, a slim bar fixed to the foot of the screen with the one primary
+// action. The page script shows it once the first screen has scrolled past,
+// and hides it while a form or the footer is on screen. Without script it
+// stays hidden: the header carries the same button.
+import BookButton from './BookButton.astro';
+
+interface Props {
+  service?: string;
+  href?: string;
+}
+const { service, href } = Astro.props;
+---
+<div class="cta-bar" data-cta-bar>
+  <BookButton small service={service} href={href} />
+</div>

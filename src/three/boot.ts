@@ -4,16 +4,16 @@
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { createStage, type SceneFactory } from './stage';
 import { bootStill, type StillDef } from './still';
-import { fontFamily } from './tokens';
+import { fontFamily, tokens } from './tokens';
+import { prepareKeyFace } from './textures';
+import { WORN_K } from './objects/keycap';
 import { heroScene } from './scenes/hero';
 import { auditScene } from './scenes/audit';
-import { serviceScene } from './scenes/service';
 import { bus } from '../scripts/bus';
 
 const SCENES: Record<string, { factory: SceneFactory; still?: boolean }> = {
   hero: { factory: heroScene },
   audit: { factory: auditScene },
-  service: { factory: serviceScene },
 };
 
 function noStage(): void {
@@ -41,6 +41,10 @@ export async function bootStage(): Promise<void> {
   });
   if (!defs.length) return;
 
+  // The hero key's worn face is the heaviest thing to draw. It is drawn here,
+  // a few rows at a turn, before the stage exists, so nothing waits on it.
+  if (defs.some((d) => d.el.dataset.scene === 'hero')) await prepareKeyFace(tokens(), 'K', phone ? 512 : 1024, WORN_K);
+
   const forceStill = new URLSearchParams(location.search).has('still');
   if (reduced || forceStill) {
     document.documentElement.classList.add('no-stage');
@@ -48,6 +52,9 @@ export async function bootStage(): Promise<void> {
     return;
   }
 
+  // The start-up is taken in steps, with the page given a turn between them.
+  const turn = () => new Promise<void>((ok) => setTimeout(ok, 0));
+  await turn();
   const debug = new URLSearchParams(location.search).has('debug');
   const stage = createStage(canvas, {
     maxDpr: phone ? 1.5 : 2,

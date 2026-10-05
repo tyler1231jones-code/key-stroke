@@ -15,10 +15,11 @@ const home = homepageTotal(today);
 const earlierYears = [...new Set(ledger.map((row) => row.confirmed.slice(0, 4)))].filter((y) => y < year);
 ---
 <Base
-  title="The counting method"
-  description="How a keystroke is defined, measured and audited, and the ledger the counter reads from."
+  title="How we count keystrokes: the method and ledger"
+  description="How a keystroke is defined, measured and audited, and the ledger that every counter on this site reads from. Check any figure we publish."
   theme="light"
   page="counting"
+  crumbs={[{ name: 'Counting method', href: '/counting' }]}
 >
   <article class="doc">
     <section class="page-head">
@@ -30,21 +31,21 @@ const earlierYears = [...new Set(ledger.map((row) => row.confirmed.slice(0, 4)))
 
     <div class="wrap">
       <ol class="steps doc-summary">
-        <li class="step">
+        <li class="step" data-reveal="card">
           <h2 class="display-s">What counts</h2>
           <p class="body">A character typed, a click, a copy, a paste or a file attached, when the rebuilt job no longer needs it. Reading and deciding are not counted.</p>
         </li>
-        <li class="step">
+        <li class="step" data-reveal="card" style="--i:1">
           <h2 class="display-s">How we count</h2>
           <p class="body">We record the job once, with you watching, and count from the recording. Then we multiply by how often your own records say it happens.</p>
         </li>
-        <li class="step">
+        <li class="step" data-reveal="card" style="--i:2">
           <h2 class="display-s">When it counts</h2>
           <p class="body">Only after the rebuilt job has run for four weeks with nobody stepping in. A job that is half automated counts for nothing.</p>
         </li>
       </ol>
 
-      <details class="method">
+      <details class="method" data-reveal>
         <summary class="display-s">The full counting method</summary>
         <div class="doc-body">
           <section class="doc-section">
@@ -100,13 +101,13 @@ const earlierYears = [...new Set(ledger.map((row) => row.confirmed.slice(0, 4)))
       </details>
 
       <section class="ledger" id="ledger" aria-labelledby="ledger-h">
-        <header class="section-head">
+        <header class="section-head" data-reveal>
           <h2 class="display-l" id="ledger-h">The ledger.</h2>
           <p class="body">One row for each job we have cleared. The counter on the homepage is the sum of these rows.</p>
         </header>
         {ledger.length > 0 ? (
           <>
-            <div class="table-frame">
+            <div class="table-frame" data-reveal="card">
               <table class="table ledger-table">
                 <caption class="vh">The ledger behind the counter, as at {dateShort(today)}</caption>
                 <thead>
@@ -143,7 +144,7 @@ const earlierYears = [...new Set(ledger.map((row) => row.confirmed.slice(0, 4)))
                 <tfoot>
                   <tr>
                     <td colspan="8">Keystrokes cleared in <span data-year>{year}</span>, to <span data-as-at>{dateShort(today)}</span>. Added first, then rounded down once.</td>
-                    <td class="n"><Counter value={home.today} size="s" id="ledger-total" /></td>
+                    <td class="n"><Counter value={home.today} size="s" id="ledger-total" data-roll /></td>
                   </tr>
                 </tfoot>
               </table>

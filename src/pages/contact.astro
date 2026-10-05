@@ -1,0 +1,48 @@
+---
+// The free consultation. Every "Book a free consultation" button on the site
+// leads here, apart from the ones on the audit page, which has this form too.
+// A link such as /contact?service=automation arrives with that service chosen
+// (src/scripts/forms.ts).
+import Base from '../layouts/Base.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import { products, site, has, BOOK_LABEL } from '../lib/data';
+import { professionalService } from '../lib/seo';
+import '../styles/pages.css';
+
+---
+<Base
+  title="Book a free consultation"
+  description="Tell us what your business needs. The first conversation and the Keystroke Audit are free, with no obligation. Every job is quoted individually."
+  page="contact"
+  band="none"
+  crumbs={[{ name: 'Contact', href: '/contact' }]}
+  schema={[professionalService('/contact')]}
+>
+  <section class="page-head">
+    <div class="wrap">
+      <h1 class="display-xl load-in">{BOOK_LABEL}.</h1>
+      <p class="lede load-in" style="--i:1">Tell us what you need help with. The first conversation and the Keystroke Audit are free, and there is no obligation.</p>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="wrap contact-grid">
+      <div class="load-in" style="--i:2">
+        <EnquiryForm kind="consultation" id="contact-form" submit={BOOK_LABEL} />
+      </div>
+      <aside class="contact-aside" aria-label="What happens next">
+        <h2 class="display-s">What happens next</h2>
+        <ol class="ticks contact-steps">
+          <li>We reply by email to arrange a time.</li>
+          <li>We talk through what you need.</li>
+          <li>{products.quoteLine}</li>
+        </ol>
+        {has('email') && <p class="body-s">Or email <a href={`mailto:${site.email}`}>{site.email}</a></p>}
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/page.ts';
+</script>

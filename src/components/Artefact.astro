@@ -65,6 +65,8 @@ const step = () => ++s;
         <header class="art-head plate"><span>{a.title}</span><span>{a.stamp}</span></header>
         <div class="art-body">
           <table class="art-table">
+            {/* The columns are plain on sight; a screen reader needs them named. */}
+            <thead class="vh"><tr><th>Date</th><th>Bank line</th><th>Amount</th><th>Matched to</th><th>Result</th></tr></thead>
             <tbody>
               {a.rows.map((row: (string | null)[]) => (
                 <tr>

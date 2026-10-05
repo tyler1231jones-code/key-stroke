@@ -5,6 +5,7 @@
 import Base from '../layouts/Base.astro';
 import Counter from '../components/Counter.astro';
 import Fig from '../components/Fig.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
 import { questions } from '../lib/quiz';
 import { products } from '../lib/data';
 import '../styles/pages.css';
@@ -12,16 +13,17 @@ import '../styles/pages.css';
 const available = products.items.length > 0;
 ---
 <Base
-  title="Nine questions"
-  description="A diagnostic in nine questions and about ninety seconds. No email gate, no sales call unless you ask for one."
+  title="90-second quiz: what should your business fix?"
+  description="Nine questions, about 90 seconds, and no email needed. Find out which manual job in your business is worth fixing first."
+  crumbs={[{ name: 'Quiz', href: '/quiz' }]}
   current="quiz"
   page="quiz"
   band="none"
 >
   <section class="quiz">
     <div class="wrap">
-      <div class="quiz-top" id="quiz-top">
-        <h1 class="eyebrow">Nine questions</h1>
+      <div class="quiz-top load-in" id="quiz-top">
+        <h1 class="eyebrow">Nine questions: what should your business fix first?</h1>
         <div class="plate quiz-progress" id="quiz-progress">
           <Counter value={1} widest={questions.length} size="s" id="quiz-step" data-figure="other" />
           <span>of <span>{questions.length}</span></span>
@@ -33,7 +35,7 @@ const available = products.items.length > 0;
       </noscript>
 
       {available ? (
-        <form id="quiz-form" novalidate>
+        <form class="load-in" style="--i:1" id="quiz-form" novalidate>
           <div class="quiz-frame" id="quiz-frame">
             {questions.map((q, i) => (
               <fieldset class="quiz-screen" data-q={q.id} data-type={q.type} data-exclusive={'exclusive' in q ? q.exclusive : undefined} hidden={i > 0}>
@@ -60,6 +62,17 @@ const available = products.items.length > 0;
       )}
 
       <div class="result" id="quiz-result" hidden></div>
+
+      {/* Below the result, never in front of it. */}
+      <div class="quiz-enquiry result-block" id="quiz-enquiry" data-reveal hidden>
+        <h2 class="display-m">Send me this and get in touch.</h2>
+        <p class="body">Your answers and this result go to us with your details, and we reply to arrange a free conversation. Nothing has been sent so far.</p>
+        <EnquiryForm kind="quiz" id="quiz-contact" submit="Send it and get in touch" />
+        <p class="result-back">
+          <a class="body-s" href="/cases">See the cases</a>
+          <button class="body-s quiz-back" type="button" id="quiz-again">Start again</button>
+        </p>
+      </div>
     </div>
   </section>
 </Base>

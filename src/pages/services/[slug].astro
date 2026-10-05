@@ -1,12 +1,14 @@
 ---
-// One service: what it is, three examples, two cases, the price
-// ranges and one button. The hero carries the page's one small scroll moment.
+// One service. It opens with the service's demonstration at full size, then
+// lists what the service offers, shows two cases, answers the questions
+// people ask, and ends on the free consultation. No prices.
 import Base from '../../layouts/Base.astro';
+import Demo from '../../components/demos/Demo.astro';
 import CaseCard from '../../components/CaseCard.astro';
 import BookButton from '../../components/BookButton.astro';
-import Fig from '../../components/Fig.astro';
-import { services, casesOf, products, serviceTotals } from '../../lib/data';
-import { num, words } from '../../lib/format';
+import Faq from '../../components/Faq.astro';
+import { services, casesOf, products, serviceHref } from '../../lib/data';
+import { serviceSchema } from '../../lib/seo';
 import '../../styles/pages.css';
 
 export function getStaticPaths() {
@@ -14,56 +16,64 @@ export function getStaticPaths() {
 }
 
 const { s } = Astro.props;
-const own = casesOf(s.slug).slice(0, 2);
-const totals = serviceTotals(s.slug);
+const own = casesOf(s.id).slice(0, 2);
 const keystrokes = own.some((c) => /keystroke/.test(c.before.unit));
-// The drums show a figure, so the figure is said in words beside them.
-const drums = s.object === 'drum' && totals.rows > 0;
+const lower = s.name.toLowerCase().replace('ai agents', 'AI agents');
 ---
-<Base title={s.name} description={`${s.name}. ${s.what}`} canvas current="services" page="service">
-  <section
-    class="phero"
-    data-scene="service"
-    data-object={s.object}
-    data-before={drums ? totals.before : 0}
-    data-after={drums ? totals.after : 0}
-  >
-    <div class="phero-pin">
-      <div class="wrap phero-grid">
-        <div class="phero-copy">
-          <p class="tag load-in">{s.practiceName}</p>
-          <h1 class="display-xl load-in">{s.name}</h1>
-          <p class="lede load-in" style="--i:1">{s.what}</p>
-        </div>
-        <div class="phero-figure">
-          <div class="phero-slot" data-slot aria-hidden="true">
-            <img class="slot-still" src={`/stills/service-${s.slug}.webp`} alt="" loading="lazy" decoding="async" />
-          </div>
-          {drums && (
-            <p class="unit phero-caption">
-              What {words(totals.rows)} clients typed in a year to build their reports: <span class="fig">{num(totals.before)}</span> keystrokes before, <span class="fig">{num(totals.after)}</span> after.
-            </p>
-          )}
-        </div>
+<Base
+  title={s.title}
+  description={s.description}
+  current="services"
+  page="service"
+  service={s.id}
+  crumbs={[{ name: 'Services', href: '/services' }, { name: s.name, href: serviceHref(s) }]}
+  faq={s.id}
+  schema={[serviceSchema(s)]}
+>
+  <section class="shero">
+    <div class="wrap shero-grid">
+      <div class="shero-copy">
+        <p class="tag load-in">{s.practiceName}</p>
+        <h1 class="display-xl load-in">{s.name}</h1>
+        <p class="lede load-in" style="--i:1">{s.what}</p>
+        <div class="load-in" style="--i:2"><BookButton service={s.id} /></div>
+      </div>
+      <div class="shero-demo">
+        <Demo kind={s.id} />
       </div>
     </div>
   </section>
 
-  <section class="section-pad">
+  <section class="section-pad" id="offers">
     <div class="wrap">
       <header class="section-head" data-reveal>
-        <h2 class="display-l">What we build.</h2>
+        <h2 class="display-l">What we offer.</h2>
       </header>
-      <ul class="steps">
-        {s.examples.map((e, i) => (
-          <li class="step" data-reveal style={`--i:${i}`}><p class="display-s">{e}</p></li>
+      <ul class="offers">
+        {s.products.map((p, i) => (
+          <li class="offer-item" data-reveal="card" style={`--i:${i % 3}`}>
+            <h3 class="display-s">{p.name}</h3>
+            <p class="body">{p.line}</p>
+          </li>
         ))}
       </ul>
+      <div class="offers-end" data-reveal>
+        {products.display.builds ? (
+          <ul class="ranges">
+            {products.builds.map((b) => (
+              <li><span>{b.name}</span><span class="figure">{b.range}</span></li>
+            ))}
+          </ul>
+        ) : (
+          <p class="body">{products.quoteLine}</p>
+        )}
+        <BookButton service={s.id} />
+      </div>
     </div>
   </section>
 
   {own.length > 0 && (
-    <section class="section-pad home-alt">
+    <section class="section-pad home-alt" id="cases">
       <div class="wrap">
         <header class="section-head" data-reveal>
           <h2 class="display-l">Jobs like this.</h2>
@@ -72,27 +82,14 @@ const drums = s.object === 'drum' && totals.rows > 0;
         <div class="cards cards-2">
           {own.map((c) => <CaseCard item={c} />)}
         </div>
-        <a class="more" href={`/cases?service=${s.slug}`}>See all cases</a>
+        <a class="more" href={`/cases?service=${s.id}`}>See all {lower} cases</a>
       </div>
     </section>
   )}
 
-  <section class="section-pad">
-    <div class="wrap">
-      <header class="section-head" data-reveal>
-        <h2 class="display-l">What it costs.</h2>
-        <p class="body"><Fig text={`Every job starts with the audit, at ${products.audit.price}. ${products.audit.next}`} /></p>
-      </header>
-      <ul class="ranges" data-reveal>
-        {products.builds.map((b) => (
-          <li><span>{b.name}</span><span class="figure">{b.range}</span></li>
-        ))}
-      </ul>
-      <div class="after-list"><BookButton /></div>
-    </div>
-  </section>
+  <Faq page={s.id} />
 </Base>
 
 <script>
-  import '../../scripts/object-page.ts';
+  import '../../scripts/page.ts';
 </script>

@@ -13,6 +13,7 @@ import BookButton from '../components/BookButton.astro';
 import QuizButton from '../components/QuizButton.astro';
 import Fig from '../components/Fig.astro';
 import { site, crew, ledger, services, products, featuredCases, homepageTotal, proofFigures, experienceLine } from '../lib/data';
+import { professionalService } from '../lib/seo';
 import { dateInZone } from '../lib/ledger';
 import { num, words, withArticle } from '../lib/format';
 import '../styles/home.css';
@@ -27,7 +28,14 @@ const w = site.tagline.split(' ');
 const lines = [w.slice(0, 3), w.slice(3, 5), w.slice(5)].map((l) => l.join(' ')).filter(Boolean);
 const crewCount = words(crew.length);
 ---
-<Base title={site.name} description={site.description} canvas page="home" band="none">
+<Base
+  title={`${site.name} | Business automation, websites and branding`}
+  description="We find the admin your team does by hand and make it run itself, then build the reports, software, website and brand to match. Free consultation."
+  canvas
+  page="home"
+  band="none"
+  schema={[professionalService('/')]}
+>
   <!-- 1. Hero -->
   <section id="hero" class="hero on-900" data-scene="hero">
     <div class="ground ground-900"></div>
@@ -38,8 +46,8 @@ const crewCount = words(crew.length);
         </h1>
         <p class="lede hero-lede">{site.description}</p>
         <div class="keys hero-keys">
-          <span style="--i:0"><QuizButton /></span>
-          <span style="--i:1"><BookButton secondary /></span>
+          <span style="--i:0"><BookButton /></span>
+          <span style="--i:1"><QuizButton secondary /></span>
         </div>
       </div>
       <div class="hero-track">
@@ -113,7 +121,11 @@ const crewCount = words(crew.length);
           </li>
         ))}
       </ol>
-      <p class="price start-price" data-reveal><span class="counter-m">{audit.price}</span><span class="unit">{audit.terms.toLowerCase()} price</span></p>
+      {products.display.audit ? (
+        <p class="price start-price" data-reveal><span class="counter-m">{audit.price}</span><span class="unit">{audit.terms.toLowerCase()} price</span></p>
+      ) : (
+        <p class="price start-price" data-reveal><span class="counter-m">{audit.offer}</span><span class="unit">{audit.note}</span></p>
+      )}
       <a class="more" href="/audit">See how the audit works</a>
     </div>
   </section>
@@ -165,12 +177,12 @@ const crewCount = words(crew.length);
       <div class="cards cards-3">
         {products.savers.tiers.map((t, i) => <TierCard tier={t} index={i} />)}
       </div>
-      <a class="more" href="/savers">Compare the plans</a>
+      <a class="more" href="/savers">See plans and pricing</a>
     </div>
   </section>
 
   <!-- 8. Not sure where to start? -->
-  <section class="band on-900" aria-labelledby="quiz-h">
+  <section class="band on-900" aria-labelledby="quiz-h" data-reveal>
     <div class="wrap band-inner">
       <h2 class="display-l" id="quiz-h">Not sure where to start?</h2>
       <p class="lede">Answer nine questions and we will tell you what to fix first.</p>
@@ -180,7 +192,7 @@ const crewCount = words(crew.length);
 
   <!-- 9. Where we are -->
   <section class="origin">
-    <div class="wrap">
+    <div class="wrap" data-reveal>
       <p class="display-m">{site.origin}</p>
       {experienceLine && <p class="body"><Fig text={experienceLine} /></p>}
     </div>

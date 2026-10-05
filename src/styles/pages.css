@@ -111,3 +111,54 @@
 /* ============ 404 ============ */
 .lost { min-height: 50svh; }
 .lost-more { margin-top: 0; }
+
+/* ============ Audit: the offer ============ */
+.offer { display: grid; gap: var(--space-4); }
+.offer-word { color: var(--readout); }
+
+/* ============ Contact ============ */
+.contact-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-19); align-items: start; }
+.contact-aside { display: grid; gap: var(--space-4); }
+.contact-steps { counter-reset: step; }
+.contact-steps li { display: grid; grid-template-columns: var(--space-8) minmax(0, 1fr); }
+.contact-steps li::before { counter-increment: step; content: counter(step); font-family: var(--font-data); color: var(--ink-muted); }
+@media (min-width: 1024px) {
+  .contact-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); }
+  .contact-aside { padding-top: var(--space-4); border-top: 1px solid var(--rule); }
+}
+
+/* ============ Privacy ============ */
+.privacy { padding-top: 0; }
+
+/* ============ Savers ============ */
+.tier-ask { justify-self: start; margin-top: var(--space-2); }
+
+/* ============ Quiz: the form under the result ============ */
+.quiz-enquiry { margin-top: var(--space-19); }
+.quiz-enquiry[hidden] { display: none; }
+
+/* ============ A service ============ */
+.shero { padding-block: var(--space-19) var(--space-12); }
+.shero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-12); align-items: center; }
+.shero-copy { display: grid; gap: var(--space-6); justify-items: start; }
+.shero-copy .display-xl { max-width: 13ch; text-wrap: balance; }
+@media (min-width: 1100px) {
+  .shero { min-height: calc(100svh - var(--bar-h)); display: flex; align-items: center; }
+  .shero-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); gap: var(--space-12); }
+  .shero-copy .display-xl { font-size: 64px; line-height: 60px; }
+}
+@media (min-width: 1500px) {
+  .shero-copy .display-xl { font-size: 72px; line-height: 68px; }
+}
+.offers { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8) var(--space-12); }
+.offer-item { display: grid; gap: var(--space-2); align-content: start; padding-top: var(--space-4); border-top: 1px solid var(--rule); }
+.offers-end { display: grid; gap: var(--space-6); justify-items: start; margin-top: var(--space-12); }
+@media (min-width: 720px) {
+  .offers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1100px) {
+  .offers { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Touch: the quiz's text controls are full-size targets. */
+.quiz-back, .result-back a { display: inline-flex; align-items: center; min-height: 48px; }

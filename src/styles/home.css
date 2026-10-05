@@ -21,6 +21,11 @@
 .hero-voice { max-width: 34ch; color: var(--ink-inverse); }
 .delta { font-size: 24px; line-height: 24px; font-weight: 500; white-space: nowrap; padding-bottom: var(--space-2); }
 .delta[hidden] { display: none; }
+/* Where the counter fills the row, the week's change is stamped above it, so it cannot push the label down. */
+@media (max-width: 959px) {
+  .hero-ctr-row { position: relative; }
+  .delta { position: absolute; left: 0; bottom: 100%; }
+}
 
 /* Phone and short screens: the copy flows, the scene pins on its own. */
 .hero-copy { padding: var(--space-12) var(--margin) var(--space-8); }
@@ -72,13 +77,13 @@
 @keyframes ks-drop { from { opacity: 0; transform: translateY(-12px); } }
 @keyframes ks-line { from { transform: translateY(112%); } }
 @keyframes ks-key { from { opacity: 0; transform: translateY(-22px); } }
-.intro .bar { animation: ks-drop 0.35s var(--ease) both; }
+.intro .bar { animation: ks-drop var(--dur-2) var(--ease-out) both; }
 /* Clipped at the foot of its own line, so a line rises out of nothing. A clip path changes no layout. */
 .intro .hero-h .line { clip-path: inset(-0.2em -0.1em 0 -0.1em); }
-.intro .hero-h .line > span { animation: ks-line 0.5s var(--ease) both; animation-delay: calc(0.15s + var(--i) * 0.09s); }
-.intro .hero-lede { animation: ks-rise 0.45s var(--ease) 0.5s both; }
-.intro .hero-keys > span { animation: ks-rise 0.45s var(--ease) both; animation-delay: calc(0.65s + var(--i) * 0.08s); }
-.intro .hero-slot .stand-in, .intro #stage { animation: ks-key 0.7s var(--ease) 0.5s backwards; }
+.intro .hero-h .line > span { animation: ks-line var(--dur-2) var(--ease-out) both; animation-delay: calc(0.15s + var(--i) * 0.09s); }
+.intro .hero-lede { animation: ks-rise var(--dur-2) var(--ease-out) 0.5s both; }
+.intro .hero-keys > span { animation: ks-rise var(--dur-2) var(--ease-out) both; animation-delay: calc(0.65s + var(--i) * 0.08s); }
+.intro .hero-slot .stand-in, .intro #stage { animation: ks-key var(--dur-3) var(--ease-out) 0.5s backwards; }
 
 /* ============ Below the hero ============ */
 .home-alt { background: var(--base-900); }

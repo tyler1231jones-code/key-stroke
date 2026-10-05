@@ -1,0 +1,31 @@
+---
+// A short list of the questions people ask before they enquire, from
+// faqs.json. Every answer is in the built HTML: a closed <details> is still
+// read by search engines and screen readers. A question whose answer is
+// still TODO is left out. The matching FAQPage data is added by the layout.
+import Fig from './Fig.astro';
+import { faqsFor } from '../lib/seo';
+
+interface Props {
+  /** The key in faqs.json. */
+  page: string;
+}
+const list = faqsFor(Astro.props.page);
+---
+{list.length > 0 && (
+  <section class="section-pad faq" id="questions" aria-labelledby="questions-h">
+    <div class="wrap faq-grid">
+      <header class="section-head" data-reveal>
+        <h2 class="display-l" id="questions-h">Questions people ask.</h2>
+      </header>
+      <div class="faq-list">
+        {list.map((f, i) => (
+          <details class="faq-item" data-reveal="card" style={`--i:${Math.min(i, 3)}`}>
+            <summary class="display-s">{f.q}</summary>
+            <p class="body"><Fig text={f.a} /></p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

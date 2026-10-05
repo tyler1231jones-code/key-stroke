@@ -1,0 +1,77 @@
+---
+// Reporting and dashboards. A wall of raw spreadsheet rows: cells lift out,
+// the rows sort, and the sheet collapses into a one-page summary with three
+// headline figures, a trend line, a bar chart and a short list of what needs
+// attention. The business and every figure are invented.
+import demos from '../../content/demos.json';
+
+const d = demos.reporting;
+const COLS = 9;
+const ROWS = 13;
+// The same "random" sheet on every build.
+let seed = 7;
+const next = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const letters = 'ABCDEFGHI'.split('');
+// The cells that lift out: three become the headline figures, five the bars.
+// All sit in the first five columns, which are the ones a narrow stage shows.
+const picks = new Map<string, string>([
+  ['2-1', 'kpi-0'], ['5-3', 'kpi-1'], ['8-0', 'kpi-2'],
+  ['3-0', 'bar-0'], ['6-2', 'bar-1'], ['9-4', 'bar-2'], ['4-3', 'bar-3'], ['10-1', 'bar-4'],
+]);
+const rows = Array.from({ length: ROWS }, (_, r) =>
+  Array.from({ length: COLS }, (_, c) => {
+    const v = next();
+    const text = v < 0.06 ? '#REF' : v < 0.5 ? String(Math.floor(next() * 9000) + 100) : (next() * 400).toFixed(2);
+    return { text, err: text === '#REF', pick: picks.get(`${r}-${c}`) };
+  }),
+);
+const bars = [46, 72, 58, 31, 84];
+---
+<div class="dr">
+  <div class="d-after dr-board">
+    <p class="dr-title"><b>{d.business}</b><span>Weekly summary</span></p>
+    <p class="dr-kpi" data-kpi="0"><span>Loads delivered</span><b>412</b></p>
+    <p class="dr-kpi" data-kpi="1"><span>On time</span><b>96%</b></p>
+    <p class="dr-kpi" data-kpi="2"><span>Trucks on the road</span><b>18</b></p>
+    <div class="dr-panel">
+      <span>Loads a week</span>
+      <svg class="dr-trend" viewBox="0 0 100 40" preserveAspectRatio="none">
+        <line x1="0" y1="39" x2="100" y2="39" />
+        <polyline points="0,32 14,28 28,30 42,20 56,22 70,12 84,14 100,5" />
+      </svg>
+    </div>
+    <div class="dr-panel">
+      <span>Loads by depot</span>
+      <div class="dr-bars">
+        {bars.map((h, i) => <i data-bar={i} style={`height:${h}%`}></i>)}
+      </div>
+    </div>
+    <div class="dr-panel dr-list">
+      <span>Needs attention</span>
+      <p><i></i>Truck 7 service overdue</p>
+      <p><i></i>Depot D down on last week</p>
+      <p><i></i>Two invoices unpaid past 30 days</p>
+    </div>
+  </div>
+
+  <div class="d-before dr-sheet">
+    <p class="dr-tab">loads_export_final_v7</p>
+    <div class="dr-grid">
+      <div class="dr-row">
+        <span class="h"></span>
+        {letters.map((l, c) => <span class:list={['h', { wide: c > 4 }]}>{l}</span>)}
+      </div>
+      {rows.map((row, r) => (
+        <div class="dr-row" data-row={r}>
+          <span class="h">{r + 1}</span>
+          {row.map((cell, c) => (
+            <span class:list={[{ err: cell.err, pick: cell.pick, wide: c > 4 }]} data-pick={cell.pick}>{cell.text}</span>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* The lifted cells travel as these, so the sheet behind them can go as one piece. */}
+  {rows.flatMap((row) => row.filter((cell) => cell.pick).map((cell) => <span class="dr-fly" data-fly={cell.pick}>{cell.text}</span>))}
+</div>

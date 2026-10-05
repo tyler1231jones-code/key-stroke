@@ -1,0 +1,7 @@
+{
+  "_note": "The invented businesses in the four service demonstrations. Each name was searched before use (see NOTES.md). They are illustrations, not clients.",
+  "web-software": { "business": "Tarnwick Plumbing", "url": "tarnwickplumbing.example" },
+  "reporting": { "business": "Wattlemere Freight" },
+  "automation": { "business": "Corrimba Fitouts", "person": "Dana Whitlock" },
+  "brand-design": { "business": "Mallowby", "kind": "Bakehouse" }
+}

@@ -12,6 +12,7 @@ import { chromium } from '@playwright/test';
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
 import { extname, join, resolve } from 'node:path';
+import { gzipSync } from 'node:zlib';
 
 const root = resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'), 'dist');
 const out = resolve(root, '..', 'shots');
@@ -22,7 +23,11 @@ const route = routeArg ? '/' + routeArg.slice(8).replace(/^\/+/, '') : '/';
 const flag = (name) => args.find((a) => a.startsWith(`--${name}`));
 const val = (name, fallback) => (flag(name)?.includes('=') ? flag(name).split('=')[1] : fallback);
 
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json', '.woff2': 'font/woff2', '.woff': 'font/woff', '.webp': 'image/webp', '.png': 'image/png', '.glb': 'model/gltf-binary', '.ico': 'image/x-icon' };
+// Text is sent gzipped when the browser accepts it, so transfer sizes and load
+// timings are close to what Cloudflare serves, not several times larger.
+const COMPRESS = new Set(['.html', '.js', '.css', '.svg', '.json', '.txt', '.xml']);
+const zipped = new Map();
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json', '.woff2': 'font/woff2', '.woff': 'font/woff', '.webp': 'image/webp', '.png': 'image/png', '.glb': 'model/gltf-binary', '.ico': 'image/x-icon', '.txt': 'text/plain', '.xml': 'application/xml' };
 
 export function serve(dir = root) {
   const server = createServer(async (req, res) => {
@@ -30,8 +35,16 @@ export function serve(dir = root) {
     const candidates = [join(dir, path), join(dir, path, 'index.html'), join(dir, `${path}.html`)];
     for (const file of candidates) {
       try {
-        const body = await readFile(file);
-        res.writeHead(200, { 'content-type': TYPES[extname(file)] || 'application/octet-stream' });
+        let body = await readFile(file);
+        const headers = { 'content-type': TYPES[extname(file)] || 'application/octet-stream' };
+        // Fingerprinted files are cached for good, as public/_headers asks Cloudflare to do.
+        if (path.startsWith('/_astro/')) headers['cache-control'] = 'public, max-age=31536000, immutable';
+        if (COMPRESS.has(extname(file)) && /\bgzip\b/.test(String(req.headers['accept-encoding'] ?? ''))) {
+          if (!zipped.has(file)) zipped.set(file, gzipSync(body));
+          body = zipped.get(file);
+          headers['content-encoding'] = 'gzip';
+        }
+        res.writeHead(200, headers);
         res.end(body);
         return;
       } catch {}

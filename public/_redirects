@@ -1,7 +1,14 @@
 # Cloudflare Workers static assets: redirects.
-# The four practice pages became service pages in revision 1.
-/practice/clear /services/automation 301
-/practice/count /services/reporting 301
-/practice/build /services/web-software 301
-/practice/face /services/brand-design 301
+
+# Revision 2 renamed the service pages after the services.
+/services/automation /services/automation-and-ai-agents 301
+/services/reporting /services/reporting-and-dashboards 301
+/services/web-software /services/websites-and-software 301
+/services/brand-design /services/branding-and-graphic-design 301
+
+# Revision 1 turned the four practice pages into service pages.
+/practice/clear /services/automation-and-ai-agents 301
+/practice/count /services/reporting-and-dashboards 301
+/practice/build /services/websites-and-software 301
+/practice/face /services/branding-and-graphic-design 301
 /practice /services 301

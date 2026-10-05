@@ -1,14 +1,19 @@
 ---
-// "Book the audit". Always goes to the booking block at the foot of the
-// audit page, so the control is never disabled and never a dead link.
-import { BOOK_HREF } from '../lib/data';
+// "Book a free consultation": the site's primary action. It goes to the form
+// on the contact page, or to `href` when the page has its own form. Passing a
+// service fills in "What do you need help with?" on arrival.
+import { BOOK_HREF, BOOK_LABEL } from '../lib/data';
 
 interface Props {
   label?: string;
   secondary?: boolean;
   /** 44px instead of 56px, for use inside a section. */
   small?: boolean;
+  /** A service id, to arrive with that service already chosen. */
+  service?: string;
+  href?: string;
 }
-const { label = 'Book the audit', secondary = false, small = false } = Astro.props;
+const { label = BOOK_LABEL, secondary = false, small = false, service, href } = Astro.props;
+const to = href ?? (service ? `${BOOK_HREF}?service=${service}` : BOOK_HREF);
 ---
-<a class:list={['key', { 'key-l': !small, 'key-2': secondary }]} href={BOOK_HREF}>{label}</a>
+<a class:list={['key', { 'key-l': !small, 'key-2': secondary }]} href={to}>{label}</a>

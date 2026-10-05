@@ -7,15 +7,16 @@ import { words } from '../../lib/format';
 import '../../styles/pages.css';
 ---
 <Base
-  title="Services"
-  description="Automation and AI agents, reporting and dashboards, websites and software, branding and graphic design."
+  title="Services: automation, reporting, web and design"
+  description="Four services for Australian businesses: automation and AI agents, reporting and dashboards, websites and software, branding and design. Free consultation."
   current="services"
   page="services"
+  crumbs={[{ name: 'Services', href: '/services' }]}
 >
   <section class="page-head">
     <div class="wrap">
       <h1 class="display-xl load-in">Services.</h1>
-      <p class="lede load-in" style="--i:1">We do {words(services.length)} things. Pick the one that sounds like your problem.</p>
+      <p class="lede load-in" style="--i:1">We do {words(services.length)} things for businesses: automation, reporting, websites and software, and branding. Pick the one that sounds like your problem.</p>
     </div>
   </section>
 

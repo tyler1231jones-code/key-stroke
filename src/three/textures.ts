@@ -81,11 +81,30 @@ export interface WearSpec {
   chip?: [number, number, number];
 }
 
-/**
- * The lit face of a key: readout ground, legend in base-900. With wear, part
- * of the legend is gone and the surface under the finger is polished.
- */
-export function keyFace(t: Tokens, legend: string, size = 512, wear?: WearSpec, aspect = 1): FaceTextures {
+/** A worn face part-way through being drawn. */
+interface WearJob {
+  t: Tokens;
+  wear: WearSpec;
+  w: number;
+  size: number;
+  c: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  rc: HTMLCanvasElement;
+  rctx: CanvasRenderingContext2D;
+  img: ImageData;
+  rough: ImageData;
+  face: Uint8ClampedArray;
+  noise: (x: number, y: number) => number;
+  fine: (x: number, y: number) => number;
+  /** The next row to draw. */
+  y: number;
+}
+
+/** Worn faces already drawn, by what they show. Drawing one is the most expensive thing the stage does. */
+const worn = new Map<string, { c: HTMLCanvasElement; rc: HTMLCanvasElement }>();
+const wornKey = (legend: string, size: number, wear: WearSpec, aspect: number) => [legend, size, aspect, wear.seed, wear.at, wear.radius, wear.chip].join(':');
+
+function drawLegend(t: Tokens, legend: string, size: number, aspect: number): [HTMLCanvasElement, CanvasRenderingContext2D, number] {
   const w = Math.round(size * aspect);
   const [c, ctx] = canvas(w, size);
   ctx.fillStyle = t.css.readout;
@@ -98,15 +117,28 @@ export function keyFace(t: Tokens, legend: string, size = 512, wear?: WearSpec, 
     ctx.textBaseline = 'alphabetic';
     ctx.fillText(legend, w / 2, size * 0.5 + px * 0.36);
   }
-  if (!wear) return { map: colourTexture(c), roughnessMap: null };
+  return [c, ctx, w];
+}
 
+function startWear(t: Tokens, legend: string, size: number, wear: WearSpec, aspect: number): WearJob {
+  const [c, ctx, w] = drawLegend(t, legend, size, aspect);
   const [rc, rctx] = canvas(w, size);
-  const noise = fbm(wear.seed);
-  const fine = fbm(wear.seed + 7);
-  const img = ctx.getImageData(0, 0, w, size);
-  const rough = rctx.createImageData(w, size);
-  const face = ctx.getImageData(0, 0, 1, 1).data; // readout as the canvas stores it
-  for (let y = 0; y < size; y++) {
+  return {
+    t, wear, w, size, c, ctx, rc, rctx,
+    img: ctx.getImageData(0, 0, w, size),
+    rough: rctx.createImageData(w, size),
+    face: ctx.getImageData(0, 0, 1, 1).data, // readout as the canvas stores it
+    noise: fbm(wear.seed),
+    fine: fbm(wear.seed + 7),
+    y: 0,
+  };
+}
+
+/** Draw the next `rows` rows of wear. True once the last row is done. */
+function wearRows(job: WearJob, rows: number): boolean {
+  const { wear, w, size, img, rough, face, noise, fine } = job;
+  const end = Math.min(size, job.y + rows);
+  for (let y = job.y; y < end; y++) {
     for (let x = 0; x < w; x++) {
       const nx = x / w;
       const ny = y / size;
@@ -134,8 +166,14 @@ export function keyFace(t: Tokens, legend: string, size = 512, wear?: WearSpec, 
       rough.data[i + 3] = 255;
     }
   }
-  ctx.putImageData(img, 0, 0);
-  rctx.putImageData(rough, 0, 0);
+  job.y = end;
+  return end >= size;
+}
+
+function finishWear(job: WearJob): { c: HTMLCanvasElement; rc: HTMLCanvasElement } {
+  const { t, wear, w, size, c, ctx, rc, rctx } = job;
+  ctx.putImageData(job.img, 0, 0);
+  rctx.putImageData(job.rough, 0, 0);
   // A few hairline scratches, each different.
   const r = rng(wear.seed + 3);
   ctx.lineCap = 'round';
@@ -153,7 +191,38 @@ export function keyFace(t: Tokens, legend: string, size = 512, wear?: WearSpec, 
     ctx.stroke();
   }
   ctx.globalAlpha = 1;
-  return { map: colourTexture(c), roughnessMap: dataTexture(rc) };
+  return { c, rc };
+}
+
+/**
+ * Draw a worn face ahead of time, a few rows at a turn, so the page stays
+ * responsive while it happens. keyFace() then finds it ready. The stage calls
+ * this for the hero key before it builds anything.
+ */
+export async function prepareKeyFace(t: Tokens, legend: string, size: number, wear: WearSpec, aspect = 1): Promise<void> {
+  const key = wornKey(legend, size, wear, aspect);
+  if (worn.has(key)) return;
+  const job = startWear(t, legend, size, wear, aspect);
+  while (!wearRows(job, 24)) await new Promise<void>((ok) => setTimeout(ok, 0));
+  worn.set(key, finishWear(job));
+}
+
+/**
+ * The lit face of a key: readout ground, legend in base-900. With wear, part
+ * of the legend is gone and the surface under the finger is polished. A worn
+ * face is drawn once and kept, so a scene that is rebuilt does not pay again.
+ */
+export function keyFace(t: Tokens, legend: string, size = 512, wear?: WearSpec, aspect = 1): FaceTextures {
+  if (!wear) return { map: colourTexture(drawLegend(t, legend, size, aspect)[0]), roughnessMap: null };
+  const key = wornKey(legend, size, wear, aspect);
+  let done = worn.get(key);
+  if (!done) {
+    const job = startWear(t, legend, size, wear, aspect);
+    wearRows(job, size);
+    done = finishWear(job);
+    worn.set(key, done);
+  }
+  return { map: colourTexture(done.c), roughnessMap: dataTexture(done.rc) };
 }
 
 /** Digits 0 to 9 stacked for wrapping around a drum: base-900 body, readout digits. */

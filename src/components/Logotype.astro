@@ -39,8 +39,9 @@ const clip = `ks-clip-${Math.random().toString(36).slice(2, 8)}`;
         <text x={B + i * W + W / 2} y={B + H / 2 + 24}>{ch}</text>
       ))}
       <g clip-path={`url(#${clip})`}>
-        <text x={B + (letters.length - 1) * W + W / 2} y={B + H / 2 + 24 + H * 0.16}>{letters.at(-1)}</text>
-        <text x={B + (letters.length - 1) * W + W / 2} y={B + H / 2 + 24 - H * 0.84}>{letters.at(-1)}</text>
+        <text id={`${clip}-e`} x={B + (letters.length - 1) * W + W / 2} y={B + H / 2 + 24 + H * 0.16}>{letters.at(-1)}</text>
+        {/* The same letter one cell higher, drawn again rather than written again, so the name is spelt once. */}
+        <use href={`#${clip}-e`} y={-H} />
       </g>
     </g>
     <rect x="0" y={H + B * 2 + 4} width={width} height="6" fill={ink} />

@@ -2,7 +2,7 @@
 // The footer: what KEYSTROKE is, where everything lives, and how to reach it.
 // A contact detail that is not set yet in site.json is left out.
 import Logotype from './Logotype.astro';
-import { site, services, has, BOOK_HREF } from '../lib/data';
+import { site, services, has, serviceHref, BOOK_HREF, BOOK_LABEL } from '../lib/data';
 
 const year = new Date().getFullYear();
 const company = [
@@ -12,37 +12,39 @@ const company = [
   { label: 'Savers', href: '/savers' },
   { label: 'Quiz', href: '/quiz' },
   { label: 'Counting method', href: '/counting' },
+  { label: 'Privacy', href: '/privacy' },
 ];
 ---
 <footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
-      <div class="foot-about">
+      <div class="foot-about" data-reveal>
         <a class="foot-logo" href="/" aria-label={`${site.name}, home`}><Logotype variant="lockup" reversed /></a>
         <p class="body-s">{site.description}</p>
       </div>
-      <nav aria-label="Services">
+      <nav aria-label="Services" data-reveal="card" style="--i:1">
         <h2 class="plate">Services</h2>
         <ul>
-          {services.map((s) => <li><a href={`/services/${s.slug}`}>{s.name}</a></li>)}
+          {services.map((s) => <li><a href={serviceHref(s)}>{s.name}</a></li>)}
         </ul>
       </nav>
-      <nav aria-label="Company">
+      <nav aria-label="Company" data-reveal="card" style="--i:2">
         <h2 class="plate">Company</h2>
         <ul>
           {company.map((c) => <li><a href={c.href}>{c.label}</a></li>)}
         </ul>
       </nav>
-      <div>
+      <div data-reveal="card" style="--i:3">
         <h2 class="plate">Contact</h2>
         <ul>
           {has('email') && <li><a href={`mailto:${site.email}`}>{site.email}</a></li>}
-          <li><a href={BOOK_HREF}>Book the audit</a></li>
+          <li><a href={BOOK_HREF}>{BOOK_LABEL}</a></li>
+          {has('serviceArea') && <li>{site.serviceArea}</li>}
         </ul>
       </div>
     </div>
     <div class="foot-line">
-      <p>{site.origin}</p>
+      <p>{site.origin}{has('location') && <> {site.location}.</>}</p>
       <p>&copy; <span class="fig" data-copy-year>{year}</span> {site.name}</p>
     </div>
   </div>

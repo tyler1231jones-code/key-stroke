@@ -1,18 +1,29 @@
 ---
 // The audit, in four short blocks: what it is, how it works, what you get,
-// and the price with one button. The stack of forms at the top is the page's
-// one set piece. The page ends on the booking block that every "Book the
-// audit" control on the site points at.
+// and what it costs, which is nothing. The stack of forms at the top is the
+// page's one set piece. The page ends on the consultation form.
 import Base from '../layouts/Base.astro';
 import ShiftReport from '../components/ShiftReport.astro';
 import BookButton from '../components/BookButton.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import Faq from '../components/Faq.astro';
 import Fig from '../components/Fig.astro';
-import { products, shiftReport } from '../lib/data';
+import { products, shiftReport, BOOK_LABEL } from '../lib/data';
 import '../styles/pages.css';
 
 const audit = products.audit;
+const show = products.display;
 ---
-<Base title={audit.name} description={audit.what} canvas current="audit" page="audit" band="book">
+<Base
+  title="Free Keystroke Audit: we count one process"
+  description="A free audit of one process in your business. We watch it, count every keystroke, and tell you what it costs and what to fix. No obligation."
+  canvas
+  current="audit"
+  page="audit"
+  band="none"
+  crumbs={[{ name: 'Audit', href: '/audit' }]}
+  faq="audit"
+>
   <!-- 1. What it is -->
   <section class="phero" data-scene="audit">
     <div class="phero-pin">
@@ -21,6 +32,7 @@ const audit = products.audit;
           <h1 class="display-xl load-in">{audit.name}.</h1>
           <p class="lede load-in" style="--i:1">{audit.what}</p>
           <p class="body-s muted load-in" style="--i:1">A keystroke is one thing a person has to type or click.</p>
+          <div class="load-in" style="--i:2"><BookButton href="#book" /></div>
         </div>
         <div class="phero-slot" data-slot aria-hidden="true">
           <img class="slot-still" src="/stills/audit.webp" alt="" loading="lazy" decoding="async" />
@@ -32,12 +44,12 @@ const audit = products.audit;
   <!-- 2. How it works -->
   <section class="section-pad" id="how">
     <div class="wrap">
-      <header class="section-head">
+      <header class="section-head" data-reveal>
         <h2 class="display-l">How it works.</h2>
       </header>
       <ol class="steps">
         {audit.steps.map((step, i) => (
-          <li class="step" style={`--i:${i}`}>
+          <li class="step" data-reveal="card" style={`--i:${i}`}>
             <span class="step-n" aria-hidden="true">{i + 1}</span>
             <h3 class="display-s">{step.title}</h3>
             <p class="body">{step.text}</p>
@@ -51,38 +63,60 @@ const audit = products.audit;
   {shiftReport && (
     <section class="section-pad home-alt" id="report">
       <div class="wrap audit-get">
-        <header class="section-head">
+        <header class="section-head" data-reveal>
           <h2 class="display-l">What you get.</h2>
-          <p class="body">A short report and a fixed quote. This is a sample.</p>
+          <p class="body">A short report and a quote. This is a sample.</p>
         </header>
-        <ShiftReport />
+        <div data-reveal="card"><ShiftReport /></div>
       </div>
     </section>
   )}
 
-  <!-- 4. The price -->
+  <!-- 4. What it costs -->
   <section class="section-pad" id="price">
     <div class="wrap audit-price">
       <div>
-        <header class="section-head">
+        <header class="section-head" data-reveal>
           <h2 class="display-l">What it costs.</h2>
         </header>
-        <p class="price"><span class="counter-m">{audit.price}</span><span class="unit">{audit.terms.toLowerCase()} price</span></p>
-        <ul class="ticks after-list">
-          <li>Delivered in <span class="fig">{audit.delivery.split(' ')[0]}</span> {audit.delivery.split(' ').slice(1).join(' ')}</li>
-          <li>{audit.tool}</li>
-        </ul>
-        <div class="after-list"><BookButton /></div>
+        {show.audit ? (
+          <p class="price" data-reveal><span class="counter-m">{audit.price}</span><span class="unit">{audit.terms.toLowerCase()} price</span></p>
+        ) : (
+          <div class="offer" data-reveal>
+            <p class="display-xl offer-word">{audit.offer}.</p>
+            <p class="lede"><Fig text={`We watch one process, count it and send you the report in ${audit.delivery}. ${audit.note}`} /></p>
+          </div>
+        )}
+        <div class="after-list" data-reveal><BookButton href="#book" /></div>
       </div>
-      <div class="audit-next">
+      <div class="audit-next" data-reveal>
         <h3 class="display-s">What happens next</h3>
-        <p class="body"><Fig text={audit.next} /></p>
-        <ul class="ranges">
-          {products.builds.map((b) => (
-            <li><span>{b.name}</span><span class="figure">{b.range}</span></li>
-          ))}
-        </ul>
+        {show.builds ? (
+          <>
+            <p class="body"><Fig text={audit.next} /></p>
+            <ul class="ranges">
+              {products.builds.map((b) => (
+                <li><span>{b.name}</span><span class="figure">{b.range}</span></li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p class="body">{products.quoteLine}</p>
+        )}
       </div>
+    </div>
+  </section>
+
+  <Faq page="audit" />
+
+  <!-- The consultation form -->
+  <section class="band on-900" id="book" aria-labelledby="book-h">
+    <div class="wrap band-form">
+      <header class="section-head" data-reveal>
+        <h2 class="display-l" id="book-h">{BOOK_LABEL}.</h2>
+        <p class="lede">Tell us what you need. The first conversation and the audit are free.</p>
+      </header>
+      <EnquiryForm kind="consultation" id="audit-form" submit={BOOK_LABEL} />
     </div>
   </section>
 </Base>

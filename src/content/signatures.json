@@ -1,0 +1,8 @@
+{
+  "people": [
+    { "id": "kieran", "name": "Kieran Jones", "legend": "K", "role": "Principal", "mobile": "0400 000 000", "email": "kieran@keystroke.example" },
+    { "id": "tyler", "name": "Tyler Jones", "legend": "T", "role": "Principal", "mobile": "0400 000 000", "email": "tyler@keystroke.example" }
+  ],
+  "fallbackDomain": "keystroke.example",
+  "imageBase": "TODO"
+}

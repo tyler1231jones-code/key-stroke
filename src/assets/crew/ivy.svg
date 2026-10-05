@@ -13,8 +13,8 @@
   <!-- Ivy: a clip on top, tall eyes, a form on the chest -->
   <rect x="62" y="12" width="36" height="13" rx="2" fill="var(--ink-muted)" />
   <rect x="72" y="5" width="16" height="9" rx="2" fill="none" stroke="var(--ink-muted)" stroke-width="3" />
-  <ellipse cx="68" cy="56" rx="4" ry="6.5" fill="var(--base-900)" />
-  <ellipse cx="92" cy="56" rx="4" ry="6.5" fill="var(--base-900)" />
+  <ellipse class="eye" cx="68" cy="56" rx="4" ry="6.5" fill="var(--base-900)" />
+  <ellipse class="eye" cx="92" cy="56" rx="4" ry="6.5" fill="var(--base-900)" />
   <path d="M67 73 Q80 85 93 73" fill="none" stroke="var(--base-900)" stroke-width="3" stroke-linecap="square" />
   <rect x="66" y="126" width="28" height="34" fill="var(--readout)" />
   <rect x="70" y="132" width="12" height="3" fill="var(--base-900)" />

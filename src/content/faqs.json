@@ -1,0 +1,58 @@
+{
+  "_note": "Questions people ask before they enquire. An answer of TODO keeps the question off the page (and out of the structured data) until a principal supplies it; `needs` says what is missing. Answers are 50 words or fewer.",
+  "audit": [
+    { "q": "Is the audit really free?", "a": "Yes. The first conversation and the audit cost nothing, and there is no obligation to go further. If you want something built afterwards, we quote that job on its own." },
+    { "q": "What do you need from us?", "a": "One process, and someone who does it. That person does the job once, the usual way, while we record it. The counting is ours." },
+    { "q": "How long does the audit take?", "a": "1–2 weeks from the recording to the report." },
+    { "q": "What is a keystroke?", "a": "One thing a person has to type or click: a character, a click, a copy, a paste or a file attached. We count them from a recording, not from an estimate." },
+    { "q": "Which process should we choose?", "a": "Something your team does by hand every week, such as quoting, invoicing or month-end. If you are not sure, the quiz will point to one." },
+    { "q": "What if the number turns out to be small?", "a": "Then the report says so, and you can stop there. If the count shows nothing worth building, we will tell you." },
+    { "q": "Do you record on site or remotely?", "a": "TODO", "needs": "How the recording is made: on site, by screen share, or either." },
+    { "q": "Who sees the recording, and how long do you keep it?", "a": "TODO", "needs": "The principals' policy on storing and deleting audit recordings." }
+  ],
+  "savers": [
+    { "q": "What is Keystroke Savers?", "a": "A monthly plan that keeps what we built for you running, fixes it when something changes, and improves it every month." },
+    { "q": "What are the hours for?", "a": "Changes and improvements. Monitoring, repair, the monthly reporting pack and a scheduled review are part of every plan, on top of the hours." },
+    { "q": "What does it not cover?", "a": "Things we did not build. Savers looks after the systems KEYSTROKE built for you. It is not a general IT helpdesk." },
+    { "q": "How quickly do you reply?", "a": "Within 1 business day, on every plan." },
+    { "q": "What is Foundation pricing?", "a": "Our launch rate for early clients." },
+    { "q": "When does a plan start?", "a": "After we have built something for you. Savers is the monthly layer that keeps it running and improving." },
+    { "q": "Is there a minimum term?", "a": "TODO", "needs": "The minimum term and notice period for a Savers plan." },
+    { "q": "Can we change plans?", "a": "TODO", "needs": "Whether and how a client moves between Watch, Run and Own." },
+    { "q": "What happens to hours we do not use?", "a": "TODO", "needs": "Whether unused hours roll over." }
+  ],
+  "automation": [
+    { "q": "What kind of work can be automated?", "a": "Work someone does by hand on a schedule: retyping details between systems, chasing approvals, building the same document, copying figures into a report. If it follows the same steps each time, it is a candidate." },
+    { "q": "Will it work with the software we already use?", "a": "We build on what you have, including Microsoft 365 tools such as Power Automate and SharePoint, and we connect systems that do not talk to each other. The free audit shows what is possible before anything is quoted." },
+    { "q": "What is an AI agent?", "a": "Software that does one set job on a schedule, such as matching bank lines or drafting quotes overnight. Ours are named on the crew page. They are not people, and a person checks their work." },
+    { "q": "Do the agents make decisions on their own?", "a": "No. Each agent has one job and stops short of the decision. An agent drafts, matches and lists. A person approves, sends or pays." },
+    { "q": "How do we start with automation?", "a": "With a free consultation, then a free audit of one process. You get the count, what it costs you in hours, and a quote for fixing it." },
+    { "q": "How long does an automation build take?", "a": "TODO", "needs": "A typical build time the principals are willing to publish." },
+    { "q": "Is our data used to train AI models?", "a": "TODO", "needs": "The principals' statement on how client data is handled by the AI services they use." }
+  ],
+  "reporting": [
+    { "q": "What do you build reports in?", "a": "Power BI and Excel, fed directly from your own systems so nobody retypes a figure." },
+    { "q": "Can you connect to our accounting or job system?", "a": "If it can export its data or offers a connection we can read, yes. We check that in the free audit, before anything is quoted." },
+    { "q": "What is job costing?", "a": "Seeing what each job is making while it is still running, not after it is finished. We build it from the hours and costs your systems already hold." },
+    { "q": "We already have a spreadsheet. Do we have to replace it?", "a": "No. Often the fix is to rebuild it so it holds: one place to enter each figure, checks that catch mistakes, and a layout anyone can follow." },
+    { "q": "How do we start with reporting?", "a": "With a free consultation, then a free audit of one report your team builds by hand. You get the count, what it costs you in hours, and a quote." },
+    { "q": "Who can see our figures?", "a": "TODO", "needs": "The principals' statement on access to client financial data." }
+  ],
+  "web-software": [
+    { "q": "Can we edit the website ourselves?", "a": "Yes. We build sites so your own team can change pages, prices and products without a developer." },
+    { "q": "What do you build websites on?", "a": "It depends on the job. We build client-managed WordPress sites and sites deployed on Cloudflare, and we will say which suits you and why." },
+    { "q": "Do you build online stores?", "a": "Yes, with stock and orders kept in step with the systems you already run." },
+    { "q": "When does a business need custom software?", "a": "When a job you do every day has no tool that fits it, or the tool you pay for assumes a different kind of business. We build for the job as you actually do it." },
+    { "q": "Who looks after it once it is live?", "a": "You can, or we can. Keystroke Savers is our monthly plan for keeping what we built running, fixing it when something changes and improving it." },
+    { "q": "Who owns the website or the software?", "a": "TODO", "needs": "The principals' terms on ownership of code, designs and accounts." },
+    { "q": "How long does a website take?", "a": "TODO", "needs": "A typical build time the principals are willing to publish." }
+  ],
+  "brand-design": [
+    { "q": "What is included in a rebrand?", "a": "A mark, colours and type, then the things that carry them: stationery, documents, signage and your website. We bring an existing brand up to date without losing what people recognise." },
+    { "q": "Do you design signage and vehicles?", "a": "Yes. A brand has to reach your premises, vehicles and signs, not only the logo, so we design those too." },
+    { "q": "Can you design tender and capability documents?", "a": "Yes. It is a large part of this work: structure, messaging, page templates and a library of answers your business owns." },
+    { "q": "How do we start with a brand project?", "a": "With a free consultation. We look at what you have, what it needs to do, and quote the job on its own." },
+    { "q": "Do you arrange printing and sign installation?", "a": "TODO", "needs": "Whether KEYSTROKE manages print and signage production or hands over artwork." },
+    { "q": "Do we get the logo files?", "a": "TODO", "needs": "The principals' terms on ownership and file handover." }
+  ]
+}

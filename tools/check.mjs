@@ -10,9 +10,14 @@
 //   - text written for the builder, not the customer: TODO, demo labels, the
 //     old audience limit, internal terms (ledger, baseline, unit and practice
 //     numbers) anywhere but the counting page
+//   - a dollar figure on any page but /savers, the one place prices are shown
 //   - a disabled control
 //   - a crew card without the tag "AI agent"
-// Text inside [data-artefact] is skipped: artefacts show invented sample rows.
+// Text inside [data-artefact] is skipped for the figure checks: artefacts show
+// invented sample rows. The dollar rule has no exceptions and reads them too.
+// Colours and radii inside a service demonstration are --demo-* properties
+// (src/styles/demos.css); those declarations are the one place a colour that
+// is not a token is allowed.
 // Warns, without failing, on any TODO left in site.json. Whether the content
 // is fit to publish is a separate question, answered by tools/predeploy.mjs.
 //
@@ -80,8 +85,9 @@ const INTERNAL = [
   [/\bPractice \d\d\b/i, 'a practice number'],
   [/\bCase \d{3}\b/, 'a case number'],
 ];
-// The service is called this, so the word is not rationed inside its name.
-const SERVICE_NAMES = ['Automation and AI agents'];
+// The design system rationed the word "automation" to once a page. Revision 2
+// names a service and a product after it and asks for it in titles, so that
+// ration is no longer checked.
 
 // Example figures quoted in the published counting method. They illustrate the method; they are not claims.
 const METHOD_EXAMPLES = [1920, 14600];
@@ -109,7 +115,7 @@ const casesAll = json('cases.json');
 const live = (rows) => (site.demo ? rows : rows.filter((r) => !r.demo));
 const ledger = live(ledgerAll);
 const cases = live(casesAll);
-const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'shiftReport.json', 'quiz.json', 'services.json'].map(json);
+const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'shiftReport.json', 'quiz.json', 'services.json', 'faqs.json'].map(json);
 
 function allowedFor(date) {
   const numbers = new Set([0]);
@@ -156,7 +162,7 @@ const hasClass = (node, cls) => (attr(node, 'class') ?? '').split(/\s+/).include
 
 function readPage(html) {
   const doc = parse(html, { scriptingEnabled: false });
-  const page = { text: '', counters: [], h1: 0, robots: null, buildDate: null, redirect: false, disabled: 0, crewCards: 0, crewCardsMarked: 0, styles: [], inline: [] };
+  const page = { text: '', all: '', counters: [], h1: 0, robots: null, buildDate: null, redirect: false, disabled: 0, crewCards: 0, crewCardsMarked: 0, styles: [], inline: [] };
   const textOf = (node) => {
     if (node.nodeName === '#text') return node.value;
     return (node.childNodes ?? []).map(textOf).join('');
@@ -178,7 +184,10 @@ function readPage(html) {
       }
     }
     if (tag && SKIP.has(tag)) return;
-    if (node.attrs && attr(node, 'data-artefact') !== undefined) return; // sample data
+    if (node.attrs && attr(node, 'data-artefact') !== undefined) {
+      page.all += ` ${textOf(node)} `; // sample data: read only by the dollar rule
+      return;
+    }
     if (tag === 'h1') page.h1++;
     if (tag && hasClass(node, 'crew-card')) {
       page.crewCards++;
@@ -189,7 +198,10 @@ function readPage(html) {
     if (tag && hasClass(node, 'ctr') && attr(node, 'data-figure') !== 'other') {
       page.counters.push(textOf(node).replace(/\s+/g, ''));
     }
-    if (node.nodeName === '#text') page.text += node.value;
+    if (node.nodeName === '#text') {
+      page.text += node.value;
+      page.all += node.value;
+    }
     if (tag && BLOCK.has(tag)) page.text += '\n';
     for (const child of node.childNodes ?? []) visit(child);
     if (tag && BLOCK.has(tag)) page.text += '\n';
@@ -215,15 +227,11 @@ for (const file of walk(dist, '.html')) {
     const m = text.match(word);
     if (m) fail(where, `banned word "${m[0]}" outside an approved copy bank line`);
   }
-  let rationed = text;
-  for (const name of SERVICE_NAMES) rationed = rationed.split(name).join(' ').split(name.toUpperCase()).join(' ');
-  const automation = rationed.match(/\bautomation\b/gi) ?? [];
-  if (automation.length > 1) fail(where, `"automation" appears ${automation.length} times outside the service's name; it is permitted once per page`);
   for (const [pattern, what] of NOT_FOR_CUSTOMERS) {
     const m = page.text.match(pattern);
     if (m) fail(where, `${what}: "${page.text.split('\n').find((l) => pattern.test(l))?.trim().slice(0, 80)}"`);
   }
-  if (!where.startsWith('counting')) {
+  if (!/^counting(\.html|\/|$)/.test(where)) {
     for (const [pattern, what] of INTERNAL) {
       if (pattern.test(page.text)) fail(where, `uses ${what}, an internal term: "${page.text.split('\n').find((l) => pattern.test(l))?.trim().slice(0, 80)}"`);
     }
@@ -234,9 +242,11 @@ for (const file of walk(dist, '.html')) {
   const emoji = text.replace(/[©®™]/g, '').match(/\p{Extended_Pictographic}/u);
   if (emoji) fail(where, `emoji in text: ${emoji[0]}`);
 
-  // Figures.
-  for (const m of page.text.matchAll(/\$\d[\d,]*(?:\.\d+)?/g)) {
-    if (!allowedDollars.has(m[0])) fail(where, `dollar figure ${m[0]} is not in a content file`);
+  // Figures. Prices are shown on the Savers page and nowhere else.
+  const savers = /^savers(\.html|\/|$)/.test(where);
+  for (const m of page.all.matchAll(/\$\s?\d[\d,]*(?:\.\d+)?/g)) {
+    if (!savers) fail(where, `dollar figure ${m[0]}: prices appear on /savers and nowhere else`);
+    else if (!allowedDollars.has(m[0])) fail(where, `dollar figure ${m[0]} is not in a content file`);
   }
   for (const m of page.text.matchAll(/(?<![$\d,.])(\d{1,3}(?:,\d{3})+)(?![\d,]*\.\d)/g)) {
     if (!allowed.has(toNumber(m[1]))) fail(where, `figure ${m[1]} is not in a content file and is not computed from the ledger`);
@@ -274,13 +284,16 @@ function checkCss(where, cssText) {
   }
   // Token declarations are where colour values live. Everything else must use them.
   css = css.replace(new RegExp(`--(?:${TOKENS.join('|')})\\s*:[^;}]+`, 'g'), '');
+  // So are the --demo-* declarations: colour inside a demonstration stage.
+  css = css.replace(/--demo-[a-z0-9-]+\s*:[^;}]+/g, '');
   for (const m of css.matchAll(/#[0-9a-f]{3,8}\b/gi)) {
     if (/^#0{4}$|^#0{8}$/i.test(m[0])) continue; // "transparent", as a minifier writes it
     fail(where, `colour ${m[0]} is not a token`);
   }
   for (const m of css.matchAll(/\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([^)]*\)/gi)) fail(where, `colour ${m[0]} is not a token`);
   for (const m of css.matchAll(/(?:^|[;{\s])((?:background|border|outline|text-decoration|column-rule|caret|accent|fill|stroke|color|box-shadow)[a-z-]*)\s*:\s*([^;}]+)/gi)) {
-    for (const word of m[2].toLowerCase().match(/[a-z]+/g) ?? []) {
+    // A custom property's own name may contain a colour word; its use is not a named colour.
+    for (const word of m[2].toLowerCase().replace(/var\(--[a-z0-9-]+\)/g, ' ').match(/[a-z]+/g) ?? []) {
       if (NAMED_COLOURS.has(word)) fail(where, `named colour "${word}" in ${m[1]}: ${m[2].trim()}`);
     }
   }

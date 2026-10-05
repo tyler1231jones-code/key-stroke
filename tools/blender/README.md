@@ -1,9 +1,15 @@
 # Offline renders
 
-Blender was not on the machine when the site was built, so every 3D object is
-built real-time in three.js (`src/three/objects/`). This folder is where the
-offline renders come from once Blender is installed. The object most worth
-rendering is the one with wear: the worn `K` key in the homepage hero.
+Blender was not on the machine when the site was built, so the two 3D scenes
+are built real-time in three.js: the worn `K` key and its field in the
+homepage hero (`src/three/scenes/hero.ts`) and the stack of forms on the audit
+page (`src/three/scenes/audit.ts`). This folder is where offline renders would
+come from once Blender is installed. The object most worth rendering is the
+one with wear: the worn `K` key.
+
+Revision 2 replaced the 3D objects on the four service pages with HTML
+demonstrations, and removed the `assets.json` hooks that swapped those objects
+for renders or GLB models. Nothing on the site reads a render today.
 
 ## What is here
 
@@ -11,7 +17,7 @@ rendering is the one with wear: the worn `K` key in the homepage hero.
   copied unmodified. It has **not been run**. Its header lists what to look at
   on the first frame. Treat the first run as part of the work.
 
-## The pipeline
+## The pipeline, if a render is wanted
 
 1. Install Blender 4.2 LTS or later and ffmpeg
    (`winget install BlenderFoundation.Blender`, `winget install Gyan.FFmpeg`).
@@ -19,7 +25,7 @@ rendering is the one with wear: the worn `K` key in the homepage hero.
    the photography brief: orthographic camera, square-on or exactly overhead,
    one large area light, matte neutral greys, `view_transform = 'Standard'`,
    transparent film. No colour, no warmth, no grain.
-3. Render headless, look at the first PNG before rendering the rest:
+3. Render headless, and look at the first PNG before rendering the rest:
 
    ```
    blender -b -P tools/blender/keycap.py -- --out renders/key-worn --frames 1 --size 1600 --overhead
@@ -29,45 +35,14 @@ rendering is the one with wear: the worn `K` key in the homepage hero.
 4. Encode to WebP (keeps the transparency) into `public/renders/`:
 
    ```
-   ffmpeg -i renders/key-worn/0001.png -frames:v 1 -c:v libwebp -quality 82 public/renders/key-worn.webp
    ffmpeg -i renders/key-worn/%04d.png -vf "scale=1600:-2" -c:v libwebp -quality 72 public/renders/key-worn/%04d.webp
    ```
 
-5. Register the render in `src/content/assets.json`. The object library then
-   draws it as a flat plane in place of the real-time mesh. Every camera on
-   the site is square-on or exactly overhead, so the swap needs no other
-   change.
+5. A rendered hero key goes in as a frame sequence scrubbed by scroll, using
+   `.claude/skills/scroll-storytelling/recipes/image-sequence.js`, in place of
+   the scene in `src/three/scenes/hero.ts`. Read `docs/skill-corrections.md`
+   first.
 
-   ```json
-   {
-     "models": {},
-     "renders": {
-       "sheet": { "still": "/renders/sheet.webp", "width": 210, "height": 297 },
-       "key-field": { "frames": ["/renders/key-field/0001.webp", "/renders/key-field/0002.webp"], "width": 8.75, "height": 4 }
-     }
-   }
-   ```
-
-   `width` and `height` are the object's footprint in its own units (see the
-   `size` each object reports in `src/three/objects/index.ts`). A `frames`
-   list is scrubbed by scroll: one frame is requested when the scene is built
-   and the rest when the object is first driven.
-
-Object names: `drum`, `key-field`, `forms-stack`, `sheet`. These are the
-objects on the four service pages, named in `src/content/services.json`. The
-hero's worn key is drawn by its own scene
-(`src/three/scenes/hero.ts`) and is not replaced by `assets.json`; a rendered
-hero key would go in as a frame sequence using
-`.claude/skills/scroll-storytelling/recipes/image-sequence.js`.
-
-## GLB models
-
-Export the same mesh from the Blender script as a GLB (uncompressed), optimise
-it with the project's `@gltf-transform/cli` (`npx @gltf-transform/cli --help`),
-put it in `public/models/`, and name it in `assets.json`:
-
-```json
-{ "models": { "sheet": "/models/sheet.glb" }, "renders": {} }
-```
-
-The loader is only fetched when a model is named.
+A GLB exported from the same Blender script can be optimised with the
+project's `@gltf-transform/cli` (`npx @gltf-transform/cli --help`). Never run
+the bare `npx gltf-transform`: that name is a different package.

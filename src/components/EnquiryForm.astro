@@ -1,0 +1,100 @@
+---
+// The one enquiry form, used for the free consultation, the Savers enquiry
+// and under the quiz result. It posts to Formspree with a reCAPTCHA v3 token
+// (src/scripts/forms.ts). While the Formspree ids or the reCAPTCHA site key
+// are still TODO in site.json it runs in development mode: it validates,
+// prints the payload it would have sent to the console, and shows the
+// thank-you.
+//
+// Fields: name, email, phone (optional), business name (optional), what you
+// need help with, message (optional). Nothing else is asked for.
+import { site, services, forms, has } from '../lib/data';
+
+interface Props {
+  kind: 'consultation' | 'savers' | 'quiz';
+  /** Unique on the page: prefixes the field ids. */
+  id: string;
+  submit: string;
+  /** A service id to start with chosen. */
+  service?: string;
+}
+const { kind, id, submit, service: chosen } = Astro.props;
+const formId = kind === 'quiz' ? forms.formspreeQuizId : forms.formspreeContactId;
+const subject = {
+  consultation: `${site.name}: free consultation`,
+  savers: `${site.name}: Keystroke Savers enquiry`,
+  quiz: `${site.name}: quiz result and enquiry`,
+}[kind];
+const f = (name: string) => `${id}-${name}`;
+---
+<div class="form-wrap" data-form-wrap>
+  <form
+    class="form"
+    id={id}
+    method="post"
+    action={forms.ready ? `https://formspree.io/f/${formId}` : undefined}
+    data-form={kind}
+    novalidate
+  >
+    <div class="form-fields">
+      <div class="field">
+        <label for={f('name')}>Name</label>
+        <input id={f('name')} name="name" type="text" autocomplete="name" required aria-describedby={f('name-error')} data-error="Enter your name." />
+        <p class="field-error" id={f('name-error')} hidden></p>
+      </div>
+      <div class="field">
+        <label for={f('email')}>Email</label>
+        <input id={f('email')} name="email" type="email" autocomplete="email" inputmode="email" spellcheck="false" required aria-describedby={f('email-error')} data-error="Enter an email address we can reply to." />
+        <p class="field-error" id={f('email-error')} hidden></p>
+      </div>
+      <div class="field">
+        <label for={f('phone')}>Phone <span class="opt">optional</span></label>
+        <input id={f('phone')} name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+      </div>
+      <div class="field">
+        <label for={f('business')}>Business name <span class="opt">optional</span></label>
+        <input id={f('business')} name="business" type="text" autocomplete="organization" />
+      </div>
+      <div class="field field-wide">
+        <label for={f('service')}>What do you need help with?</label>
+        <select id={f('service')} name="service">
+          {services.map((s) => <option value={s.name} data-id={s.id} selected={chosen === s.id}>{s.name}</option>)}
+          <option value="Not sure yet" data-id="unsure" selected={!chosen}>Not sure yet</option>
+        </select>
+      </div>
+      <div class="field field-wide">
+        <label for={f('message')}>Message <span class="opt">optional</span></label>
+        <textarea id={f('message')} name="message" rows="4"></textarea>
+      </div>
+    </div>
+
+    {/* Formspree's honeypot: people never see it, so anything in it is a bot. */}
+    <input class="form-pot" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <input type="hidden" name="_subject" value={subject} />
+    <input type="hidden" name="page" value={Astro.url.pathname.replace(/\.html$/, '')} />
+    <input type="hidden" name="plan" value="" />
+    {kind === 'quiz' && (
+      <>
+        <input type="hidden" name="quiz_answers" value="" />
+        <input type="hidden" name="quiz_recommended" value="" />
+        <input type="hidden" name="quiz_result" value="" />
+      </>
+    )}
+
+    <div class="form-foot">
+      <button class="key key-l form-submit" type="submit" data-label={submit}>{submit}</button>
+      <p class="form-status" role="alert" hidden>
+        That did not send. Nothing you typed has been lost. Try again{has('email') && <>, or email us at <a href={`mailto:${site.email}`}>{site.email}</a></>}.
+      </p>
+    </div>
+    <p class="form-legal">This site is protected by reCAPTCHA. <a href="/privacy">How we handle your details</a></p>
+    <noscript>
+      <p class="form-legal">This form needs JavaScript to send.{has('email') && <> You can also email <a href={`mailto:${site.email}`}>{site.email}</a>.</>}</p>
+    </noscript>
+  </form>
+
+  <div class="form-thanks" tabindex="-1" hidden>
+    <p class="display-m">Thank you. That is with us.</p>
+    <p class="body">{kind === 'savers' ? 'We will reply by email to arrange a time to talk.' : 'We will reply by email to arrange a time to talk. The first conversation is free, and there is no obligation.'}</p>
+  </div>
+</div>

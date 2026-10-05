@@ -1,11 +1,14 @@
 ---
-// One of the four services, all at equal size and weight. The short form is
-// the homepage card; `full` adds the three examples for the services page.
+// One of the four services, all at equal size and weight. On the homepage
+// each card opens with a compact version of the service's demonstration. On
+// the services page each card lists what the service offers.
 import ServiceIcon from './ServiceIcon.astro';
-import type { Service } from '../lib/data';
+import Demo from './demos/Demo.astro';
+import { serviceHref, type Service } from '../lib/data';
 
 interface Props {
   item: Service;
+  /** The services page: icon, the practice label and the list of products. */
   full?: boolean;
   level?: 'h2' | 'h3';
   index?: number;
@@ -13,14 +16,14 @@ interface Props {
 const { item, full = false, level = 'h3', index = 0 } = Astro.props;
 const H = level;
 ---
-<article class="card scard" data-reveal style={`--i:${index}`}>
-  <ServiceIcon slug={item.slug} />
+<article class:list={['card', 'scard', { 'scard-demo': !full }]} data-reveal="card" style={`--i:${index}`}>
+  {full ? <ServiceIcon slug={item.id} /> : <Demo kind={item.id} compact />}
   {full && <p class="plate muted">{item.practiceName}</p>}
-  <H class="display-m"><a class="card-link" href={`/services/${item.slug}`}>{item.name}</a></H>
+  <H class="display-m"><a class="card-link" href={serviceHref(item)}>{item.name}</a></H>
   <p class="body">{item.line}</p>
   {full ? (
     <ul class="scard-examples">
-      {item.examples.map((e) => <li>{e}</li>)}
+      {item.products.map((p) => <li>{p.name}</li>)}
     </ul>
   ) : <span></span>}
   <p class="scard-go" aria-hidden="true">See the service</p>

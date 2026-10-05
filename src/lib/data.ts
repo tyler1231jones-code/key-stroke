@@ -1,5 +1,5 @@
-// One place that applies demo mode. Templates read content through here,
-// never from the JSON files directly.
+// One place that applies demo mode and reads site settings. Templates read
+// content through here, never from the JSON files directly.
 import siteJson from '../content/site.json';
 import casesJson from '../content/cases.json';
 import ledgerJson from '../content/ledger.json';
@@ -27,6 +27,10 @@ export const shiftReport = site.demo || !shiftReportJson.demo ? shiftReportJson 
 export const services: Service[] = servicesJson;
 
 export const products = {
+  /** Which prices are shown. Savers is the only one on. Turning one back on is a one-word change in products.json. */
+  display: productsJson.display,
+  /** Said wherever a price used to sit and a visitor would expect one. */
+  quoteLine: productsJson.quoteLine,
   audit: productsJson.audit,
   builds: productsJson.builds,
   items: live(productsJson.items),
@@ -34,21 +38,24 @@ export const products = {
   savers: productsJson.savers,
 };
 
-export function service(slug: string): Service {
-  return services.find((s) => s.slug === slug)!;
+/** A service by its id: the value a case carries in `service`. */
+export function service(id: string): Service {
+  return services.find((s) => s.id === id)!;
 }
 
-/** Quiz items and old links still name a practice; every practice is one service. */
+/** Quiz items still name a practice; every practice is one service. */
 export function serviceOfPractice(key: string): Service {
   return services.find((s) => s.practice === key)!;
 }
+
+export const serviceHref = (s: Service): string => `/services/${s.slug}`;
 
 export function caseById(id: string): Case | undefined {
   return cases.find((c) => c.id === id);
 }
 
-export function casesOf(slug: string): Case[] {
-  return cases.filter((c) => c.service === slug);
+export function casesOf(serviceId: string): Case[] {
+  return cases.filter((c) => c.service === serviceId);
 }
 
 /** The three cases on the homepage, named in site.json. */
@@ -76,18 +83,19 @@ export function rowAccrued(row: LedgerRow, onDate: string): number {
   return roundDownHundred(accrual(row, onDate));
 }
 
-/** Before and after, a year, summed across the ledger rows of one service. */
-export function serviceTotals(slug: string) {
-  const rows = ledger.filter((row) => caseById(row.caseId)?.service === slug);
-  return {
-    before: rows.reduce((t, row) => t + row.baselinePerYear, 0),
-    after: rows.reduce((t, row) => t + row.remainingPerYear, 0),
-    rows: rows.length,
-  };
-}
+const isSet = (value: unknown): value is string => typeof value === 'string' && value !== '' && value !== 'TODO';
 
 /** A value in site.json that the principals have set. Anything still TODO is left off the page. */
-export const has = (key: 'email' | 'bookingUrl' | 'domain'): boolean => site[key] !== 'TODO' && site[key] !== '';
+export const has = (key: 'email' | 'domain' | 'location' | 'serviceArea' | 'analyticsToken'): boolean => isSet(site[key]);
+
+/** The forms post for real only when both Formspree ids and the reCAPTCHA site key are set. */
+export const forms = {
+  ...site.forms,
+  ready: isSet(site.forms.formspreeContactId) && isSet(site.forms.formspreeQuizId) && isSet(site.forms.recaptchaSiteKey),
+};
+
+/** "https://example.com.au", with no trailing slash, or null until the domain is set. */
+export const origin: string | null = isSet(site.domain) ? `https://${site.domain.replace(/^https?:\/\//, '').replace(/\/+$/, '')}` : null;
 
 /** Shown only when yearsExperience is a number. */
 export const experienceLine: string | null = (() => {
@@ -96,13 +104,14 @@ export const experienceLine: string | null = (() => {
   return n === null ? null : site.experienceLine.replace('{years}', String(n));
 })();
 
-/** Every "Book the audit" control goes to the booking block at the foot of the audit page. */
-export const BOOK_HREF = '/audit#book';
+/** Every "Book a free consultation" control goes to the form on the contact page. */
+export const BOOK_HREF = '/contact';
+export const BOOK_LABEL = 'Book a free consultation';
 export const QUIZ_HREF = '/quiz';
 
 /** Cases in an order that shows the range of work first: one from each service in turn. */
 export const casesMixed: Case[] = (() => {
-  const groups = services.map((s) => casesOf(s.slug));
+  const groups = services.map((s) => casesOf(s.id));
   const out: Case[] = [];
   for (let i = 0; groups.some((g) => i < g.length); i++) for (const g of groups) if (g[i]) out.push(g[i]);
   return out;

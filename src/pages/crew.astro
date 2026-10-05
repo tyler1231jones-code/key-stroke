@@ -12,10 +12,11 @@ const today = dateInZone(site.timezone);
 const widest = Math.max(0, ...crew.map((a) => agentTotal(a.unit, today)));
 ---
 <Base
-  title="The crew"
-  description={`Our crew is ${words(crew.length)} AI agents. They do the overnight work, and we check it.`}
+  title={`The crew: ${words(crew.length)} AI agents that work overnight`}
+  description={`Meet the ${words(crew.length)} AI agents that do the overnight work at KEYSTROKE: what each one does, when it runs, and what it has saved clients.`}
   current="crew"
   page="crew"
+  crumbs={[{ name: 'Crew', href: '/crew' }]}
 >
   <section class="page-head">
     <div class="wrap">

@@ -62,5 +62,9 @@ export function clock(hhmm: string): string {
 
 /** "3 WEEKS PER TENDER. EACH ONE STARTS FROM THE LAST." -> "3 weeks per tender. Each one starts from the last." */
 export function sentenceCase(s: string): string {
-  return s.toLowerCase().replace(/(^|[.?]\s+)([a-z])/g, (_, lead: string, ch: string) => lead + ch.toUpperCase());
+  return s
+    .toLowerCase()
+    .replace(/(^|[.?]\s+)([a-z])/g, (_, lead: string, ch: string) => lead + ch.toUpperCase())
+    // Headlines are stored in capitals, so the days of the week need theirs put back.
+    .replace(/\b(mon|tues|wednes|thurs|fri|satur|sun)day\b/g, (day) => day[0].toUpperCase() + day.slice(1));
 }

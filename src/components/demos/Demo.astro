@@ -1,0 +1,71 @@
+---
+// One service demonstration: a stage that turns something poor into
+// something good, with a Before / After toggle and a replay control. Built in
+// HTML, CSS and SVG and animated by src/scripts/demos.ts. Not video, not the
+// WebGL canvas.
+//
+// The stage is an illustration with an invented business, so it is hidden
+// from screen readers and described in one sentence each way instead. Its
+// text is still in the page for search engines.
+//
+// It rests on the after state: that is what shows with reduced motion, and
+// without script. `compact` is the homepage version: no controls, and it
+// loops slowly while it is on screen.
+import '../../styles/demos.css';
+import WebDemo from './WebDemo.astro';
+import ReportDemo from './ReportDemo.astro';
+import AutomationDemo from './AutomationDemo.astro';
+import BrandDemo from './BrandDemo.astro';
+
+interface Props {
+  /** A service id. */
+  kind: string;
+  compact?: boolean;
+}
+const { kind, compact = false } = Astro.props;
+const about: Record<string, { before: string; after: string }> = {
+  'web-software': {
+    before: 'A dated business website: cramped, tiny text, clip-art, and cut off on a phone.',
+    after: 'The same business with a clean, modern website that works on a desktop and a phone.',
+  },
+  reporting: {
+    before: 'A wall of raw spreadsheet rows.',
+    after: 'A one-page summary: three headline figures, a trend line, a bar chart and a short list of what needs attention.',
+  },
+  automation: {
+    before: 'An email arrives in an inbox, asking for a quote by a date.',
+    after: 'The same request as a task on a task board, assigned and dated, with a calendar entry and a drafted reply.',
+  },
+  'brand-design': {
+    before: 'A tired logo with stretched, mismatched type, and a worn shopfront with a faded sign.',
+    after: 'A redrawn mark on a business card and a letterhead, and the shopfront repainted in the new brand.',
+  },
+};
+const text = about[kind];
+---
+{text && (
+  <figure class:list={['demo', { 'demo-compact': compact }]} data-demo={kind} data-state="after" data-compact={compact ? '' : undefined}>
+    <div class="demo-stage" aria-hidden="true">
+      <div class="demo-canvas">
+        {kind === 'web-software' && <WebDemo />}
+        {kind === 'reporting' && <ReportDemo />}
+        {kind === 'automation' && <AutomationDemo />}
+        {kind === 'brand-design' && <BrandDemo />}
+      </div>
+    </div>
+    {compact ? (
+      <figcaption class="vh">An illustration. Before: {text.before} After: {text.after}</figcaption>
+    ) : (
+      <figcaption class="demo-bar">
+        <p class="demo-note">An illustration, with an invented business.</p>
+        <div class="demo-controls" role="group" aria-label="Show the demonstration before or after">
+          <button class="demo-toggle" type="button" data-show="before" aria-pressed="false">Before</button>
+          <button class="demo-toggle" type="button" data-show="after" aria-pressed="true">After</button>
+          <button class="demo-replay" type="button">Replay</button>
+        </div>
+        <p class="vh" data-demo-says aria-live="polite">After: {text.after}</p>
+        <p class="vh">Before: {text.before} After: {text.after}</p>
+      </figcaption>
+    )}
+  </figure>
+)}

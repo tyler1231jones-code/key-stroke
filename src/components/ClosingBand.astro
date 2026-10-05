@@ -1,41 +1,22 @@
 ---
-// How every page ends: one sentence and the two buttons. On the audit page
-// the same band is the booking block that every "Book the audit" control
-// points at. It shows the booking link and the email address once they are
-// set in site.json, and nothing in their place until then.
+// How every page ends: one sentence and the two buttons. The free
+// consultation is the primary action; the quiz is the way in for someone who
+// is not ready to talk yet.
 import BookButton from './BookButton.astro';
 import QuizButton from './QuizButton.astro';
-import Fig from './Fig.astro';
-import { site, products, has } from '../lib/data';
 
 interface Props {
-  mode?: 'close' | 'book';
+  /** A service id, so the form opens with that service chosen. */
+  service?: string;
 }
-const { mode = 'close' } = Astro.props;
-const audit = products.audit;
+const { service } = Astro.props;
 ---
-{mode === 'book' ? (
-  <section class="band on-900" id="book" aria-labelledby="book-h">
-    <div class="wrap band-inner">
-      <h2 class="display-l" id="book-h">Book the audit.</h2>
-      <p class="lede"><Fig text={`One process, counted in ${audit.delivery}, for ${audit.price}.`} /></p>
-      <div class="keys">
-        {has('bookingUrl') && <a class="key key-l" href={site.bookingUrl}>Choose a time</a>}
-        <QuizButton secondary={has('bookingUrl')} />
-      </div>
-      {has('email') && (
-        <p class="body band-contact">Or write to us: <a href={`mailto:${site.email}`}>{site.email}</a></p>
-      )}
+<section class="band on-900" aria-labelledby="close-h" data-reveal>
+  <div class="wrap band-inner">
+    <h2 class="display-l" id="close-h">Book a free consultation, or start with the quiz.</h2>
+    <div class="keys">
+      <BookButton service={service} />
+      <QuizButton secondary />
     </div>
-  </section>
-) : (
-  <section class="band on-900" aria-labelledby="close-h">
-    <div class="wrap band-inner">
-      <h2 class="display-l" id="close-h">Start with the quiz, or book the audit.</h2>
-      <div class="keys">
-        <QuizButton />
-        <BookButton secondary />
-      </div>
-    </div>
-  </section>
-)}
+  </div>
+</section>

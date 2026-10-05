@@ -1,0 +1,125 @@
+---
+// Branding and graphic design. Two beats. First a tired logo (stretched,
+// mismatched type, clip-art) is redrawn and rolls out across a business card
+// and a letterhead. Then a worn shopfront with a faded sign is repainted in
+// the new brand: the work reaches the building, not only the logo. The
+// business is invented.
+import demos from '../../content/demos.json';
+
+const d = demos['brand-design'];
+const old = `${d.business} Bakery`;
+---
+<div class="db">
+  <div class="db-id">
+    <div class="db-logo">
+      <div class="d-after db-new" data-logo-new>
+        <svg class="db-mark" viewBox="0 0 60 60" data-mark>
+          <circle cx="30" cy="30" r="27" fill="var(--demo-brand-gold)" />
+          <g fill="none" stroke="var(--demo-brand-green)" stroke-width="5" stroke-linecap="round">
+            <path d="M17 36 L29 20" pathLength="1" />
+            <path d="M26 42 L38 26" pathLength="1" />
+            <path d="M35 46 L45 33" pathLength="1" />
+          </g>
+        </svg>
+        <p class="db-word" data-word>{d.business}</p>
+        <p class="db-sub" data-sub>{d.kind}</p>
+      </div>
+      <div class="d-before db-old" data-logo-old>
+        <svg class="db-old-burst" viewBox="0 0 40 40">
+          <polygon points="20,1 24,13 37,9 29,19 39,27 26,27 27,39 20,29 13,39 14,27 1,27 11,19 3,9 16,13" fill="var(--demo-drab-2)" />
+        </svg>
+        <p class="db-old-name">{old.toUpperCase()}</p>
+        <p class="db-old-tag">fresh bread daily</p>
+      </div>
+    </div>
+
+    <div class="db-print">
+      <div class="db-card" data-card>
+        <div class="d-after db-new">
+          <span class="db-dot"></span>
+          <p><b>{d.business}</b><span>{d.kind} / Open from 6</span></p>
+        </div>
+        <div class="d-before db-old"><b>{old}</b>Proprietor<br />Ph. see shop</div>
+      </div>
+      <div class="db-letter" data-letter>
+        <div class="d-after db-new">
+          <span class="db-dot"></span>
+          <i></i><i></i><i></i><i></i><i></i><i></i>
+          <span class="db-letter-band"></span>
+        </div>
+        <div class="d-before db-old"><b>{old}</b>Tax invoice<br />To:<br />Date:</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="db-shop">
+    <div class="d-after" data-shop-new>
+      <svg viewBox="0 0 340 350" preserveAspectRatio="xMidYMax meet">
+        <rect x="-400" width="1140" height="350" fill="var(--demo-web-soft)" />
+        <rect x="-400" y="306" width="1140" height="44" fill="var(--demo-line)" />
+        <rect x="0" y="306" width="340" height="44" fill="var(--demo-line)" />
+        <rect x="20" y="36" width="300" height="270" fill="var(--demo-brand-cream)" />
+        <rect x="20" y="284" width="300" height="22" fill="var(--demo-brand-green)" />
+        <!-- the sign -->
+        <rect x="36" y="56" width="268" height="54" rx="4" fill="var(--demo-brand-green)" data-sign />
+        <circle cx="66" cy="83" r="16" fill="var(--demo-brand-gold)" />
+        <g fill="none" stroke="var(--demo-brand-green)" stroke-width="3.2" stroke-linecap="round">
+          <path d="M58 87 L65 77" /><path d="M63 91 L70 81" /><path d="M69 93 L75 85" />
+        </g>
+        <text x="94" y="92" font-size="27" letter-spacing="1.5" fill="var(--demo-brand-cream)">{d.business}</text>
+        <text x="96" y="104" font-size="8" letter-spacing="3" fill="var(--demo-brand-gold)">{d.kind}</text>
+        <!-- the awning -->
+        <polygon points="36,124 304,124 320,162 20,162" fill="var(--demo-brand-clay)" />
+        <polygon points="74,124 112,124 106,162 63,162" fill="var(--demo-brand-cream)" />
+        <polygon points="150,124 188,124 191,162 148,162" fill="var(--demo-brand-cream)" />
+        <polygon points="226,124 264,124 277,162 234,162" fill="var(--demo-brand-cream)" />
+        <!-- the window, with bread in it -->
+        <rect x="40" y="176" width="164" height="100" fill="var(--demo-paper)" />
+        <rect x="46" y="182" width="152" height="88" fill="var(--demo-web-soft)" />
+        <rect x="46" y="244" width="152" height="5" fill="var(--demo-brand-crust)" />
+        <ellipse cx="78" cy="234" rx="22" ry="11" fill="var(--demo-brand-crust)" />
+        <ellipse cx="126" cy="232" rx="18" ry="13" fill="var(--demo-brand-gold)" />
+        <ellipse cx="168" cy="235" rx="20" ry="10" fill="var(--demo-brand-crust)" />
+        <rect x="60" y="196" width="60" height="18" rx="3" fill="var(--demo-brand-clay)" />
+        <!-- the door -->
+        <rect x="224" y="176" width="78" height="130" fill="var(--demo-brand-green)" />
+        <rect x="236" y="188" width="54" height="56" fill="var(--demo-web-soft)" />
+        <rect x="282" y="252" width="5" height="18" rx="2" fill="var(--demo-brand-gold)" />
+        <!-- a planter -->
+        <rect x="24" y="292" width="34" height="22" fill="var(--demo-brand-clay)" />
+        <circle cx="33" cy="286" r="10" fill="var(--demo-brand-green)" /><circle cx="48" cy="284" r="12" fill="var(--demo-brand-green)" />
+      </svg>
+    </div>
+    <div class="d-before" data-shop-old>
+      <svg viewBox="0 0 340 350" preserveAspectRatio="xMidYMax meet">
+        <rect x="-400" width="1140" height="350" fill="var(--demo-drab-1)" />
+        <rect x="-400" y="306" width="1140" height="44" fill="var(--demo-drab-2)" />
+        <rect x="0" y="306" width="340" height="44" fill="var(--demo-drab-2)" />
+        <rect x="20" y="36" width="300" height="270" fill="var(--demo-drab-0)" />
+        <polyline points="250,36 244,70 256,92 248,120" fill="none" stroke="var(--demo-drab-2)" stroke-width="2" />
+        <polygon points="24,250 60,262 44,300 20,306" fill="var(--demo-drab-1)" />
+        <!-- the faded sign -->
+        <rect x="36" y="56" width="268" height="54" fill="var(--demo-drab-1)" />
+        <text x="170" y="92" font-size="22" text-anchor="middle" fill="var(--demo-drab-2)" style="font-family: 'Times New Roman', Times, serif; letter-spacing: 2px;">{old.toUpperCase()}</text>
+        <polygon points="60,58 96,56 88,74 66,70" fill="var(--demo-drab-0)" />
+        <polygon points="230,96 272,90 280,110 240,110" fill="var(--demo-drab-0)" />
+        <!-- the awning, sun-bleached -->
+        <polygon points="36,124 304,124 320,162 20,162" fill="var(--demo-drab-2)" />
+        <polygon points="74,124 112,124 106,162 63,162" fill="var(--demo-drab-1)" />
+        <polygon points="150,124 188,124 191,162 148,162" fill="var(--demo-drab-1)" />
+        <polygon points="226,124 264,124 277,162 234,162" fill="var(--demo-drab-1)" />
+        <polygon points="270,150 320,162 284,162" fill="var(--demo-drab-0)" />
+        <!-- the window -->
+        <rect x="40" y="176" width="164" height="100" fill="var(--demo-drab-3)" />
+        <rect x="46" y="182" width="152" height="88" fill="var(--demo-drab-2)" />
+        <rect x="120" y="182" width="4" height="88" fill="var(--demo-drab-3)" />
+        <rect x="134" y="196" width="50" height="34" fill="var(--demo-drab-0)" />
+        <!-- the door -->
+        <rect x="224" y="176" width="78" height="130" fill="var(--demo-drab-3)" />
+        <rect x="236" y="188" width="54" height="56" fill="var(--demo-drab-2)" />
+        <rect x="282" y="252" width="5" height="18" fill="var(--demo-drab-1)" />
+      </svg>
+    </div>
+    <span class="db-roller"></span>
+  </div>
+</div>

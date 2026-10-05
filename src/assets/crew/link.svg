@@ -15,8 +15,8 @@
   <rect x="75" y="3" width="10" height="8" rx="2" fill="var(--ink-muted)" />
   <rect x="29" y="52" width="9" height="20" rx="2" fill="var(--ink-muted)" />
   <rect x="122" y="52" width="9" height="20" rx="2" fill="var(--ink-muted)" />
-  <circle cx="68" cy="58" r="5.5" fill="none" stroke="var(--base-900)" stroke-width="3" />
-  <circle cx="92" cy="58" r="5.5" fill="none" stroke="var(--base-900)" stroke-width="3" />
+  <circle class="eye" cx="68" cy="58" r="5.5" fill="none" stroke="var(--base-900)" stroke-width="3" />
+  <circle class="eye" cx="92" cy="58" r="5.5" fill="none" stroke="var(--base-900)" stroke-width="3" />
   <path d="M70 75 Q80 81 90 75" fill="none" stroke="var(--base-900)" stroke-width="3" stroke-linecap="square" />
   <rect x="60" y="134" width="24" height="13" rx="6" fill="none" stroke="var(--readout)" stroke-width="3" />
   <rect x="76" y="134" width="24" height="13" rx="6" fill="none" stroke="var(--readout)" stroke-width="3" />

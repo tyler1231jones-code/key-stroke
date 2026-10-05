@@ -6,6 +6,7 @@ import { driver } from './driver';
 import { counter } from './counter';
 import { refreshFigures } from './live';
 import { initSite } from './site';
+import { initDemos } from './demos';
 import { loadStage } from './stage';
 import { bus, HERO } from './bus';
 
@@ -79,6 +80,7 @@ function boot(): void {
   const figures = refreshFigures();
   initSmooth();
   initHero(figures);
+  initDemos();
   initSite();
   document.documentElement.classList.add('run');
 

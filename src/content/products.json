@@ -1,7 +1,17 @@
 {
+  "display": {
+    "audit": false,
+    "builds": false,
+    "cases": false,
+    "quiz": false,
+    "savers": true
+  },
+  "quoteLine": "Every job is quoted individually after a free consultation.",
   "audit": {
     "name": "The Keystroke Audit",
     "what": "We watch one of your processes from start to finish, count every keystroke in it, and tell you what it costs and what to fix.",
+    "offer": "Free",
+    "note": "No cost and no obligation.",
     "price": "$1,500",
     "terms": "Fixed",
     "delivery": "1–2 weeks",

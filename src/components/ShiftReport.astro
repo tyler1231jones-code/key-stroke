@@ -1,8 +1,8 @@
 ---
 // The sample audit report: three labelled parts and the quote. A document,
 // so it takes the light theme. Filled from shiftReport.json. Every figure is
-// labelled in words.
-import { shiftReport as r } from '../lib/data';
+// labelled in words. The quote range is shown only while products.display.builds is on.
+import { shiftReport as r, products } from '../lib/data';
 import { num } from '../lib/format';
 ---
 {r && (
@@ -33,7 +33,11 @@ import { num } from '../lib/format';
     </div>
     <div class="report-part">
       <p class="display-s">The quote</p>
-      <p class="report-fig"><span class="counter-m">{r.quote.range}</span><span class="unit">to rebuild this process</span></p>
+      {products.display.builds ? (
+        <p class="report-fig"><span class="counter-m">{r.quote.range}</span><span class="unit">to rebuild this process</span></p>
+      ) : (
+        <p class="body">Quoted after the audit</p>
+      )}
     </div>
   </div>
 )}

@@ -5,7 +5,6 @@
 export const bus = {
   hero: { p: 0, press: 0 },
   audit: { p: 0 },
-  service: { p: 0 },
   invalidate: () => {},
 };
 

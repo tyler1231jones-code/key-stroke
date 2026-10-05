@@ -1,6 +1,6 @@
 ---
 import Logotype from './Logotype.astro';
-import { BOOK_HREF } from '../lib/data';
+import { BOOK_HREF, BOOK_LABEL } from '../lib/data';
 
 interface Props {
   /** The key of the header item the current page belongs to. */
@@ -30,7 +30,7 @@ const items = [
           <li><a href={item.href} aria-current={current === item.key ? 'page' : undefined}>{item.label}</a></li>
         ))}
       </ul>
-      <a class="key bar-book" href={BOOK_HREF}>Book the audit</a>
+      <a class="key bar-book" href={BOOK_HREF}>{BOOK_LABEL}</a>
       <details class="menu">
         <summary class="plate">Menu</summary>
         <ul class="menu-list">

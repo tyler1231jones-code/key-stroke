@@ -3,14 +3,18 @@
 // and has its own URL, with the answers in the hash. The result says three
 // things: the read, the recommended items, and the next step.
 //
-// "Ask a question about it" is a mail link, shown once site.email is set. The
-// bounded conversation in the business plan would attach here: a Worker route
-// (say POST /api/ask) that receives the result code and the question.
+// The result is shown without asking for anything. Beneath it sits one form,
+// "Send me this and get in touch", which carries the answers and the result
+// with the visitor's details. Nothing leaves the browser unless that form is
+// sent (src/scripts/forms.ts).
 import { gsap } from 'gsap';
 import { interpret, encode, decode, type Answers, type Result } from '../lib/quiz';
-import { site, has, BOOK_HREF } from '../lib/data';
+import { products } from '../lib/data';
 import { figureRuns, withArticle } from '../lib/format';
 import { counter } from './counter';
+import { questions } from '../lib/quiz';
+import { initForms } from './forms';
+import { initSite, initReveal } from './site';
 
 const ROLL = 0.18;
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -21,6 +25,7 @@ const top = document.getElementById('quiz-top');
 const next = document.getElementById('quiz-next') as HTMLButtonElement | null;
 const back = document.getElementById('quiz-back') as HTMLButtonElement | null;
 const stepEl = document.getElementById('quiz-step');
+const enquiry = document.getElementById('quiz-enquiry');
 const screens = form ? Array.from(form.querySelectorAll<HTMLFieldSetElement>('.quiz-screen')) : [];
 const step = stepEl ? counter(stepEl) : null;
 let current = 0;
@@ -99,11 +104,18 @@ function finish(): void {
   if (screens.some((s) => answersOf(s).length === 0)) return;
   const code = encode(a);
   history.replaceState(null, '', `#r=${code}`);
-  show(interpret(a), code);
+  show(interpret(a), code, a);
 }
 
 /* ---------- The result ---------- */
-function show(r: Result, code: string): void {
+/** The answers as a person would read them, for the enquiry that goes with the result. */
+function answersAsText(a: Answers): string {
+  return questions
+    .map((q) => `${q.text} ${(a[q.id] ?? []).map((id) => q.options.find((o) => o.id === id)?.label ?? id).join(', ')}`)
+    .join('\n');
+}
+
+function show(r: Result, code: string, a: Answers): void {
   if (!resultEl) return;
   if (form) form.hidden = true;
   if (top) top.hidden = true;
@@ -129,19 +141,24 @@ function show(r: Result, code: string): void {
   // 2. The recommended items, in the order to do them.
   if (r.items.length) {
     const block = el('div', 'result-block');
+    block.setAttribute('data-reveal', '');
     block.appendChild(el('h3', 'display-m', r.items.length === 1 ? 'What we would fix' : 'What we would fix, in order'));
     const list = el('ol', 'result-items');
     r.items.forEach((item, i) => {
       const li = el('li', 'result-item');
+      li.setAttribute('data-reveal', 'card');
+      li.style.setProperty('--i', String(i));
       li.appendChild(el('span', 'n', String(i + 1)));
       const body = el('div', 'result-item-body');
       body.appendChild(el('p', 'display-s', item.name));
-      const cost = el('p', 'result-cost');
-      cost.appendChild(el('span', 'figure', item.range));
-      const what = el('span', 'unit');
-      what.textContent = 'is the usual cost';
-      cost.appendChild(what);
-      body.appendChild(cost);
+      if (products.display.quiz) {
+        const cost = el('p', 'result-cost');
+        cost.appendChild(el('span', 'figure', item.range));
+        const what = el('span', 'unit');
+        what.textContent = 'is the usual cost';
+        cost.appendChild(what);
+        body.appendChild(cost);
+      }
       if (item.case) {
         const link = el('a', 'body-s');
         link.href = `/cases/${item.case.id}`;
@@ -153,39 +170,34 @@ function show(r: Result, code: string): void {
     });
     block.appendChild(list);
     if (r.order) block.appendChild(el('p', 'body', r.order));
+    if (!products.display.quiz) block.appendChild(el('p', 'body-s muted', products.quoteLine));
     resultEl.appendChild(block);
   }
 
   // 3. The next step.
   const exits = el('div', 'result-block');
+  exits.setAttribute('data-reveal', '');
   exits.appendChild(el('h3', 'display-m', 'The next step'));
   if (r.next) exits.appendChild(el('p', 'body', r.next));
-  const row = el('div', 'keys');
-  const exit = (label: string, href: string, primary: boolean) => {
-    const a = el('a', primary ? 'key key-l' : 'key key-l key-2', label);
-    a.href = href;
-    row.appendChild(a);
-  };
-  const subject = encodeURIComponent(`${site.name}: my nine answers`);
-  const body = encodeURIComponent(url);
-  if (r.showBook) exit('Book the audit', BOOK_HREF, true);
-  exit('Email me this', `mailto:?subject=${subject}&body=${body}`, !r.showBook);
-  if (has('email')) exit('Ask a question about it', `mailto:${site.email}?subject=${subject}&body=${body}`, false);
-  exits.appendChild(row);
-  const tail = el('p', 'result-back');
-  const all = el('a', 'body-s', 'See the cases');
-  all.href = '/cases';
-  tail.appendChild(all);
-  const again = el('button', 'body-s quiz-back', 'Start again');
-  again.type = 'button';
-  again.addEventListener('click', restart);
-  tail.appendChild(again);
-  exits.appendChild(tail);
   resultEl.appendChild(exits);
+
+  // The form under the result carries the answers and the result with it.
+  if (enquiry) {
+    const set = (name: string, value: string) => {
+      const field = enquiry.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+      if (field) field.value = value;
+    };
+    set('quiz_answers', answersAsText(a));
+    set('quiz_recommended', r.buyNothing ? 'Buy nothing yet' : r.items.map((item, i) => `${i + 1}. ${item.name} (${item.service})`).join('\n'));
+    set('quiz_result', url);
+    enquiry.hidden = false;
+  }
 
   resultEl.hidden = false;
   h.focus({ preventScroll: true });
   window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  // The blocks below the first screen arrive as they are reached.
+  initReveal(resultEl.parentElement ?? resultEl);
 }
 
 function restart(): void {
@@ -195,6 +207,14 @@ function restart(): void {
   current = 0;
   step?.show(1);
   if (resultEl) resultEl.hidden = true;
+  if (enquiry) {
+    enquiry.hidden = true;
+    // A result already sent starts again with a fresh form.
+    const sent = enquiry.querySelector<HTMLFormElement>('form');
+    const thanks = enquiry.querySelector<HTMLElement>('.form-thanks');
+    if (sent) sent.hidden = false;
+    if (thanks) thanks.hidden = true;
+  }
   if (form) form.hidden = false;
   if (top) top.hidden = false;
   sync();
@@ -210,7 +230,7 @@ function fromHash(): boolean {
     const given = a[s.dataset.q ?? ''] ?? [];
     s.querySelectorAll<HTMLInputElement>('input').forEach((i) => (i.checked = given.includes(i.value)));
   });
-  show(interpret(a), m[1]);
+  show(interpret(a), m[1], a);
   return true;
 }
 
@@ -235,10 +255,13 @@ if (form && next && back) {
   });
   next.addEventListener('click', () => (current === screens.length - 1 ? finish() : go(current + 1)));
   back.addEventListener('click', () => go(current - 1));
+  document.getElementById('quiz-again')?.addEventListener('click', restart);
   form.addEventListener('submit', (event) => event.preventDefault());
   window.addEventListener('hashchange', () => {
     if (!fromHash() && resultEl && !resultEl.hidden) restart();
   });
   if (!fromHash()) sync();
 }
+initForms();
+initSite();
 document.documentElement.classList.add('run');

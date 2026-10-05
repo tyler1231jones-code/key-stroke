@@ -6,7 +6,7 @@ import Counter from '../../components/Counter.astro';
 import Artefact from '../../components/Artefact.astro';
 import BookButton from '../../components/BookButton.astro';
 import Fig from '../../components/Fig.astro';
-import { cases, service } from '../../lib/data';
+import { cases, service, products, serviceHref } from '../../lib/data';
 import { num, sentenceCase } from '../../lib/format';
 import '../../styles/pages.css';
 
@@ -18,19 +18,28 @@ const { item } = Astro.props;
 const s = service(item.service);
 const who = item.descriptor.split(' · ')[0];
 const keystrokes = /keystroke/.test(item.before.unit);
+// A meta description is cut at a sentence end, inside 155 characters.
+const describe = (text: string) => {
+  if (text.length <= 155) return text;
+  const cut = text.slice(0, 155);
+  const stop = cut.lastIndexOf('. ');
+  return stop > 60 ? cut.slice(0, stop + 1) : `${cut.slice(0, cut.lastIndexOf(' '))}.`;
+};
 ---
 <Base
-  title={`${who}: ${sentenceCase(item.headline).replace(/\.$/, '')}`}
-  description={`${item.wrong} ${item.summary}`}
+  title={sentenceCase(item.headline).replace(/\.$/, '')}
+  description={describe(`${who}. ${item.wrong} ${item.summary}`)}
   current="cases"
   page="case"
+  service={item.service}
+  crumbs={[{ name: 'Cases', href: '/cases' }, { name: sentenceCase(item.headline).replace(/\.$/, ''), href: `/cases/${item.id}` }]}
 >
   <article>
     <section class="page-head">
       <div class="wrap">
         <p class="body-s muted load-in">{item.descriptor}</p>
         <h1 class="display-xl case-h load-in"><Fig text={item.headline} /></h1>
-        <p class="load-in" style="--i:1"><a class="tag" href={`/services/${s.slug}`}>{s.name}</a></p>
+        <p class="load-in" style="--i:1"><a class="tag" href={serviceHref(s)}>{s.name}</a></p>
       </div>
     </section>
 
@@ -73,9 +82,15 @@ const keystrokes = /keystroke/.test(item.before.unit);
         </div>
 
         <div class="case-cost" data-reveal>
-          <h2 class="display-s">What a build like this costs</h2>
-          <p class="price"><span class="counter-m">{item.costRange}</span></p>
-          <BookButton />
+          {products.display.cases ? (
+            <>
+              <h2 class="display-s">What a build like this costs</h2>
+              <p class="price"><span class="counter-m">{item.costRange}</span></p>
+            </>
+          ) : (
+            <p class="body">{products.quoteLine}</p>
+          )}
+          <BookButton service={item.service} />
         </div>
       </div>
       <div class="wrap">

@@ -9,6 +9,7 @@ A scroll-driven site with real-time and pre-rendered 3D, built with Astro, three
 - `docs/stack.md` lists the packages, versions and tools.
 - `docs/skill-corrections.md` lists where the skills in `.claude/skills/` are out of date or wrong. Read it before using any `threejs-*` or `gsap-*` skill.
 - `docs/revision-1.md` is the first revision of the build. Where it disagrees with the build brief or the design system, the revision wins.
+- `docs/revision-2.md` is the second revision. Where it disagrees with revision 1, the build brief or the design system, revision 2 wins.
 
 Precedence: the brief, then the design system, then the business plan.
 

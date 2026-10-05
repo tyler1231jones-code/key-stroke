@@ -1,0 +1,76 @@
+---
+// Automation and AI agents. An email arrives in an inbox. The key details
+// (who, what, by when) are picked out and carried across, and become a task
+// on a task board, assigned and dated, with a calendar entry and a drafted
+// reply. The inbox and the board are generic, and the business is invented.
+import demos from '../../content/demos.json';
+
+const d = demos.automation;
+const first = d.person.split(' ')[0];
+---
+<div class="da">
+  <div class="da-pane da-inbox">
+    <p class="da-head">Inbox <span>1 new</span></p>
+    <p class="da-mail da-mail-new" data-mail><b>{d.person}</b>Quote for a shop counter</p>
+    <div class="da-open" data-open>
+      <p>Hi,</p>
+      <p>
+        This is <mark data-pick="who">{d.person} from {d.business}</mark>. Could you{' '}<mark data-pick="what">quote a new shop counter</mark> for our Elm Road store? We need it{' '}<mark data-pick="when">by Friday 16 October</mark>.
+      </p>
+      <p>Thanks, {first}</p>
+      <p class="da-filed d-only-after" data-filed>Filed as a task</p>
+    </div>
+    <p class="da-mail"><b>Supplier</b>Your order has shipped</p>
+    <p class="da-mail"><b>Accounts</b>Statement attached</p>
+  </div>
+
+  <div class="da-work">
+    <div class="da-pane da-board">
+      <p class="da-head">Task board <span>This week</span></p>
+      <div class="da-cols">
+        <div class="da-col">
+          <span>To do</span>
+          <div class="da-card da-task d-only-after" data-task>
+            <b data-slot="what">Quote: shop counter</b>
+            <p>For <span data-slot="who">{d.person}, {d.business}</span></p>
+            <p>Due <span data-slot="when">Fri 16 Oct</span></p>
+            <p class="da-owner" data-owner><i></i>Sam</p>
+          </div>
+          <div class="da-card"><b>Order laminate</b>Due Wed</div>
+        </div>
+        <div class="da-col">
+          <span>Doing</span>
+          <div class="da-card"><b>Fit-out drawings</b>Due Thu</div>
+        </div>
+        <div class="da-col">
+          <span>Done</span>
+          <div class="da-card"><b>Site measure</b>Mon</div>
+        </div>
+      </div>
+    </div>
+    <div class="da-low">
+      <div class="da-pane">
+        <p class="da-head">Calendar</p>
+        <div class="da-week">
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day) => (
+            <div class="da-day">
+              {day}
+              {day === 'Fri' && <p class="da-event d-only-after" data-event>Quote due</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="da-pane">
+        <p class="da-head">Reply <span>Draft</span></p>
+        <div class="da-reply d-only-after" data-reply>
+          <p class="da-reply-tag">Drafted. Ready for you to check.</p>
+          <p data-reply-text>Hi {first}, thanks for getting in touch. Your quote for the shop counter will be with you by Friday.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span class="da-chip" data-chip="who">Who</span>
+  <span class="da-chip" data-chip="what">What</span>
+  <span class="da-chip" data-chip="when">By when</span>
+</div>

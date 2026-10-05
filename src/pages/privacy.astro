@@ -1,0 +1,77 @@
+---
+// What this site collects and where it goes, stated plainly. It describes
+// what the code does. Anything that is a business policy rather than a fact
+// about the site is for the principals to confirm before launch: see
+// NOTES.md.
+import Base from '../layouts/Base.astro';
+import { site, has, BOOK_HREF } from '../lib/data';
+import '../styles/pages.css';
+---
+<Base
+  title="Privacy"
+  description="What the KEYSTROKE website collects when you send a form, where it goes, and how to ask for your details to be removed."
+  page="privacy"
+  crumbs={[{ name: 'Privacy', href: '/privacy' }]}
+>
+  <article class="doc">
+    <section class="page-head">
+      <div class="wrap">
+        <h1 class="display-xl load-in">Privacy.</h1>
+        <p class="lede load-in" style="--i:1">This site collects what you type into a form, and only when you send it. Nothing else about you is kept.</p>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <div class="doc-body privacy">
+        <section class="doc-section" data-reveal>
+          <h2 class="display-s">What the forms collect</h2>
+          <div class="doc-copy">
+            <p class="body">Your name and email address. Your phone number, business name and a message, if you choose to give them. Which service you asked about, and the page you sent the form from.</p>
+            <p class="body">If you send the form under a quiz result, your nine answers and the result go with it. The quiz itself sends nothing: until you send that form, your answers stay in your browser.</p>
+          </div>
+        </section>
+
+        <section class="doc-section" data-reveal>
+          <h2 class="display-s">Where it goes</h2>
+          <div class="doc-copy">
+            <p class="body">Forms are processed by Formspree, a form service. Formspree receives what you send, passes it to us by email and keeps a copy in our Formspree account.</p>
+            <p class="body">We use what you send to reply to you and to arrange a conversation.</p>
+          </div>
+        </section>
+
+        <section class="doc-section" data-reveal>
+          <h2 class="display-s">reCAPTCHA</h2>
+          <div class="doc-copy">
+            <p class="body">The forms use Google reCAPTCHA to tell people from automated senders. It is loaded only when a form is on screen. When you send a form, reCAPTCHA scores the visit and Formspree checks that score before accepting it.</p>
+          </div>
+        </section>
+
+        <section class="doc-section" data-reveal>
+          <h2 class="display-s">Cookies and tracking</h2>
+          <div class="doc-copy">
+            <p class="body">This site sets no cookies of its own. reCAPTCHA sets one that it needs to work, on pages where a form has been on screen.</p>
+            <p class="body">Your browser remembers, until you close the tab, that the opening animation on the homepage has played. That note holds nothing about you.</p>
+            {has('analyticsToken') && (
+              <p class="body">We count page views with Cloudflare Web Analytics, which uses no cookies and does not follow you to other sites.</p>
+            )}
+          </div>
+        </section>
+
+        <section class="doc-section" data-reveal>
+          <h2 class="display-s">Having your details removed</h2>
+          <div class="doc-copy">
+            {has('email') ? (
+              <p class="body">Email <a href={`mailto:${site.email}`}>{site.email}</a> and ask. We will remove what you sent from our records and from Formspree.</p>
+            ) : (
+              <p class="body">Ask through <a href={BOOK_HREF}>the contact form</a>. We will remove what you sent from our records and from Formspree.</p>
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  </article>
+</Base>
+
+<script>
+  import '../scripts/page.ts';
+</script>

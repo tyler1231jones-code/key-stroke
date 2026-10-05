@@ -5,7 +5,7 @@
   --measure: 46ch; /* keeps running copy under 66 characters a line in Archivo, whose zero is wide */
   --wide: 1600px;
   --section: calc(var(--space-24) + var(--space-12));
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1); /* eases out, never past its target */
+  --ease: var(--ease-out); /* older name, kept for the hero load-in */
   color-scheme: dark;
 }
 [data-theme="light"] { color-scheme: light; }
@@ -168,11 +168,39 @@ a.tag:hover { color: var(--ink); border-color: var(--ink); }
 .is-off { visibility: hidden; }
 html.menu-open { overflow: hidden; }
 
-/* A quiet reveal, once, as a block enters the viewport. The script marks
-   only blocks that are still below the fold, so nothing is hidden without it. */
-[data-reveal] { transition: opacity 0.4s var(--ease), transform 0.4s var(--ease); transition-delay: calc(var(--i, 0) * 60ms); }
-[data-reveal].pre { opacity: 0; transform: translateY(16px); transition: none; }
+/* Arrivals, responses and page transitions are in motion.css. */
 
-/* Inner pages: the heading and the first block rise in on load. */
-@keyframes ks-rise { from { opacity: 0; transform: translateY(16px); } }
-.motion .load-in { animation: ks-rise 0.4s var(--ease) both; animation-delay: calc(var(--i, 0) * 90ms); }
+/* ---------- Touch ---------- */
+/* Every tap target is at least 48px in both directions, with room around it. */
+.skip { display: inline-flex; align-items: center; min-height: 48px; }
+@media (max-width: 899px) {
+  .key, .chip { min-height: 48px; }
+  .bar-home { display: flex; align-items: center; min-width: 48px; min-height: 48px; }
+  .menu > summary { display: flex; align-items: center; justify-content: center; min-width: 48px; min-height: 48px; padding: 0 var(--space-2); }
+  .more { align-items: center; min-height: 48px; }
+  a.tag { display: inline-flex; align-items: center; min-height: 48px; padding-inline: var(--space-4); }
+  .foot ul { gap: 0; }
+  .foot li > a { display: flex; align-items: center; min-height: 48px; }
+  .foot-logo { display: flex; align-items: center; min-height: 48px; }
+  .foot h2 { margin-bottom: var(--space-2); }
+}
+/* The header holds the mark, the button and the menu inside 360px. The mark
+   and the word Menu keep their place on the page margin; their 48px tap areas
+   reach 8px into it. */
+@media (max-width: 479px) {
+  .bar .wrap { gap: var(--space-3); }
+  .bar-nav { gap: var(--space-3); }
+  .bar-home { justify-content: center; margin-left: calc(var(--space-2) * -1); }
+  .menu > summary { padding: 0; margin-right: calc(var(--space-2) * -1); }
+  .bar-book { padding: 0 var(--space-3); }
+}
+/* Narrower than any current phone: the button leaves the header. The hero and the bar at the foot still carry it. */
+@media (max-width: 349px) {
+  .bar-book { display: none; }
+}
+/* ---------- Reading on a phone ---------- */
+/* The text sizes for small screens are at the end of parts.css, after the parts they adjust. */
+@media (max-width: 719px) {
+  /* While the bar at the foot of the screen is up, the header does not repeat its button. */
+  .cta-on .bar-book { visibility: hidden; }
+}

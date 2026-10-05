@@ -7,10 +7,11 @@
 //   - tabbing reaches every control, brings it on screen, and is never trapped by a pinned section
 //   - LCP and layout shift on a throttled phone profile
 //   - 3D memory returns to where it started after scrolling the page twice
+// The forms have their own test: npm run forms.
 // Prints a report. Exits 1 if a hard limit is broken.
 import { serve, launch } from './shots.mjs';
 
-const routes = ['/', '/services', '/services/automation', '/services/reporting', '/services/web-software', '/services/brand-design', '/cases', '/cases/002', '/cases/011', '/audit', '/crew', '/savers', '/counting', '/quiz', '/quiz#r=a.c.ab.c.d.c.c.a.b', '/missing'];
+const routes = ['/', '/services', '/services/automation-and-ai-agents', '/services/reporting-and-dashboards', '/services/websites-and-software', '/services/branding-and-graphic-design', '/cases', '/cases/002', '/cases/011', '/audit', '/crew', '/savers', '/contact', '/privacy', '/counting', '/quiz', '/quiz#r=a.c.ab.c.d.c.c.a.b', '/missing'];
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } };
 const problems = [];
 const note = (s) => console.log(s);
@@ -37,7 +38,7 @@ for (const [sizeName, viewport] of Object.entries(sizes)) {
         let worst = { n: 0, text: '' };
         const blocks = document.querySelectorAll('.lede, .body, .body-s, main p:not([class]), main li:not([class])');
         for (const el of blocks) {
-          if (el.closest('[data-artefact], table, .plate') || !el.offsetParent) continue;
+          if (el.closest('[data-artefact], .demo-stage, table, .plate') || !el.offsetParent) continue; // illustrations are not running copy
           const lines = new Map();
           const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
           let node;
@@ -116,7 +117,7 @@ for (const [sizeName, viewport] of Object.entries(sizes)) {
 }
 
 /* ---------- Keyboard ---------- */
-for (const route of ['/', '/cases', '/audit', '/quiz', '/counting']) {
+for (const route of ['/', '/cases', '/audit', '/contact', '/savers', '/quiz', '/counting']) {
   const context = await browser.newContext({ viewport: sizes.desktop });
   const page = await context.newPage();
   await page.goto(url + route, { waitUntil: 'networkidle' });
@@ -174,7 +175,7 @@ for (const route of ['/', '/cases', '/audit', '/quiz', '/counting']) {
   await page.goto(url + '/', { waitUntil: 'load' });
   await page.waitForTimeout(6000);
   const m = await page.evaluate(() => ({ lcp: window.__lcp, cls: window.__cls, transfer: performance.getEntriesByType('resource').reduce((t, r) => t + (r.transferSize || 0), 0) }));
-  note(`\nLoad, throttled phone: LCP ${(m.lcp / 1000).toFixed(2)}s, layout shift ${m.cls.toFixed(4)}, ${(m.transfer / 1024).toFixed(0)} KB transferred (uncompressed by this local server)`);
+  note(`\nLoad, throttled phone: LCP ${(m.lcp / 1000).toFixed(2)}s, layout shift ${m.cls.toFixed(4)}, ${(m.transfer / 1024).toFixed(0)} KB transferred (gzipped)`);
   if (m.lcp > 2500) bad(`LCP ${(m.lcp / 1000).toFixed(2)}s is over 2.5s`);
   if (m.cls > 0.01) bad(`layout shift ${m.cls.toFixed(4)}`);
   await context.close();

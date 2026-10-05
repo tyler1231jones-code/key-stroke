@@ -1,58 +1,146 @@
 [
   {
-    "slug": "automation",
+    "id": "automation",
+    "slug": "automation-and-ai-agents",
     "practice": "clear",
+    "practiceName": "Clear",
     "name": "Automation and AI agents",
+    "title": "Automation and AI agents for business",
+    "description": "Automation and AI agents that do the work your team does by hand: email to task, quotes and invoices, approvals, documents. Free consultation.",
     "line": "The work happens without anyone doing it.",
     "what": "We take the work your team does by hand every week and rebuild it so it runs on its own.",
-    "examples": [
-      "Forms that write the job and the invoice",
-      "Approvals that route themselves",
-      "Systems that update each other overnight"
-    ],
-    "object": "forms-stack",
-    "practiceName": "Clear"
+    "products": [
+      {
+        "name": "Email to task",
+        "line": "An email comes in. The task, the owner and the due date are created for you."
+      },
+      {
+        "name": "Quote and invoice automation",
+        "line": "Enter the details once. The quote, the invoice and the accounts are written from it."
+      },
+      {
+        "name": "Approvals and routing",
+        "line": "Requests go to the right person and come back approved, without the chasing."
+      },
+      {
+        "name": "Document generation",
+        "line": "Contracts, reports and letters produced from your own data."
+      },
+      {
+        "name": "System integration",
+        "line": "Systems that do not talk to each other, made to."
+      },
+      {
+        "name": "Overnight agents",
+        "line": "AI agents that do the scheduled work while the office is closed."
+      }
+    ]
   },
   {
-    "slug": "reporting",
+    "id": "reporting",
+    "slug": "reporting-and-dashboards",
     "practice": "count",
+    "practiceName": "Count",
     "name": "Reporting and dashboards",
+    "title": "Business reporting and dashboards",
+    "description": "Reports and dashboards that build themselves from your own systems: executive dashboards, month-end packs and job costing. Free consultation.",
     "line": "See how the business is doing in time to act.",
     "what": "We connect your systems so your reports build themselves and arrive while you can still act on them.",
-    "examples": [
-      "Monthly reporting packs",
-      "Job costing while the job is running",
-      "Dashboards the whole team can read"
-    ],
-    "object": "drum",
-    "practiceName": "Count"
+    "products": [
+      {
+        "name": "Executive dashboards",
+        "line": "The numbers that matter on one screen, current every morning."
+      },
+      {
+        "name": "Monthly reporting packs",
+        "line": "The month-end pack, built and checked without the copying."
+      },
+      {
+        "name": "Job costing",
+        "line": "What each job is making while it is still running."
+      },
+      {
+        "name": "Project and timesheet analytics",
+        "line": "Where the hours went, by project, person and week."
+      },
+      {
+        "name": "Spreadsheets that hold",
+        "line": "The one spreadsheet everything depends on, rebuilt so anyone can use it."
+      }
+    ]
   },
   {
-    "slug": "web-software",
+    "id": "web-software",
+    "slug": "websites-and-software",
     "practice": "build",
+    "practiceName": "Build",
     "name": "Websites and software",
+    "title": "Websites and custom software for business",
+    "description": "Websites you can edit yourself, online stores and custom software built for how your business works. Free consultation, quoted individually.",
     "line": "A site or a tool built for how you actually work.",
     "what": "We build websites you can edit yourself and software shaped to the way your business runs.",
-    "examples": [
-      "Websites you can edit yourself",
-      "Online stores",
-      "Custom apps"
-    ],
-    "object": "key-field",
-    "practiceName": "Build"
+    "products": [
+      {
+        "name": "Business websites",
+        "line": "Fast, clear and built to bring in enquiries."
+      },
+      {
+        "name": "Websites you can edit",
+        "line": "Change your own pages, prices and products without a developer."
+      },
+      {
+        "name": "Online stores",
+        "line": "Sell online, with stock and orders in step with your systems."
+      },
+      {
+        "name": "Custom applications",
+        "line": "Software made for one job your business does every day."
+      },
+      {
+        "name": "Invoicing and time tracking",
+        "line": "Hours and invoices entered once, where the work happens."
+      },
+      {
+        "name": "Dashboards and portals",
+        "line": "A place for your clients or your team to see what they need."
+      }
+    ]
   },
   {
-    "slug": "brand-design",
+    "id": "brand-design",
+    "slug": "branding-and-graphic-design",
     "practice": "face",
+    "practiceName": "Face",
     "name": "Branding and graphic design",
+    "title": "Branding, logo and graphic design",
+    "description": "Logos, rebrands, signage, tender documents and stationery for Australian businesses. Free consultation, and every job quoted individually.",
     "line": "Look like the business you have become.",
     "what": "We design the brand, the documents and the print your business sends out.",
-    "examples": [
-      "Logos and rebrands",
-      "Tender and capability documents",
-      "Brochures and stationery"
-    ],
-    "object": "sheet",
-    "practiceName": "Face"
+    "products": [
+      {
+        "name": "Logo and identity",
+        "line": "A mark, colours and type that belong to you."
+      },
+      {
+        "name": "Rebrands",
+        "line": "An existing brand brought up to date without losing what people recognise."
+      },
+      {
+        "name": "Signage and shopfront",
+        "line": "Your premises, vehicles and signs in the new brand."
+      },
+      {
+        "name": "Tender and capability documents",
+        "line": "Bids that look as capable as the business behind them."
+      },
+      {
+        "name": "Brochures and stationery",
+        "line": "Everything you hand over or send out, as one family."
+      },
+      {
+        "name": "Messaging and content",
+        "line": "What to say and how to say it, written down once."
+      }
+    ]
   }
 ]

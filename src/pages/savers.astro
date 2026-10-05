@@ -1,15 +1,29 @@
 ---
-// Keystroke Savers: what it is in one sentence, three plans, and what every
-// plan includes.
+// Keystroke Savers: what it is in one sentence, three plans with their
+// prices, what every plan includes, and an enquiry form that carries the
+// chosen plan. This is the only page on the site that shows a price.
 import Base from '../layouts/Base.astro';
 import TierCard from '../components/TierCard.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import Faq from '../components/Faq.astro';
 import Fig from '../components/Fig.astro';
 import { products } from '../lib/data';
+import { saversSchema } from '../lib/seo';
 import '../styles/pages.css';
 
 const savers = products.savers;
+const prices = products.display.savers;
 ---
-<Base title="Keystroke Savers" description={savers.what} current="savers" page="savers">
+<Base
+  title="Keystroke Savers: monthly plans and pricing"
+  description="Three monthly plans that keep what we built for you running, fix it when something changes and improve it every month. Plans, hours and prices."
+  current="savers"
+  page="savers"
+  band="none"
+  crumbs={[{ name: 'Keystroke Savers', href: '/savers' }]}
+  faq="savers"
+  schema={[saversSchema()]}
+>
   <section class="page-head">
     <div class="wrap">
       <h1 class="display-xl load-in">Keystroke Savers.</h1>
@@ -19,17 +33,30 @@ const savers = products.savers;
 
   <section class="page-body">
     <div class="wrap">
-      <p class="savers-label" data-reveal><span class="tag">{savers.label}</span><span class="body-s">{savers.foundationNote}</span></p>
+      {prices && <p class="savers-label" data-reveal><span class="tag">{savers.label}</span><span class="body-s">{savers.foundationNote}</span></p>}
       <div class="cards cards-3">
-        {savers.tiers.map((t, i) => <TierCard tier={t} level="h2" index={i} />)}
+        {savers.tiers.map((t, i) => <TierCard tier={t} prices={prices} level="h2" index={i} />)}
       </div>
-      <div class="savers-incl" data-reveal>
-        <h2 class="display-m">Every plan includes</h2>
+      {!prices && <p class="body after-list" data-reveal>{products.quoteLine}</p>}
+      <div class="savers-incl">
+        <h2 class="display-m" data-reveal>Every plan includes</h2>
         <ul class="ticks">
-          {savers.includes.map((line) => <li>{line}</li>)}
-          <li>A reply within <Fig text={savers.response} /></li>
+          {savers.includes.map((line, i) => <li data-reveal style={`--i:${i}`}>{line}</li>)}
+          <li data-reveal style={`--i:${savers.includes.length}`}>A reply within <Fig text={savers.response} /></li>
         </ul>
       </div>
+    </div>
+  </section>
+
+  <Faq page="savers" />
+
+  <section class="band on-900" id="enquire" aria-labelledby="enquire-h">
+    <div class="wrap band-form">
+      <header class="section-head" data-reveal>
+        <h2 class="display-l" id="enquire-h">Ask about a plan.</h2>
+        <p class="lede" data-plan-note>Tell us what we built for you, or what you want built, and which plan you are considering.</p>
+      </header>
+      <EnquiryForm kind="savers" id="savers-form" submit="Send the enquiry" />
     </div>
   </section>
 </Base>

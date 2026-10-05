@@ -181,3 +181,71 @@ html:not(.motion):not(.still) .slot-still, .no-webgl .slot-still { display: bloc
   .art-targets li { grid-template-columns: var(--space-4) minmax(0, 1fr); }
   .artefact { font-size: 12px; line-height: 18px; }
 }
+
+/* ---------- The enquiry form ---------- */
+.form { display: grid; gap: var(--space-6); max-width: 760px; }
+.form-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6) var(--space-4); }
+.field { display: grid; gap: var(--space-2); align-content: start; }
+.field label { font-size: 16px; line-height: 25px; font-weight: 600; }
+.field .opt { color: var(--ink-muted); font-weight: 400; }
+/* 16px text, so a phone does not zoom when a field takes focus. */
+.field input, .field select, .field textarea { width: 100%; min-height: 56px; padding: var(--space-3) var(--space-4); background: var(--base-100); color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius-key); font-family: var(--font-body); font-size: 16px; line-height: 25px; }
+.field textarea { min-height: 128px; resize: vertical; }
+.field input:hover, .field select:hover, .field textarea:hover { border-color: var(--ink-muted); }
+.field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { border-color: var(--ink); }
+.field [aria-invalid="true"] { border-color: var(--signal); }
+.field-error { color: var(--ink); font-size: 14px; line-height: 21px; font-weight: 600; padding-left: var(--space-3); border-left: 2px solid var(--signal); }
+.field-error[hidden], .form-status[hidden], .form-thanks[hidden], .form[hidden] { display: none; }
+.form-pot { display: none; }
+.form-foot { display: grid; gap: var(--space-4); justify-items: start; }
+.form-submit { min-width: min(100%, 280px); cursor: pointer; }
+.form-submit[aria-busy="true"] { cursor: progress; background: var(--base-100); color: var(--ink); border: 1px solid var(--rule); box-shadow: var(--shadow-press); transform: translateY(1px); }
+.form-status { max-width: var(--measure); padding-left: var(--space-3); border-left: 2px solid var(--signal); }
+.form-legal { color: var(--ink-muted); font-size: 14px; line-height: 21px; }
+/* Google allows its floating badge to be hidden when the line above is shown beside the form. */
+.grecaptcha-badge { visibility: hidden; }
+.form-thanks { display: grid; gap: var(--space-4); max-width: 760px; padding: var(--space-8); border: 1px solid var(--rule); background: var(--base-100); }
+.band-form { display: grid; gap: var(--space-8); }
+.band .form-legal, .band .field .opt { color: var(--readout); }
+@media (min-width: 720px) {
+  .form-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .field-wide { grid-column: 1 / -1; }
+}
+@media (max-width: 479px) {
+  .form-submit { width: 100%; }
+}
+
+/* ---------- Questions ---------- */
+.faq-list { border-top: 1px solid var(--rule); max-width: 860px; }
+.faq-item { border-bottom: 1px solid var(--hairline); }
+.faq-item > summary { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); min-height: 64px; padding: var(--space-4) 0; cursor: pointer; list-style: none; text-transform: none; font-family: var(--font-body); font-size: 19px; line-height: 28px; font-weight: 600; letter-spacing: 0; }
+.faq-item > summary::-webkit-details-marker { display: none; }
+.faq-item > summary::after { content: "+"; flex: none; font-family: var(--font-data); font-size: 24px; line-height: 24px; font-weight: 500; color: var(--ink-muted); }
+.faq-item[open] > summary::after { content: "-"; }
+.faq-item > summary:hover::after { color: var(--ink); }
+.faq-item > p { padding-bottom: var(--space-6); }
+@media (min-width: 1024px) {
+  .faq-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--space-19); align-items: start; }
+}
+
+/* ---------- The bar at the foot of a phone screen ---------- */
+.cta-bar { display: none; }
+@media (max-width: 719px) {
+  .cta-bar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; padding: var(--space-2) var(--margin) calc(var(--space-2) + env(safe-area-inset-bottom, 0px)); background: var(--base-900); border-top: 1px solid var(--rule); transform: translateY(110%); visibility: hidden; transition: transform var(--dur-2) var(--ease-out), visibility 0s var(--dur-2); }
+  .cta-bar.is-on { transform: none; visibility: visible; transition: transform var(--dur-2) var(--ease-out), visibility 0s; }
+  .cta-bar .key { flex: 1; min-height: 48px; }
+}
+
+/* A service card on the homepage opens with its demonstration, edge to edge. */
+.scard-demo { padding-top: 0; }
+.scard-demo .demo { margin: 0 calc(-1 * var(--space-8)) var(--space-2); }
+.scard-demo .demo-stage { border-width: 0 0 1px; }
+@media (max-width: 719px) {
+  .scard-demo .demo { margin-inline: calc(-1 * var(--space-6)); }
+}
+
+/* ---------- Reading on a phone or a tablet ---------- */
+/* Running text is 16px or more. Labels, tags and the units beside figures stay small. */
+@media (max-width: 899px) {
+  .body-s, .ccard-who, .scard-examples, .foot ul, .foot-line, .form-legal, .demo-note { font-size: 16px; line-height: 24px; }
+}
