@@ -10,12 +10,14 @@ import EnquiryForm from '../components/EnquiryForm.astro';
 import Faq from '../components/Faq.astro';
 import Fig from '../components/Fig.astro';
 import { products } from '../lib/data';
+// Read here and nowhere else, so the list is in this page and not in the site's scripts.
+import priceList from '../content/prices.json';
 import { saversSchema } from '../lib/seo';
 import '../styles/pages.css';
 
 const savers = products.savers;
 const prices = products.display.savers;
-const { care, websites, audits } = products.priceList;
+const { care, websites, audits } = priceList;
 ---
 <Base
   title="Keystroke Savers: monthly plans and pricing"
@@ -104,8 +106,8 @@ const { care, websites, audits } = products.priceList;
               ))}
             </div>
             <div class="price-notes">
-              <p class="body" data-reveal>{products.priceList.rest}</p>
-              <p class="body-s muted" data-reveal>{products.priceList.currency}</p>
+              <p class="body" data-reveal>{priceList.rest}</p>
+              <p class="body-s muted" data-reveal>{priceList.currency}</p>
             </div>
           </div>
         </>
