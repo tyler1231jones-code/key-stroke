@@ -36,6 +36,8 @@ export const products = {
   items: live(productsJson.items),
   estimates: site.demo || !productsJson.estimates.demo ? productsJson.estimates : null,
   savers: productsJson.savers,
+  /** The published price list. Shown on /savers only. */
+  priceList: productsJson.priceList,
 };
 
 /** A service by its id: the value a case carries in `service`. */

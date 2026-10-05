@@ -1,15 +1,18 @@
 ---
-// A Keystroke Savers plan. On /savers it carries its monthly price, its hours
-// and a button that starts an enquiry about that plan. Anywhere else it shows
-// the name and who the plan suits, and no figures.
+// A monthly plan: a Keystroke Savers plan or a website care plan. On /savers
+// it carries its monthly price, its hours and a button that starts an enquiry
+// about that plan. Anywhere else it shows the name and who the plan suits,
+// and no figures.
 interface Props {
   tier: { name: string; hours: number; monthly: string; suits: string };
   /** Show the price and the hours. Only the Savers page does. */
   prices?: boolean;
   level?: 'h2' | 'h3';
   index?: number;
+  /** What the enquiry calls the plan, where the name alone would not say. */
+  plan?: string;
 }
-const { tier, prices = false, level = 'h3', index = 0 } = Astro.props;
+const { tier, prices = false, level = 'h3', index = 0, plan = tier.name } = Astro.props;
 const H = level;
 ---
 <article class="card tier" data-reveal="card" style={`--i:${index}`}>
@@ -17,11 +20,11 @@ const H = level;
   {prices && (
     <>
       <p class="tier-price"><span class="counter-m">{tier.monthly}</span><span class="unit">a month</span></p>
-      <p class="tier-facts tier-price"><span class="counter-s">{tier.hours}</span> <span class="unit">hours of our time each month</span></p>
+      {tier.hours > 0 && <p class="tier-facts tier-price"><span class="counter-s">{tier.hours}</span> <span class="unit">hours of our time each month</span></p>}
     </>
   )}
   <p class="body">{tier.suits}</p>
   {prices && (
-    <a class="key key-2 tier-ask" href="#enquire" data-plan={tier.name}>Ask about {tier.name}</a>
+    <a class="key key-2 tier-ask" href="#enquire" data-plan={plan}>Ask about {tier.name}</a>
   )}
 </article>

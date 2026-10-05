@@ -1,7 +1,9 @@
 ---
-// Keystroke Savers: what it is in one sentence, three plans with their
-// prices, what every plan includes, and an enquiry form that carries the
-// chosen plan. This is the only page on the site that shows a price.
+// Keystroke Savers, and the published price list. What Savers is in one
+// sentence, its three plans with their prices and what every plan includes;
+// then website care, the two website builds and the two audits, each with its
+// price; then an enquiry form that carries the chosen plan. This is the only
+// page on the site that shows a price.
 import Base from '../layouts/Base.astro';
 import TierCard from '../components/TierCard.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
@@ -13,10 +15,11 @@ import '../styles/pages.css';
 
 const savers = products.savers;
 const prices = products.display.savers;
+const { care, websites, audits } = products.priceList;
 ---
 <Base
   title="Keystroke Savers: monthly plans and pricing"
-  description="Three monthly plans that keep what we built for you running, fix it when something changes and improve it every month. Plans, hours and prices."
+  description="What KEYSTROKE costs: Keystroke Savers plans, website care, fixed-price website builds and audits, with the hours and the price of each."
   current="savers"
   page="savers"
   band="none"
@@ -44,7 +47,69 @@ const prices = products.display.savers;
           {savers.includes.map((line, i) => <li data-reveal style={`--i:${i}`}>{line}</li>)}
           <li data-reveal style={`--i:${savers.includes.length}`}>A reply within <Fig text={savers.response} /></li>
         </ul>
+        <p class="body" data-reveal>{savers.scope}</p>
       </div>
+
+      {prices && (
+        <>
+          <div class="price-block" id="website-care">
+            <header class="section-head" data-reveal>
+              <h2 class="display-l">{care.title}.</h2>
+              <p class="body">{care.what}</p>
+            </header>
+            <div class="cards cards-3">
+              {care.tiers.map((t, i) => <TierCard tier={t} prices level="h3" index={i} plan={`${care.title}: ${t.name}`} />)}
+            </div>
+          </div>
+
+          <div class="price-block" id="website-builds">
+            <header class="section-head" data-reveal>
+              <h2 class="display-l">{websites.title}.</h2>
+              <p class="body">{websites.what}</p>
+            </header>
+            <div class="cards cards-2">
+              {websites.builds.map((b, i) => (
+                <article class="card price-card" data-reveal="card" style={`--i:${i}`}>
+                  <h3 class="display-m">{b.name}</h3>
+                  <p class="tier-price"><span class="counter-m">{b.price}</span><span class="unit">fixed price</span></p>
+                  <dl class="price-facts">
+                    {b.facts.map((f) => (
+                      <div>
+                        <dt>{f.label}</dt>
+                        <dd><Fig text={f.text} /></dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <a class="key key-2 tier-ask" href="#enquire" data-plan={`${websites.title}: ${b.name}`}>Ask about this build</a>
+                </article>
+              ))}
+            </div>
+            <div class="price-notes">
+              {websites.after.map((line) => <p class="body" data-reveal>{line}</p>)}
+            </div>
+          </div>
+
+          <div class="price-block" id="audits">
+            <header class="section-head" data-reveal>
+              <h2 class="display-l">{audits.title}.</h2>
+              <p class="body">{audits.what}</p>
+            </header>
+            <div class="cards cards-2">
+              {audits.items.map((a, i) => (
+                <article class="card price-card" data-reveal="card" style={`--i:${i}`}>
+                  <h3 class="display-m">{a.name}</h3>
+                  <p class="tier-price"><span class="counter-m">{a.price}</span>{a.price !== 'Free' && <span class="unit">fixed price</span>}</p>
+                  <p class="body"><Fig text={a.includes} /></p>
+                </article>
+              ))}
+            </div>
+            <div class="price-notes">
+              <p class="body" data-reveal>{products.priceList.rest}</p>
+              <p class="body-s muted" data-reveal>{products.priceList.currency}</p>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   </section>
 
