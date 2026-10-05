@@ -138,7 +138,7 @@ Voice: plain Australian English, direct, second person, short sentences. No sale
 The fields:
 - read: two to four sentences on what their answers say about how the business runs today, in their terms. This is the first thing they read.
 - picks: the products, in the order to do them. For each, "why" is one or two sentences tying it to answers they gave, and "tools" is the tools from our list that fit.
-- first_step: one or two sentences on what to do first. The free consultation and the free audit are the ways in. Take account of what they said is stopping them.`;
+- first_step: one or two sentences on what to do first. The way in is the free consultation, which can include a free initial audit: a quick overview of where the hand work is, not an in-depth count. Do not describe the initial audit as counting keystrokes or hours, and do not call any other audit free. Take account of what they said is stopping them.`;
 
 const FORMAT = {
   type: 'json_schema' as const,
@@ -242,8 +242,8 @@ async function quizResult(request: Request, env: Env): Promise<Response> {
     const advice = await advise(answers, env.ANTHROPIC_API_KEY, env.ANTHROPIC_WORKSPACE_ID);
     return advice ? json({ advice }) : json({ error: 'no-advice', reason: 'empty' }, 502);
   } catch (err) {
-    // The reason goes back with the error so a failure can be told apart
-    // without the logs: which kind it was, never the key.
+    // The kind of failure goes back with the error, so one can be told from
+    // another without the logs. The full message stays in the logs.
     let reason = 'worker';
     if (err instanceof Anthropic.AuthenticationError) {
       reason = 'api-key';
@@ -254,7 +254,6 @@ async function quizResult(request: Request, env: Env): Promise<Response> {
     } else if (err instanceof Anthropic.APIError) {
       reason = `claude-${err.status ?? 'connection'}`;
       console.error(`Claude answered ${err.status}:`, err.message);
-      if (err.status === 400 || err.status === 404) return json({ error: 'no-advice', reason, detail: err.message.slice(0, 300) }, 502);
     } else {
       console.error('The quiz result failed:', err);
     }
