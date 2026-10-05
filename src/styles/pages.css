@@ -164,3 +164,8 @@
 
 /* Touch: the quiz's text controls are full-size targets. */
 .quiz-back, .result-back a { display: inline-flex; align-items: center; min-height: 48px; }
+
+/* "Consultation." set at 64px is wider than a small phone. */
+@media (max-width: 719px) {
+  [data-page="contact"] .page-head h1 { font-size: min(64px, 15vw); line-height: min(60px, 14vw); }
+}
