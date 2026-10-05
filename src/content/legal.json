@@ -1,0 +1,298 @@
+{
+  "version": "1.0",
+  "privacy": {
+    "title": "Privacy Policy",
+    "lede": "This policy explains what personal information Keystroke collects, why, where it goes, how long we keep it, and how to get it corrected or deleted. It covers our website and its quiz, our emails and calls, and the work we do for clients.",
+    "sections": [
+      {
+        "h": "Who we are",
+        "blocks": [
+          { "p": "{whoWeAre} The principals are Kieran and Tyler. We rebuild the manual parts of a business: reporting, scheduled work, software, websites and design." },
+          { "p": "We handle personal information in line with the Australian Privacy Principles (APPs) in the Privacy Act 1988 (Cth). Where we handle health information, we also follow the Health Privacy Principles in the Health Records Act 2001 (Vic)." },
+          { "p": "Contact for anything in this policy: {privacyContact}" }
+        ]
+      },
+      {
+        "h": "What we collect",
+        "blocks": [
+          {
+            "table": {
+              "head": ["Who you are", "What we collect"],
+              "rows": [
+                ["Website visitor", "Technical data: IP address, browser and device type, pages viewed, time of visit. We do not use advertising cookies or tracking pixels."],
+                ["Quiz user", "Your nine answers. The quiz does not ask for your name or email, and you can see your result without giving either."],
+                ["Someone who sends us a form", "Your name and email address. Your phone number, business name and a message, if you choose to give them. Which service you asked about, and the page you sent the form from. If you send the form under a quiz result, your nine answers and the result go with it."],
+                ["Someone we contact about our services", "Your name, role, business name, business email, business phone and business website, taken from public sources (see How we collect it)."],
+                ["Client, or a client's staff member", "Name, role, contact details, details of the work, meeting notes and recordings you agree to, invoices and payments."],
+                ["Person whose details sit in a client's systems", "Whatever the client's systems hold and we need to access to do the work. We handle this only on the client's instructions (see Personal information we handle for clients)."],
+                ["Supplier or adviser", "Name, business contact details, payment details."]
+              ]
+            }
+          },
+          { "p": "Sensitive information. We do not ask for sensitive information, such as health, racial or ethnic origin, religious or political views, or criminal records. Please do not type it into a form. If a client engagement needs access to systems that hold health information, we handle it under Personal information we handle for clients and the Health Records Act." },
+          { "p": "Tax file numbers. We do not collect tax file numbers. If a client's payroll or timesheet system holds them, we design our work so we do not need to see them. If we must, we follow the Privacy (Tax File Number) Rule 2015." }
+        ]
+      },
+      {
+        "h": "How we collect it",
+        "blocks": [
+          {
+            "ul": [
+              "From you, when you use the quiz, send a form, email or call us, book a meeting, or engage us.",
+              "Automatically, when you visit the site. Our host, Cloudflare, records technical data to keep the site secure and working.{analytics}",
+              "From public sources, when we research businesses we think we can help. We use the business's own website, its Google Business Profile, ABN Lookup, ASIC's public register, public LinkedIn profiles, industry directories, council and chamber of commerce listings and news articles. We do not buy contact lists, and we do not use data brokers or leaked data.",
+              "From our clients, when they give us access to their systems or records to do the work."
+            ]
+          },
+          { "p": "If we collect your details from a public source, our first message tells you who we are, where we found your details, and how to stop hearing from us." },
+          { "p": "Cookies. This site sets no cookies of its own. Google reCAPTCHA, which tells people from automated senders on the forms and the quiz, sets one that it needs to work, on pages where a form has been on screen or the quiz has been finished. Your browser remembers, until you close the tab, that the opening animation on the homepage has played and the quiz result it has just shown you. Neither holds your name or contact details." }
+        ]
+      },
+      {
+        "h": "Why we use it",
+        "blocks": [
+          {
+            "table": {
+              "head": ["Purpose", "Information used"],
+              "rows": [
+                ["Run the website and keep it secure, including stopping abuse of the quiz", "Technical data"],
+                ["Give you a quiz result", "Quiz answers"],
+                ["Follow up if you ask us to, or book a call", "Contact details, quiz result"],
+                ["Contact businesses about our services", "Business contact details from public sources"],
+                ["Deliver the work a client engaged us for", "Client contact details and data in client systems"],
+                ["Invoice, take payment and keep tax records", "Client and supplier details"],
+                ["Improve the quiz, the site and our services", "Quiz results sent to us with a form, reviewed by Kieran and Tyler"],
+                ["Meet legal obligations and deal with disputes", "Any of the above, as needed"]
+              ]
+            }
+          },
+          { "p": "We use personal information only for the purpose we collected it, a related purpose you would reasonably expect, or where the law allows or requires it." }
+        ]
+      },
+      {
+        "h": "Software agents and AI",
+        "blocks": [
+          { "p": "The quiz result is written by a software agent built on Anthropic's Claude models. When you answer the last question, your nine answers are sent to our website and on to Claude, which writes the result you see. Kieran and Tyler see a result only if you send it to us with the form beneath it." },
+          {
+            "ul": [
+              "What the agent does. It reads your answers, names the problem back to you, and recommends up to three items from our product list. It cannot quote, commit to dates or agree to anything on our behalf.",
+              "No decisions about you. The quiz makes no decision that significantly affects your rights or interests. A result is a suggestion. Nothing is approved, refused or priced for you by a computer program. If that ever changes, this policy will say which kinds of personal information the program uses and what decisions it makes.",
+              "Your information is not used to train AI models. Under Anthropic's commercial terms, information we send through its API is not used to train its models. Anthropic deletes it within 30 days, except where its own policies require longer, such as investigating misuse.",
+              "Client work. Our scheduled agents (\"the crew\") process client data only for the work the client engaged us to do, using commercial services whose terms prohibit training on that data. We do not put client personal information into free or consumer AI tools.",
+              "Human review. Anything an agent produces for a client is checked by Kieran or Tyler before it is relied on, unless the client has agreed in writing that a process can run unattended."
+            ]
+          }
+        ]
+      },
+      {
+        "h": "Personal information we handle for clients",
+        "blocks": [
+          { "p": "When a client gives us access to its systems, the client decides what personal information is in them and why. We act as the client's service provider. We:" },
+          {
+            "ul": [
+              "access only what the work needs, and only for that work",
+              "follow the client's reasonable instructions and its privacy obligations",
+              "keep the data secure (see How we keep it secure and how long we keep it)",
+              "tell the client without delay, and within 72 hours, if we become aware of a data breach that affects its data",
+              "return or delete the client's data when the engagement ends, unless the law requires us to keep it"
+            ]
+          },
+          { "p": "If you are a client's customer, patient or staff member and want to access or correct your information, contact the client first. We will help the client respond." }
+        ]
+      },
+      {
+        "h": "Marketing",
+        "blocks": [
+          { "p": "We send commercial emails only to business addresses that are published for a person's role, where our message relates to that role, and where the business has not said it does not want unsolicited commercial email. We also send them to people who have agreed to hear from us." },
+          { "p": "Every email identifies Keystroke, gives our ABN and contact details, and has an unsubscribe link. We action unsubscribes within five business days and keep your address on a do-not-contact list so it is not used again." },
+          { "p": "We make business calls only between 9am and 8pm on weekdays and 9am and 5pm on Saturdays, never on Sundays or national public holidays. We display our number, and we end the call when asked. We check any mobile number against the Do Not Call Register before calling." },
+          { "p": "We never sell, rent or trade personal information." }
+        ]
+      },
+      {
+        "h": "Who we share it with",
+        "blocks": [
+          { "p": "We share personal information only with the service providers we use to run the business, and only what each needs." },
+          {
+            "table": {
+              "head": ["Provider", "What for", "Where data is held or processed"],
+              "rows": [
+                ["Anthropic", "AI models behind the quiz and the crew", "United States, and other countries where Anthropic runs its models"],
+                ["Cloudflare", "Website hosting and security", "A global network, including the United States"],
+                ["Formspree", "Receiving what you send through a form, passing it to us by email and keeping a copy in our Formspree account", "United States"],
+                ["Google reCAPTCHA", "Telling people from automated senders on the forms and the quiz", "United States, and other countries where Google operates"],
+                ["Microsoft 365", "Email, files, notifications, bookings and reporting", "Australia for email and files. Some services, such as Power Automate, run in the region set for our account"],
+                ["Our accountant, lawyer and insurer", "Professional advice and cover", "Australia"]
+              ]
+            }
+          },
+          { "p": "We may also disclose personal information where the law requires it, for example to a court, a regulator or the police, or where it is needed to prevent a serious threat to someone's life, health or safety." }
+        ]
+      },
+      {
+        "h": "Overseas disclosure",
+        "blocks": [
+          { "p": "Some of our providers process information outside Australia, mainly in the United States. Cloudflare's network operates in many countries, so technical data and cached content can pass through any of them. Before we use a provider, we check its terms, and we use providers whose data processing terms bind them to keep information secure and use it only to provide their service to us. We send them only what the task needs." }
+        ]
+      },
+      {
+        "h": "How we keep it secure and how long we keep it",
+        "blocks": [
+          { "p": "We use multi-factor authentication on every account, keep access to the two principals, use encrypted connections, apply security updates promptly and keep client data in client systems or our Microsoft 365 tenant, not on personal devices or loose files." },
+          {
+            "table": {
+              "head": ["Information", "How long we keep it"],
+              "rows": [
+                ["Quiz answers", "Not kept by the website. They are sent to Anthropic to write your result (see Software agents and AI)"],
+                ["Quiz results and enquiries you send us through a form", "Up to 24 months, unless you become a client"],
+                ["Business contact details of people we have contacted", "Until you ask us to stop, then only on our do-not-contact list"],
+                ["Client records, invoices and contracts", "7 years after the engagement ends, to meet tax and company law"],
+                ["Data in or from client systems", "Returned or deleted when the engagement ends"],
+                ["Website technical logs", "As set by Cloudflare's own retention policy"]
+              ]
+            }
+          },
+          { "p": "When we no longer need information, we delete it or remove anything that identifies you." }
+        ]
+      },
+      {
+        "h": "Data breaches",
+        "blocks": [
+          { "p": "If we suspect a data breach, we contain it, assess it within 30 days, and tell the people affected and the Office of the Australian Information Commissioner (OAIC) where the breach is likely to cause serious harm. Where the breach involves client data, we tell the client within 72 hours." }
+        ]
+      },
+      {
+        "h": "Access, correction and staying anonymous",
+        "blocks": [
+          { "p": "You can ask what personal information we hold about you, and ask us to correct or delete it. {privacyAsk}. We may need to confirm who you are. We respond within 30 days, and it costs nothing. If we refuse, we tell you why in writing and how to complain." },
+          { "p": "You can use the quiz without giving your name. You can ask us a general question without identifying yourself, though we will need your details to do paid work for you." }
+        ]
+      },
+      {
+        "h": "Complaints",
+        "blocks": [
+          { "p": "{privacyAsk} with what happened. We acknowledge your complaint within five business days and give you a written response within 30 days." },
+          { "p": "If you are not satisfied, you can complain to the Office of the Australian Information Commissioner on 1300 363 992. If your complaint is about health information in Victoria, you can also contact the Health Complaints Commissioner." }
+        ]
+      },
+      {
+        "h": "Changes to this policy",
+        "blocks": [
+          { "p": "We update this policy when what we do changes. The date at the top shows the current version. If a change matters to clients, we tell them directly." }
+        ]
+      },
+      {
+        "h": "Contact",
+        "blocks": [
+          { "p": "Privacy Officer, {who}. {privacyContact}" }
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Website Terms of Use",
+    "lede": "These terms apply to anyone using this website, including the quiz. By using the site you agree to them. Paid work is covered by our Client Terms of Engagement, not by these terms.",
+    "sections": [
+      {
+        "h": "Who we are",
+        "blocks": [
+          { "p": "{siteRunBy} \"We\", \"us\" and \"our\" mean Keystroke. \"You\" means the person using the site and, if you use it for a business, that business." }
+        ]
+      },
+      {
+        "h": "What the site is for",
+        "blocks": [
+          { "p": "The site shows work we have done, explains what we sell and what it costs, and helps you decide whether we can help. It is general information. It is not financial, accounting, tax, legal or IT security advice for your business, and it does not take your circumstances into account." },
+          { "p": "Cases. Every case on the site describes real work. Businesses are described, not named, unless they have agreed to be named. Before and after counts come from our counting ledger, using the method published on the site. A result in one business does not mean the same result in yours." },
+          { "p": "Demonstration builds. Items marked as a demonstration build show what we can build. They are not client work." }
+        ]
+      },
+      {
+        "h": "The quiz",
+        "blocks": [
+          { "p": "The quiz result is written by a software agent, not a person." },
+          {
+            "ul": [
+              "A result is a suggestion, not advice or a quote. It is based only on your nine answers. Any hours figure is an estimate and is labelled as one. Only a written quote from us is a price.",
+              "The agent can be wrong. It is limited to our product list, and is instructed not to guess. If something it says conflicts with a written quote or these terms, the quote and the terms win.",
+              "Nothing in a quiz result binds either of us. The agent cannot quote for custom work, agree dates, give discounts or make promises. A contract exists only when you accept a written quote under our Client Terms of Engagement.",
+              "Do not enter sensitive or confidential information in a form. Do not type in health details, passwords, financial account details or anyone else's personal information."
+            ]
+          }
+        ]
+      },
+      {
+        "h": "Using the site properly",
+        "blocks": [
+          { "p": "You must not:" },
+          {
+            "ul": [
+              "try to make the agent ignore its instructions, reveal them, or produce harmful, unlawful or misleading content",
+              "send automated or bulk requests to the quiz or the forms, or try to get around their limits",
+              "scrape, copy or harvest content from the site, including to train an AI model",
+              "try to access parts of the site or our systems you are not meant to",
+              "upload or send anything that contains malware or infringes someone else's rights",
+              "use the site in a way that breaks the law"
+            ]
+          },
+          { "p": "We may block access or delete content if these rules are broken." }
+        ]
+      },
+      {
+        "h": "Prices on the site",
+        "blocks": [
+          { "p": "Prices are in Australian dollars. {gst} Published ranges for builds are indicative. The price you pay is the one in your accepted quote. We may change published prices at any time, but a change does not affect a quote you have already accepted." }
+        ]
+      },
+      {
+        "h": "Who owns the content",
+        "blocks": [
+          { "p": "We, or the people who license it to us, own the site and everything on it: text, design, code, the counting method, the quiz, case material, images and the Keystroke name and marks. You may view and print pages for your own use in deciding whether to engage us. You may not copy, republish, sell or adapt them without our written permission." }
+        ]
+      },
+      {
+        "h": "Links to other sites",
+        "blocks": [
+          { "p": "We may link to other websites. We do not control them and are not responsible for their content or how they handle your information." }
+        ]
+      },
+      {
+        "h": "Availability",
+        "blocks": [
+          { "p": "We aim to keep the site and the quiz running, but we do not promise they will always be available, error-free or free of interruption. We may change or remove any part of the site." }
+        ]
+      },
+      {
+        "h": "Our liability",
+        "blocks": [
+          { "p": "Nothing in these terms excludes, restricts or changes any right or remedy you have under the Australian Consumer Law or any other law that cannot lawfully be excluded." },
+          { "p": "The site and the quiz are free general information tools. To the extent the law allows, we are not liable for any loss arising from your reliance on general information on the site, or on a quiz result, without first getting a written quote or advice from us. This does not limit our liability for anything we agree to do in a contract with you." }
+        ]
+      },
+      {
+        "h": "Privacy",
+        "blocks": [
+          { "p": "Our {privacyLink} explains how we handle personal information collected through the site and the quiz." }
+        ]
+      },
+      {
+        "h": "Changes to these terms",
+        "blocks": [
+          { "p": "We may update these terms. The version and date at the top show which apply. Changes apply from the date they are published, and do not affect anything done before then." }
+        ]
+      },
+      {
+        "h": "Law",
+        "blocks": [
+          { "p": "These terms are governed by the law of Victoria, Australia. You and we submit to the courts of Victoria and the courts that hear appeals from them." }
+        ]
+      },
+      {
+        "h": "Contact",
+        "blocks": [
+          { "p": "{who}. {generalContact}" }
+        ]
+      }
+    ]
+  }
+}

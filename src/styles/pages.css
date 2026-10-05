@@ -140,6 +140,10 @@
 
 /* ============ Privacy ============ */
 .privacy { padding-top: 0; }
+/* Tables in the privacy policy and the terms: row headings in plain text, cells that wrap. */
+.legal-table tbody th { text-align: left; font-family: var(--font-body); font-size: 14px; line-height: 21px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--ink); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--hairline); vertical-align: top; min-width: 11ch; }
+.legal-table td { min-width: 18ch; }
+.doc .page-head .plate { margin-top: var(--space-6); }
 
 /* ============ Savers ============ */
 .tier-ask { justify-self: start; margin-top: var(--space-2); }

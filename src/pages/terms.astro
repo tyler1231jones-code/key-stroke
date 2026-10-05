@@ -1,0 +1,20 @@
+---
+// The website terms of use, as the principals supplied them. The text is in
+// src/content/legal.json. See LegalDoc.astro for how the business's details
+// are filled in.
+import Base from '../layouts/Base.astro';
+import LegalDoc from '../components/LegalDoc.astro';
+import '../styles/pages.css';
+---
+<Base
+  title="Website terms of use"
+  description="The terms for using the KEYSTROKE website and its quiz: what the site is for, what a quiz result is and is not, prices, ownership and liability."
+  page="terms"
+  crumbs={[{ name: 'Terms', href: '/terms' }]}
+>
+  <LegalDoc doc="terms" />
+</Base>
+
+<script>
+  import '../scripts/page.ts';
+</script>

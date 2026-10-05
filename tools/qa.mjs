@@ -11,7 +11,7 @@
 // Prints a report. Exits 1 if a hard limit is broken.
 import { serve, launch } from './shots.mjs';
 
-const routes = ['/', '/services', '/services/automation-and-ai-agents', '/services/reporting-and-dashboards', '/services/websites-and-software', '/services/branding-and-graphic-design', '/cases', '/cases/002', '/cases/011', '/audit', '/crew', '/savers', '/contact', '/privacy', '/counting', '/quiz', '/quiz#r=a.c.ab.c.d.c.c.a.b', '/missing'];
+const routes = ['/', '/services', '/services/automation-and-ai-agents', '/services/reporting-and-dashboards', '/services/websites-and-software', '/services/branding-and-graphic-design', '/cases', '/cases/002', '/cases/011', '/audit', '/crew', '/savers', '/contact', '/privacy', '/terms', '/counting', '/quiz', '/quiz#r=a.c.ab.c.d.c.c.a.b', '/missing'];
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } };
 const problems = [];
 const note = (s) => console.log(s);

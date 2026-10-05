@@ -115,7 +115,7 @@ const casesAll = json('cases.json');
 const live = (rows) => (site.demo ? rows : rows.filter((r) => !r.demo));
 const ledger = live(ledgerAll);
 const cases = live(casesAll);
-const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'prices.json', 'shiftReport.json', 'quiz.json', 'services.json', 'faqs.json'].map(json);
+const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'prices.json', 'legal.json', 'shiftReport.json', 'quiz.json', 'services.json', 'faqs.json'].map(json);
 
 function allowedFor(date) {
   const numbers = new Set([0]);
@@ -227,11 +227,16 @@ for (const file of walk(dist, '.html')) {
     const m = text.match(word);
     if (m) fail(where, `banned word "${m[0]}" outside an approved copy bank line`);
   }
+  // The privacy policy and the terms are the principals' own legal wording.
+  // They may name the ledger, demonstration builds and software agents; they
+  // still may not print TODO.
+  const legalDoc = /^(privacy|terms)(\.html|\/|$)/.test(where);
   for (const [pattern, what] of NOT_FOR_CUSTOMERS) {
+    if (legalDoc && what !== 'prints TODO') continue;
     const m = page.text.match(pattern);
     if (m) fail(where, `${what}: "${page.text.split('\n').find((l) => pattern.test(l))?.trim().slice(0, 80)}"`);
   }
-  if (!/^counting(\.html|\/|$)/.test(where)) {
+  if (!legalDoc && !/^counting(\.html|\/|$)/.test(where)) {
     for (const [pattern, what] of INTERNAL) {
       if (pattern.test(page.text)) fail(where, `uses ${what}, an internal term: "${page.text.split('\n').find((l) => pattern.test(l))?.trim().slice(0, 80)}"`);
     }

@@ -1,0 +1,87 @@
+---
+// A legal document: the privacy policy or the website terms. The text is in
+// src/content/legal.json, as the principals supplied it, numbered section by
+// section. The business's own details (entity, ABN, address, emails, phone,
+// effective date, GST) come from "legal" in site.json. One that is still TODO
+// is left out, and the sentence that needed it falls back to the contact form.
+import legal from '../content/legal.json';
+import { site, has, BOOK_HREF } from '../lib/data';
+
+interface Props {
+  doc: 'privacy' | 'terms';
+}
+const { doc } = Astro.props;
+const text = legal[doc];
+
+const details = site.legal as Record<string, string>;
+const set = (key: string): string | null => (typeof details[key] === 'string' && details[key] !== '' && details[key] !== 'TODO' ? details[key] : null);
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const mail = (address: string) => `<a href="mailto:${esc(address)}">${esc(address)}</a>`;
+const form = `<a href="${BOOK_HREF}">the contact form</a>`;
+
+const entity = set('entity');
+const abn = set('abn');
+const acn = set('acn');
+const address = set('address');
+const phone = set('phone');
+const who = entity ? `${esc(entity)} trading as Keystroke` : 'Keystroke';
+const registered = [abn && `ABN ${esc(abn)}`, acn && `ACN ${esc(acn)}`].filter(Boolean).join(', ');
+const reach = (email: string | null) => [email ? mail(email) : form, phone && esc(phone), address && esc(address)].filter(Boolean).join(' · ');
+
+const TOKENS: Record<string, string> = {
+  who,
+  whoWeAre: entity ? `Keystroke is ${esc(entity)}${registered ? ` (${registered})` : ''}, a two-person business based in Victoria, Australia.` : 'Keystroke is a two-person business based in Victoria, Australia.',
+  siteRunBy: entity ? `The site is run by ${esc(entity)}${abn ? ` (ABN ${esc(abn)})` : ''}, trading as Keystroke${address ? `, of ${esc(address)}` : ''}.` : 'The site is run by Keystroke.',
+  privacyContact: `${reach(set('privacyEmail'))}.`,
+  generalContact: `${reach(set('generalEmail'))}.`,
+  privacyAsk: set('privacyEmail') ? `Email ${mail(set('privacyEmail')!)}` : `Use ${form}`,
+  privacyLink: '<a href="/privacy">Privacy Policy</a>',
+  analytics: has('analyticsToken') ? ' We use cookieless analytics that count visits without identifying you.' : '',
+  gst: set('gst') ?? 'GST is confirmed in your quote.',
+};
+const fill = (s: string) => esc(s).replace(/\{(\w+)\}/g, (all, key) => TOKENS[key] ?? all);
+
+type Block = { p?: string; ul?: string[]; table?: { head: string[]; rows: string[][] } };
+const head = [entity && who, abn && `ABN ${abn}`, set('effective') && `Effective ${set('effective')}`, `Version ${legal.version}`].filter(Boolean).join(' · ');
+---
+<article class="doc">
+  <section class="page-head">
+    <div class="wrap">
+      <h1 class="display-xl load-in">{text.title}.</h1>
+      <p class="lede load-in" style="--i:1">{text.lede}</p>
+      <p class="plate muted load-in" style="--i:2">{head}</p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="doc-body privacy">
+      {text.sections.map((section, i) => (
+        <section class="doc-section" data-reveal>
+          <h2 class="display-s"><span class="fig">{i + 1}.</span> {section.h}</h2>
+          <div class="doc-copy">
+            {(section.blocks as Block[]).map((block) =>
+              block.table ? (
+                <div class="table-frame">
+                  <table class="table legal-table">
+                    <thead>
+                      <tr>{block.table.head.map((cell) => <th scope="col">{cell}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                      {block.table.rows.map((row) => (
+                        <tr>{row.map((cell, n) => (n === 0 ? <th scope="row">{cell}</th> : <td set:html={fill(cell)} />))}</tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : block.ul ? (
+                <ul>{block.ul.map((item) => <li set:html={fill(item)} />)}</ul>
+              ) : (
+                <p class="body" set:html={fill(block.p ?? '')} />
+              ),
+            )}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</article>

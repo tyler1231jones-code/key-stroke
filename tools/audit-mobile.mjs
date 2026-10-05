@@ -27,7 +27,7 @@ const val = (name, fallback) => {
 const tag = val('tag', 'now');
 const root = resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const out = join(root, 'shots', 'audit');
-const ROUTES = (val('routes') ?? 'home,services,services/automation-and-ai-agents,services/reporting-and-dashboards,services/websites-and-software,services/branding-and-graphic-design,cases,cases/002,audit,crew,savers,quiz,quiz#r=a.c.ab.c.d.c.c.a.b,counting,contact,privacy,missing')
+const ROUTES = (val('routes') ?? 'home,services,services/automation-and-ai-agents,services/reporting-and-dashboards,services/websites-and-software,services/branding-and-graphic-design,cases,cases/002,audit,crew,savers,quiz,quiz#r=a.c.ab.c.d.c.c.a.b,counting,contact,privacy,terms,missing')
   .split(',')
   .map((r) => (r === 'home' ? '/' : `/${r}`));
 const SIZES = [

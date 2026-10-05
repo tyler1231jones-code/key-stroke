@@ -25,6 +25,17 @@
     "003",
     "011"
   ],
+  "legal": {
+    "entity": "TODO",
+    "abn": "TODO",
+    "acn": "TODO",
+    "address": "TODO",
+    "phone": "TODO",
+    "privacyEmail": "TODO",
+    "generalEmail": "TODO",
+    "effective": "5 October 2026",
+    "gst": "TODO"
+  },
   "logotype": "drum",
   "timezone": "Australia/Brisbane"
 }
