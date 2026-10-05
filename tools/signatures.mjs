@@ -140,35 +140,38 @@ function rows(p, t) {
   ].filter(Boolean);
 }
 
-// Housing and Paper: one layout in the two themes.
+// Housing and Paper: one layout in the two themes. A long, low card: who and
+// how to reach them on one line, the logotype, the tagline and the key below.
 function card(p, name) {
   const t = THEMES[name];
   // The key is a table cell, not a styled link: mail programs keep a cell's
   // bgcolor and drop a link's background.
-  const cta = `${table('align="right"')}><tr><td bgcolor="${t.readout}" style="background:${t.readout};border-bottom:2px solid ${t.rule};border-radius:6px;padding:8px 12px;white-space:nowrap;"><a href="${origin}/contact" style="color:${t.legend};font-family:${FONT.body};font-size:12px;line-height:18px;font-weight:600;text-decoration:none;white-space:nowrap;"><font color="${t.legend}">Book a free consultation</font></a></td></tr></table>`;
-  return `${table(`width="460" bgcolor="${t.ground}" style="width:100%;max-width:460px;background:${t.ground};border:1px solid ${t.rule};border-collapse:separate;"`)}>
-  <tr><td style="padding:20px 20px 18px 20px;">
-    ${table()}><tr>
-      <td valign="top" style="padding-right:18px;"><img src="${src(`key-${p.legend.toLowerCase()}-${name}.png`)}" width="80" height="80" alt="" style="display:block;border:0;"></td>
-      <td valign="top">
-        <div style="font-family:${FONT.display};font-size:27px;line-height:28px;font-weight:600;letter-spacing:0.01em;text-transform:uppercase;color:${t.ink};">${esc(p.name)}</div>
-        <div style="padding-top:5px;font-family:${FONT.data};font-size:11px;line-height:14px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:${t.muted};">${esc(p.role)} <span style="color:${t.live};">/</span> ${esc(site.name)}</div>
-        ${table('style="margin-top:12px;"')}>
+  const cta = `${table('align="right"')}><tr><td bgcolor="${t.readout}" style="background:${t.readout};border-bottom:2px solid ${t.rule};border-radius:6px;padding:6px 12px;white-space:nowrap;"><a href="${origin}/contact" style="color:${t.legend};font-family:${FONT.body};font-size:12px;line-height:18px;font-weight:600;text-decoration:none;white-space:nowrap;"><font color="${t.legend}">Book a free consultation</font></a></td></tr></table>`;
+  return `${table(`width="640" bgcolor="${t.ground}" style="width:100%;max-width:640px;background:${t.ground};border:1px solid ${t.rule};border-collapse:separate;"`)}>
+  <tr><td style="padding:18px 20px 16px 20px;">
+    ${table('width="100%"')}><tr>
+      <td valign="middle" width="64" style="padding-right:16px;"><img src="${src(`key-${p.legend.toLowerCase()}-${name}.png`)}" width="64" height="64" alt="" style="display:block;border:0;"></td>
+      <td valign="middle" style="padding-right:20px;">
+        <div style="font-family:${FONT.display};font-size:27px;line-height:28px;font-weight:600;letter-spacing:0.01em;text-transform:uppercase;white-space:nowrap;color:${t.ink};">${esc(p.name)}</div>
+        <div style="padding-top:6px;font-family:${FONT.data};font-size:10px;line-height:14px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap;color:${t.muted};">${esc(p.role)}</div>
+      </td>
+      <td valign="middle" align="right">
+        ${table(`align="right" style="border-left:1px solid ${t.hairline};"`)}>
           ${rows(p, t).map(([label, value]) => `<tr>
-            <td width="24" style="font-family:${FONT.data};font-size:11px;line-height:22px;font-weight:500;color:${t.muted};">${label}</td>
-            <td style="font-family:${FONT.body};font-size:14px;line-height:22px;color:${t.ink};">${value}</td>
+            <td width="24" style="padding-left:20px;font-family:${FONT.data};font-size:11px;line-height:21px;font-weight:500;color:${t.muted};">${label}</td>
+            <td style="font-family:${FONT.body};font-size:14px;line-height:21px;white-space:nowrap;color:${t.ink};">${value}</td>
           </tr>`).join('')}
         </table>
       </td>
     </tr></table>
   </td></tr>
-  <tr><td style="border-top:1px solid ${t.hairline};padding:14px 20px 16px 20px;">
+  <tr><td style="border-top:1px solid ${t.hairline};padding:12px 20px 14px 20px;">
     ${table('width="100%"')}><tr>
-      <td valign="middle"><a href="${origin}" style="text-decoration:none;"><img src="${src(`lockup-${name}.png`)}" width="147" height="28" alt="${esc(site.name)}" style="display:block;border:0;"></a></td>
+      <td valign="middle" width="126"><a href="${origin}" style="text-decoration:none;"><img src="${src(`lockup-${name}.png`)}" width="126" height="24" alt="${esc(site.name)}" style="display:block;border:0;"></a></td>
+      <td valign="middle" style="padding:0 16px;font-family:${FONT.data};font-size:10px;line-height:14px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:${t.muted};">${esc(site.tagline)}</td>
       <td valign="middle" align="right">${cta}</td>
     </tr></table>
   </td></tr>
-  <tr><td style="padding:0 20px 14px 20px;font-family:${FONT.data};font-size:10px;line-height:14px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:${t.muted};">${esc(site.tagline)}</td></tr>
   <tr><td height="6" bgcolor="${name === 'dark' ? t.readout : t.ink}" style="height:6px;line-height:6px;font-size:0;background:${name === 'dark' ? t.readout : t.ink};">&nbsp;</td></tr>
 </table>`;
 }
@@ -208,7 +211,7 @@ await writeFile(join(out, 'index.html'), `<!doctype html>
 <title>${esc(site.name)} email signatures</title>
 <style>
   body{margin:0;padding:40px 24px 80px;background:#f4f6f8;color:#0b0d10;font:16px/25px Archivo,Helvetica,Arial,sans-serif}
-  main{max-width:560px;margin:0 auto}
+  main{max-width:720px;margin:0 auto}
   h1{font:600 34px/34px Oswald,'Arial Narrow',Arial,sans-serif;text-transform:uppercase;margin:0 0 12px}
   .warn{border:1px solid #cc1f14;padding:12px 16px;margin:16px 0}
   ol{padding-left:20px;color:#5b6672;font-size:14px;line-height:21px}

@@ -1,7 +1,7 @@
 {
   "people": [
-    { "id": "kieran", "name": "Kieran Jones", "legend": "K", "role": "Principal", "mobile": "0400 000 000", "email": "kieran@keystroke.example" },
-    { "id": "tyler", "name": "Tyler Jones", "legend": "T", "role": "Principal", "mobile": "0400 000 000", "email": "tyler@keystroke.example" }
+    { "id": "kieran", "name": "Kieran Jones", "legend": "K", "role": "Automation & Integration Engineer", "mobile": "0437 881 099", "email": "kieran@key-stroke.com.au" },
+    { "id": "tyler", "name": "Tyler Jones", "legend": "T", "role": "Software & Digital Developer", "mobile": "0438 819 910", "email": "tyler@key-stroke.com.au" }
   ],
   "fallbackDomain": "key-stroke.com.au",
   "imageBase": "TODO"
