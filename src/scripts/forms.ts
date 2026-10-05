@@ -47,7 +47,8 @@ function loadRecaptcha(): Promise<void> {
   return recaptcha;
 }
 
-async function tokenFor(action: string): Promise<string> {
+/** A reCAPTCHA v3 token for one action. The quiz asks for one before its result is written. */
+export async function tokenFor(action: string): Promise<string> {
   await loadRecaptcha();
   const g = window.grecaptcha;
   if (!g) throw new Error('reCAPTCHA is not available');

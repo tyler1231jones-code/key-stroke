@@ -14,6 +14,12 @@
 .hero-keys > span { display: flex; }
 .hero-slot { position: relative; min-height: 46svh; container-type: size; }
 .hero-slot .stand-in { position: absolute; inset: 0; margin: auto; width: 80cqmin; height: 80cqmin; }
+/* The drawn key is for when there is no 3D key. On a desktop the stage starts at once, so the slot stays empty
+   until it arrives and a flat key never flashes before the real one. A phone starts the stage late on purpose
+   (src/scripts/stage.ts) and keeps the drawn key until then. */
+@media (min-width: 900px) and (pointer: fine) {
+  html:is(.motion, .still):not(.no-stage) .hero-slot .stand-in { visibility: hidden; }
+}
 .hero-strip { display: flex; flex-direction: column; gap: var(--space-6); padding-bottom: var(--space-8); }
 .hero-ctr-row { display: flex; align-items: flex-end; gap: var(--space-6); flex-wrap: wrap; }
 .hero-label { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); color: var(--readout); font-size: 14px; line-height: 21px; }

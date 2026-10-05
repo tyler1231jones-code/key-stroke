@@ -27,3 +27,6 @@ pnpm-debug.log*
 /shots/
 /renders/
 .wrangler/
+
+# local Worker secrets
+.dev.vars

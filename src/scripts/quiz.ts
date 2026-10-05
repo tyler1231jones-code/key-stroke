@@ -1,19 +1,24 @@
 // The quiz. One question per screen; each screen advances like a counter
-// indexing. The result is worked out by deterministic rules (src/lib/quiz.ts)
-// and has its own URL, with the answers in the hash. The result says three
-// things: the read, the recommended items, and the next step.
+// indexing. The result has its own URL, with the answers in the hash, and
+// says three things: the read, the recommended items, and the next step.
+//
+// When the last question is answered the nine answers go to /api/quiz with a
+// reCAPTCHA token, and Claude writes the read and picks the items
+// (src/worker.ts). The page also works the result out itself by fixed rules
+// (src/lib/quiz.ts) and shows that if the request fails, is refused or is
+// slow, so the quiz never ends on an error. Only the answers are sent: no
+// name, no email.
 //
 // The result is shown without asking for anything. Beneath it sits one form,
 // "Send me this and get in touch", which carries the answers and the result
-// with the visitor's details. Nothing leaves the browser unless that form is
-// sent (src/scripts/forms.ts).
+// with the visitor's details (src/scripts/forms.ts).
 import { gsap } from 'gsap';
-import { interpret, encode, decode, type Answers, type Result } from '../lib/quiz';
-import { products } from '../lib/data';
+import { interpret, encode, decode, recommendationFor, orderLine, type Answers, type Result, type Recommendation } from '../lib/quiz';
+import { products, forms } from '../lib/data';
 import { figureRuns, withArticle } from '../lib/format';
 import { counter } from './counter';
 import { questions } from '../lib/quiz';
-import { initForms } from './forms';
+import { initForms, tokenFor } from './forms';
 import { initSite, initReveal } from './site';
 
 const ROLL = 0.18;
@@ -30,6 +35,17 @@ const screens = form ? Array.from(form.querySelectorAll<HTMLFieldSetElement>('.q
 const step = stepEl ? counter(stepEl) : null;
 let current = 0;
 let rolling = false;
+let asking = false;
+
+/** What /api/quiz sends back (src/worker.ts). */
+interface Advice {
+  read: string;
+  picks: { product: string; why: string; tools: string[] }[];
+  firstStep: string;
+}
+/** How long the page waits for Claude before showing its own result. */
+const WAIT = 20_000;
+const kept = (code: string) => `ks-quiz-${code}`;
 
 /* ---------- Small DOM helpers ---------- */
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls = '', text = ''): HTMLElementTagNameMap[K] {
@@ -99,12 +115,71 @@ function go(to: number): void {
   gsap.fromTo(into, { yPercent: 100 * dir }, { yPercent: 0, duration: ROLL * 1.5, ease: 'none', onComplete: done });
 }
 
-function finish(): void {
+/** Claude's read of the answers, or null if it cannot be had. Never throws. */
+async function ask(a: Answers, code: string): Promise<Advice | null> {
+  const before = remembered(code);
+  if (before) return before;
+  if (!forms.ready) return null;
+  const stop = new AbortController();
+  const fetched = async (): Promise<Advice> => {
+    const token = await tokenFor('quiz_result');
+    const response = await fetch('/api/quiz', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ answers: a, token }),
+      signal: stop.signal,
+    });
+    if (!response.ok) throw new Error(`/api/quiz answered ${response.status}`);
+    const { advice } = (await response.json()) as { advice?: Advice };
+    if (!advice?.read || !Array.isArray(advice.picks)) throw new Error('/api/quiz sent no advice');
+    try {
+      sessionStorage.setItem(kept(code), JSON.stringify(advice));
+    } catch {}
+    return advice;
+  };
+  // The wait covers reCAPTCHA as well as the request: neither can hold the result back.
+  let timer = 0;
+  const late = new Promise<never>((_, fail) => (timer = window.setTimeout(() => fail(new Error('no answer in time')), WAIT)));
+  try {
+    return await Promise.race([fetched(), late]);
+  } catch (err) {
+    stop.abort();
+    console.warn('The result was worked out in the page.', err);
+    return null;
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
+
+/** A result already written in this tab, so going back to its URL does not ask again. */
+function remembered(code: string): Advice | null {
+  try {
+    const text = sessionStorage.getItem(kept(code));
+    return text ? (JSON.parse(text) as Advice) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function finish(): Promise<void> {
   const a = allAnswers();
-  if (screens.some((s) => answersOf(s).length === 0)) return;
+  if (asking || screens.some((s) => answersOf(s).length === 0)) return;
   const code = encode(a);
+  asking = true;
+  if (next) {
+    next.hidden = false;
+    next.disabled = true;
+    next.setAttribute('aria-busy', 'true');
+    next.textContent = 'Reading your answers';
+  }
+  const advice = await ask(a, code);
+  asking = false;
+  if (next) {
+    next.disabled = false;
+    next.removeAttribute('aria-busy');
+  }
   history.replaceState(null, '', `#r=${code}`);
-  show(interpret(a), code, a);
+  show(interpret(a), code, a, advice);
 }
 
 /* ---------- The result ---------- */
@@ -115,8 +190,16 @@ function answersAsText(a: Answers): string {
     .join('\n');
 }
 
-function show(r: Result, code: string, a: Answers): void {
+function show(r: Result, code: string, a: Answers, advice: Advice | null = null): void {
   if (!resultEl) return;
+  // Claude's picks, shown with the site's own names, cases and ranges. Without them, the page's own.
+  const shown: { item: Recommendation; why?: string; tools?: string[] }[] = advice
+    ? advice.picks.flatMap((pick) => {
+        const item = recommendationFor(pick.product, a);
+        return item ? [{ item, why: pick.why, tools: pick.tools }] : [];
+      })
+    : r.items.map((item) => ({ item }));
+  const buyNothing = advice ? shown.length === 0 : r.buyNothing;
   if (form) form.hidden = true;
   if (top) top.hidden = true;
   resultEl.textContent = '';
@@ -124,11 +207,11 @@ function show(r: Result, code: string, a: Answers): void {
 
   // 1. The read.
   const read = el('div', 'result-read');
-  const h = el('h2', 'display-l', r.buyNothing ? 'Buy nothing yet.' : 'What your answers say.');
+  const h = el('h2', 'display-l', buyNothing ? 'Buy nothing yet.' : 'What your answers say.');
   h.tabIndex = -1;
   read.appendChild(h);
-  read.appendChild(el('p', 'lede', r.read.join(' ')));
-  if (r.estimate) {
+  read.appendChild(el('p', 'lede', advice ? advice.read : r.read.join(' ')));
+  if (r.estimate && shown.length > 0) {
     const fig = el('p', 'result-estimate');
     fig.appendChild(el('span', 'counter-m', r.estimate.hours));
     const label = el('span', 'unit');
@@ -139,18 +222,24 @@ function show(r: Result, code: string, a: Answers): void {
   resultEl.appendChild(read);
 
   // 2. The recommended items, in the order to do them.
-  if (r.items.length) {
+  if (shown.length) {
     const block = el('div', 'result-block');
     block.setAttribute('data-reveal', '');
-    block.appendChild(el('h3', 'display-m', r.items.length === 1 ? 'What we would fix' : 'What we would fix, in order'));
+    block.appendChild(el('h3', 'display-m', shown.length === 1 ? 'What we would fix' : 'What we would fix, in order'));
     const list = el('ol', 'result-items');
-    r.items.forEach((item, i) => {
+    shown.forEach(({ item, why, tools }, i) => {
       const li = el('li', 'result-item');
       li.setAttribute('data-reveal', 'card');
       li.style.setProperty('--i', String(i));
       li.appendChild(el('span', 'n', String(i + 1)));
       const body = el('div', 'result-item-body');
       body.appendChild(el('p', 'display-s', item.name));
+      if (why) body.appendChild(el('p', 'body-s', why));
+      if (tools?.length) {
+        const fits = el('ul', 'result-tools');
+        tools.forEach((tool) => fits.appendChild(el('li', 'tag', tool)));
+        body.appendChild(fits);
+      }
       if (products.display.quiz) {
         const cost = el('p', 'result-cost');
         cost.appendChild(el('span', 'figure', item.range));
@@ -169,7 +258,7 @@ function show(r: Result, code: string, a: Answers): void {
       list.appendChild(li);
     });
     block.appendChild(list);
-    if (r.order) block.appendChild(el('p', 'body', r.order));
+    block.appendChild(el('p', 'body', orderLine(shown.length)));
     if (!products.display.quiz) block.appendChild(el('p', 'body-s muted', products.quoteLine));
     resultEl.appendChild(block);
   }
@@ -178,7 +267,9 @@ function show(r: Result, code: string, a: Answers): void {
   const exits = el('div', 'result-block');
   exits.setAttribute('data-reveal', '');
   exits.appendChild(el('h3', 'display-m', 'The next step'));
+  if (advice?.firstStep) exits.appendChild(el('p', 'body', advice.firstStep));
   if (r.next) exits.appendChild(el('p', 'body', r.next));
+  if (advice) exits.appendChild(el('p', 'body-s muted', 'This result was written by Claude, an AI model, from your nine answers. We check it with you in the free consultation before anything is quoted.'));
   resultEl.appendChild(exits);
 
   // The form under the result carries the answers and the result with it.
@@ -188,7 +279,13 @@ function show(r: Result, code: string, a: Answers): void {
       if (field) field.value = value;
     };
     set('quiz_answers', answersAsText(a));
-    set('quiz_recommended', r.buyNothing ? 'Buy nothing yet' : r.items.map((item, i) => `${i + 1}. ${item.name} (${item.service})`).join('\n'));
+    set(
+      'quiz_recommended',
+      [
+        buyNothing ? 'Buy nothing yet' : shown.map(({ item }, i) => `${i + 1}. ${item.name} (${item.service})`).join('\n'),
+        advice ? `Written by Claude: ${advice.read}` : 'Worked out by the page (Claude was not reached).',
+      ].join('\n'),
+    );
     set('quiz_result', url);
     enquiry.hidden = false;
   }
@@ -230,7 +327,7 @@ function fromHash(): boolean {
     const given = a[s.dataset.q ?? ''] ?? [];
     s.querySelectorAll<HTMLInputElement>('input').forEach((i) => (i.checked = given.includes(i.value)));
   });
-  show(interpret(a), m[1], a);
+  show(interpret(a), m[1], a, remembered(m[1]));
   return true;
 }
 

@@ -1,18 +1,25 @@
-// Cloudflare Workers with static assets (not Pages). There is no Worker
-// script: Cloudflare serves the built site in dist/ directly.
+// Cloudflare Workers with static assets (not Pages). Cloudflare serves the
+// built site in dist/ directly; only /api/* runs the Worker (src/worker.ts),
+// which writes the quiz result with Claude.
 // Deploy with `npm run deploy` after `npx wrangler login` (done by a person).
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "keystroke-site",
   "compatibility_date": "2026-10-02",
+  "main": "src/worker.ts",
   "assets": {
     "directory": "./dist",
     // Unknown addresses get dist/404.html with a 404 status.
     "not_found_handling": "404-page",
-    "html_handling": "auto-trailing-slash"
-  }
-  // When the bounded "ask a question" conversation is built, add
-  //   "main": "src/worker.ts"
-  // and "run_worker_first": ["/api/*"] under "assets", so only that route
-  // reaches the Worker and everything else stays static.
+    "html_handling": "auto-trailing-slash",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  // One visitor can ask for a quiz result 5 times a minute.
+  "ratelimits": [
+    { "name": "QUIZ_LIMIT", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }
+  ],
+  // Secrets set in the dashboard stay when a deploy goes out.
+  "keep_vars": true,
+  "observability": { "enabled": true }
 }

@@ -1,5 +1,7 @@
 // The quiz interpreter: deterministic rules over quiz.json and products.json.
-// No model call. It recommends only from the product list, never more than
+// No model call here. This is the result the page can always work out itself;
+// when /api/quiz answers, Claude's read of the same answers is shown in its
+// place (src/worker.ts, src/scripts/quiz.ts). It recommends only from the product list, never more than
 // three items, never a price beyond the published ranges, and nothing the
 // answers do not support. When no item qualifies it says buy nothing yet.
 import quiz from '../content/quiz.json';
@@ -31,6 +33,9 @@ export interface Result {
 
 export const questions = quiz.questions;
 
+/** The line under the list of items: where to start. */
+export const orderLine = (count: number): string => (count > 1 ? quiz.order.many : quiz.order.one);
+
 function option(qid: string, oid: string) {
   return questions.find((q) => q.id === qid)?.options.find((o) => o.id === oid) as Record<string, unknown> | undefined;
 }
@@ -48,8 +53,31 @@ function joinList(parts: string[]): string {
   return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
 }
 
+type Item = (typeof products.items)[number];
+
+function businessTypeOf(a: Answers): string | null {
+  return (option('q1', a.q1?.[0] ?? '')?.businessType as string | null) ?? null;
+}
+
+/** A product as the result shows it: its name, its service, its range and a case from the same kind of business. */
+function recommendation(item: Item, businessType: string | null): Recommendation {
+  const band = products.builds.find((b) => b.band === item.band);
+  const linked =
+    item.cases.map((id) => cases.find((c) => c.id === id)).find((c) => c && c.businessType === businessType) ??
+    item.cases.map((id) => cases.find((c) => c.id === id)).find(Boolean) ??
+    null;
+  const s = serviceOfPractice(item.practice);
+  return { id: item.id, name: item.name, service: s.name, serviceSlug: s.slug, range: band?.range ?? '', case: linked };
+}
+
+/** The same, for a product chosen by id (the picks that come back from /api/quiz). */
+export function recommendationFor(id: string, a: Answers): Recommendation | null {
+  const item = products.items.find((x) => x.id === id);
+  return item ? recommendation(item, businessTypeOf(a)) : null;
+}
+
 export function interpret(a: Answers): Result {
-  const businessType = (option('q1', a.q1?.[0] ?? '')?.businessType as string | null) ?? null;
+  const businessType = businessTypeOf(a);
 
   // The evidence, in their own answers.
   const evidence: string[] = [];
@@ -85,15 +113,7 @@ export function interpret(a: Answers): Result {
     return { read, buyNothing, estimate: null, items: [], order: null, next, showBook: false };
   }
 
-  const items: Recommendation[] = qualified.slice(0, quiz.sizing.maxItems).map((item) => {
-    const band = products.builds.find((b) => b.band === item.band);
-    const linked =
-      item.cases.map((id) => cases.find((c) => c.id === id)).find((c) => c && c.businessType === businessType) ??
-      item.cases.map((id) => cases.find((c) => c.id === id)).find(Boolean) ??
-      null;
-    const s = serviceOfPractice(item.practice);
-    return { id: item.id, name: item.name, service: s.name, serviceSlug: s.slug, range: band?.range ?? '', case: linked };
-  });
+  const items: Recommendation[] = qualified.slice(0, quiz.sizing.maxItems).map((item) => recommendation(item, businessType));
 
   // The estimate is a figure about typing things twice, so it shows only when
   // that item qualifies, and only for a size of business that has one.
@@ -108,7 +128,7 @@ export function interpret(a: Answers): Result {
     buyNothing,
     estimate,
     items,
-    order: items.length > 1 ? quiz.order.many : quiz.order.one,
+    order: orderLine(items.length),
     next,
     showBook: true,
   };

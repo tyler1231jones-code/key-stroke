@@ -27,7 +27,15 @@ import '../styles/pages.css';
           <h2 class="display-s">What the forms collect</h2>
           <div class="doc-copy">
             <p class="body">Your name and email address. Your phone number, business name and a message, if you choose to give them. Which service you asked about, and the page you sent the form from.</p>
-            <p class="body">If you send the form under a quiz result, your nine answers and the result go with it. The quiz itself sends nothing: until you send that form, your answers stay in your browser.</p>
+            <p class="body">If you send the form under a quiz result, your nine answers and the result go with it.</p>
+          </div>
+        </section>
+
+        <section class="doc-section" data-reveal>
+          <h2 class="display-s">The quiz</h2>
+          <div class="doc-copy">
+            <p class="body">When you answer the last question, your nine answers are sent to our website and on to Claude, an AI model made by Anthropic, which writes the result you see. Only the answers you chose are sent. Your name, email and anything else about you are not, because the quiz does not ask for them.</p>
+            <p class="body">We do not keep the answers unless you send the form under the result. Anthropic handles them under its own terms for business use of its service.</p>
           </div>
         </section>
 
@@ -42,15 +50,15 @@ import '../styles/pages.css';
         <section class="doc-section" data-reveal>
           <h2 class="display-s">reCAPTCHA</h2>
           <div class="doc-copy">
-            <p class="body">The forms use Google reCAPTCHA to tell people from automated senders. It is loaded only when a form is on screen. When you send a form, reCAPTCHA scores the visit and Formspree checks that score before accepting it.</p>
+            <p class="body">The forms use Google reCAPTCHA to tell people from automated senders. It is loaded only when a form is on screen or the quiz is finishing. When you send a form, reCAPTCHA scores the visit and Formspree checks that score before accepting it. The quiz result is checked the same way, by our own website, before your answers go to Claude.</p>
           </div>
         </section>
 
         <section class="doc-section" data-reveal>
           <h2 class="display-s">Cookies and tracking</h2>
           <div class="doc-copy">
-            <p class="body">This site sets no cookies of its own. reCAPTCHA sets one that it needs to work, on pages where a form has been on screen.</p>
-            <p class="body">Your browser remembers, until you close the tab, that the opening animation on the homepage has played. That note holds nothing about you.</p>
+            <p class="body">This site sets no cookies of its own. reCAPTCHA sets one that it needs to work, on pages where a form has been on screen or the quiz has been finished.</p>
+            <p class="body">Your browser remembers, until you close the tab, that the opening animation on the homepage has played, and the quiz result it has just shown you, so going back to it does not ask again. Neither holds your name or contact details.</p>
             {has('analyticsToken') && (
               <p class="body">We count page views with Cloudflare Web Analytics, which uses no cookies and does not follow you to other sites.</p>
             )}

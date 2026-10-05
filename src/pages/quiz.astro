@@ -1,7 +1,8 @@
 ---
 // Nine questions, one per screen, tappable answers only, no email gate.
 // Answers are real radio and checkbox groups. The result has its own URL,
-// with the answers encoded in the hash.
+// with the answers encoded in the hash. The result is written by Claude from
+// the answers (src/worker.ts), or worked out in the page if that fails.
 import Base from '../layouts/Base.astro';
 import Counter from '../components/Counter.astro';
 import Fig from '../components/Fig.astro';
@@ -31,7 +32,7 @@ const available = products.items.length > 0;
       </div>
 
       <noscript>
-        <p class="quiz-noscript body">The quiz works its result out in the browser, so it needs JavaScript. Without it, <a href="/cases">the cases</a> are the place to start.</p>
+        <p class="quiz-noscript body">The quiz runs in the browser, so it needs JavaScript. Without it, <a href="/cases">the cases</a> are the place to start.</p>
       </noscript>
 
       {available ? (
@@ -66,7 +67,7 @@ const available = products.items.length > 0;
       {/* Below the result, never in front of it. */}
       <div class="quiz-enquiry result-block" id="quiz-enquiry" data-reveal hidden>
         <h2 class="display-m">Send me this and get in touch.</h2>
-        <p class="body">Your answers and this result go to us with your details, and we reply to arrange a free conversation. Nothing has been sent so far.</p>
+        <p class="body">Your answers and this result go to us with your details, and we reply to arrange a free conversation. So far only your nine answers have been read, to write this result. Nothing about you has been sent.</p>
         <EnquiryForm kind="quiz" id="quiz-contact" submit="Send it and get in touch" />
         <p class="result-back">
           <a class="body-s" href="/cases">See the cases</a>

@@ -156,6 +156,38 @@ loaded only when a form comes near the viewport or takes focus. Its floating
 badge is hidden, and the line Google asks for in that case sits under every
 form.
 
+## The quiz result
+
+When the last question is answered, the page sends the nine answers and a
+reCAPTCHA v3 token to `/api/quiz`, a small Worker (`src/worker.ts`) that is
+the only code running on Cloudflare; every page is still a static file. The
+Worker:
+
+1. accepts only the quiz's own option ids, never free text;
+2. checks the token with Google, and stops there if the check fails;
+3. asks Claude (`claude-opus-5-5`) to read the answers against the product
+   list. Claude can pick only from the ids it is given. Names, cases and
+   prices on the page come from the site's own content.
+
+If any of that fails, or takes longer than 20 seconds, the page shows the
+result it works out itself by fixed rules (`src/lib/quiz.ts`).
+
+Two secrets, set by a person in the Cloudflare dashboard under the Worker's
+Settings, Variables and Secrets. They are never written in this project:
+
+| Name | What |
+| --- | --- |
+| `ANTHROPIC_API_KEY` | A key from the Claude Console. Set a monthly spend limit there. |
+| `RECAPTCHA_SECRET` | The reCAPTCHA v3 secret key, the same one given to Formspree. |
+
+`/api/health` on the live site says whether each is set (yes or no, never the
+value). One visitor can ask for 5 results a minute. Errors are in the Worker's
+logs in the dashboard.
+
+To run the Worker on this machine: `npm run build`, then
+`npx wrangler dev --local`. Local secrets go in `.dev.vars`, which is not
+committed.
+
 ## Prices
 
 Prices are shown on `/savers` and nowhere else. `src/content/products.json`
