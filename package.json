@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:onboard": "node tools/onboard-preview.mjs",
     "preview": "astro preview",
     "check": "node tools/check.mjs",
     "check:types": "astro check",

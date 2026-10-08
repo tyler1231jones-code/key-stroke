@@ -136,6 +136,20 @@ Things that are not obvious from reading one file.
 - The Read tool cannot render PDF pages here (no `pdftoppm`), so passing
   `pages` fails. Read the whole PDF instead.
 
+## Onboarding forms
+
+Added 8 October on the branch `onboarding` (`docs/onboarding-brief.md`,
+README "Onboarding forms"). Templates are TypeScript files in
+`src/onboarding/templates/`, checked when the site builds
+(`src/onboarding/index.ts`): a bad id, a show-if that points at nothing or
+waits for an answer that is not offered, a field that asks for a password,
+or more than 10 uploads in one form stops the build. The pages are generated
+only once `forms.formspreeOnboardId` is set, or with `npm run build:onboard`.
+`node tools/onboard-test.mjs` drives every form end to end and writes each
+email's contents to `shots/onboard/`. `Base.astro`, `Nav.astro` and
+`Footer.astro` gained a `minimal` prop for these pages; the Worker gained
+`/api/stamp`.
+
 ## The repository is public
 
 `github.com/tyler1231jones-code/key-stroke` can be read by anyone. Since

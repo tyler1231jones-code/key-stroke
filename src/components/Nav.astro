@@ -5,8 +5,10 @@ import { BOOK_HREF, BOOK_LABEL } from '../lib/data';
 interface Props {
   /** The key of the header item the current page belongs to. */
   current?: string;
+  /** The mark alone, for a client's working page such as an onboarding form. */
+  minimal?: boolean;
 }
-const { current } = Astro.props;
+const { current, minimal = false } = Astro.props;
 
 // Each item is its own page. The live underline marks the one the visitor is on.
 const items = [
@@ -24,7 +26,7 @@ const items = [
       <Logotype variant="lockup" />
       <Logotype variant="mark" />
     </a>
-    <nav class="bar-nav" aria-label="Site">
+    {!minimal && <nav class="bar-nav" aria-label="Site">
       <ul class="nav-list plate">
         {items.map((item) => (
           <li><a href={item.href} aria-current={current === item.key ? 'page' : undefined}>{item.label}</a></li>
@@ -39,7 +41,7 @@ const items = [
           ))}
         </ul>
       </details>
-    </nav>
+    </nav>}
   </div>
 </header>
 

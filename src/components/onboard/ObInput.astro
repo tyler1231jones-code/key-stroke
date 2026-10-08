@@ -1,0 +1,49 @@
+---
+// One simple onboarding field: text, email, phone, address, date, long text
+// or colour, with its label, help and error line. Used on its own and inside
+// repeatable groups.
+import type { SimpleField } from '../../onboarding/types';
+
+interface Props {
+  field: SimpleField;
+  /** The form field name: the field id, or group.n.id inside a group. */
+  name: string;
+  /** Unique on the page. */
+  uid: string;
+  /** Extra attributes for the wrapper, such as data-show-if. */
+  wrap?: Record<string, string | undefined>;
+  class?: string;
+}
+const { field: f, name, uid, wrap = {}, class: extra } = Astro.props;
+const helpId = f.help ? `${uid}-help` : undefined;
+const errId = `${uid}-error`;
+const describedBy = [helpId, errId].filter(Boolean).join(' ');
+const wide = f.type === 'longtext' || f.wide;
+// Addresses are typed loosely ("www.example.com.au"), so they are text fields
+// checked by the page script, not type="url", which rejects anything without https://.
+const types: Record<string, 'text' | 'email' | 'tel' | 'date' | 'color'> = { text: 'text', email: 'email', tel: 'tel', url: 'text', date: 'date', colour: 'color' };
+const inputType = types[f.type] ?? 'text';
+---
+<div class:list={['field', 'ob-field', extra, { 'field-wide': wide }]} data-field={name} {...wrap}>
+  <label for={uid}>{f.label}{!f.required && <span class="opt"> optional</span>}</label>
+  {f.help && <p class="ob-help" id={helpId}>{f.help}</p>}
+  {f.type === 'longtext' ? (
+    <textarea id={uid} name={name} rows={f.rows ?? 5} placeholder={f.placeholder} aria-describedby={describedBy} data-required={f.required ? '' : undefined} data-kind="longtext"></textarea>
+  ) : f.type === 'colour' ? (
+    <input id={uid} name={name} type="color" value="#0b0d10" class="ob-colour" aria-describedby={describedBy} data-kind="colour" />
+  ) : (
+    <input
+      id={uid}
+      name={name}
+      type={inputType}
+      inputmode={f.type === 'url' ? 'url' : f.type === 'email' ? 'email' : f.type === 'tel' ? 'tel' : undefined}
+      spellcheck={f.type === 'url' || f.type === 'email' ? 'false' : undefined}
+      autocomplete={'autocomplete' in f ? f.autocomplete : undefined}
+      placeholder={'placeholder' in f ? f.placeholder : undefined}
+      aria-describedby={describedBy}
+      data-required={f.required ? '' : undefined}
+      data-kind={f.type}
+    />
+  )}
+  <p class="field-error" id={errId} hidden></p>
+</div>

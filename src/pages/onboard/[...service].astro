@@ -1,0 +1,182 @@
+---
+// The onboarding forms: /onboard lists them (for us, to copy a link), and
+// /onboard/<service> is the form we send a client. One step at a time with
+// script; every step on one page without it. Sending posts everything to the
+// Formspree onboarding form, which emails it to us (src/scripts/onboard.ts).
+//
+// These pages are built only once forms.formspreeOnboardId is set in
+// site.json, so no client can reach a form that would not send.
+// `npm run build:onboard` builds them anyway, for a look on this computer.
+import Base from '../../layouts/Base.astro';
+import ObField from '../../components/onboard/ObField.astro';
+import Fig from '../../components/Fig.astro';
+import { templates, onboarding, onboardBuilt, onboardFormId, onboardLive } from '../../onboarding';
+import { origin } from '../../lib/data';
+import type { Template } from '../../onboarding/types';
+import '../../styles/pages.css';
+import '../../styles/onboard.css';
+
+export function getStaticPaths() {
+  if (!onboardBuilt) return [];
+  return [
+    { params: { service: undefined }, props: { template: null } },
+    ...templates.map((t) => ({ params: { service: t.id }, props: { template: t } })),
+  ];
+}
+
+const { template: t } = Astro.props as { template: Template | null };
+const terms = onboarding.terms;
+const list = <T,>(v: T | T[] | undefined): T[] => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
+const showIf = (s: Template['steps'][number]['showIf']) =>
+  s ? JSON.stringify(list(s).map((w) => ({ ...w, is: w.is === undefined ? undefined : list(w.is), has: w.has === undefined ? undefined : list(w.has) }))) : undefined;
+
+// What the page script needs to write the email: every step and field, in order.
+const definition = t && {
+  id: t.id,
+  name: t.name,
+  formId: onboardFormId,
+  live: onboardLive,
+  files: onboarding.files,
+  termsVersion: terms.version,
+  terms: terms.items,
+  steps: t.steps.map((s) => ({
+    id: s.id,
+    title: s.title,
+    fields: s.fields
+      .filter((f) => f.type !== 'note')
+      .map((f) => ({
+        id: f.id,
+        type: f.type,
+        label: 'label' in f ? f.label : '',
+        item: f.type === 'group' ? f.item : undefined,
+        fields: f.type === 'group' ? f.fields.map((g) => ({ id: g.id, label: g.label, type: g.type })) : undefined,
+      })),
+  })),
+};
+---
+{t ? (
+  <Base title={`${t.name}: onboarding`} description={t.summary} page="onboard" noindex minimal band="none">
+    <section class="page-head ob-head">
+      <div class="wrap">
+        <p class="plate ob-eyebrow load-in">Client onboarding</p>
+        <h1 class="display-xl load-in" style="--i:1">{t.name}.</h1>
+        <p class="lede load-in" style="--i:2">{t.summary}</p>
+      </div>
+    </section>
+
+    <section class="page-body ob-body">
+      <div class="wrap ob" data-onboard={t.id}>
+        <script is:inline>document.documentElement.classList.add('ob-js');</script>
+
+        <div class="ob-intro">
+          <div class="ob-intro-grid">
+            <div>
+              <h2 class="display-s">Before you start</h2>
+              <p class="body"><Fig text={t.time} /></p>
+              <ul class="ticks ob-bring">
+                {t.bring.map((b) => <li>{b}</li>)}
+              </ul>
+            </div>
+            <div class="ob-privacy">
+              <h2 class="display-s">Your information</h2>
+              <p class="body-s">{onboarding.privacy} <a href="/privacy">Our privacy policy</a>.</p>
+              <p class="body-s ob-kept">{onboarding.keptOnDevice}</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="ob-resume body-s" data-resume hidden>
+          <span data-resume-text></span>
+          <button class="ob-link" type="button" data-restart>Start again with an empty form</button>
+        </p>
+
+        <div class="ob-progress" data-progress hidden>
+          <p class="plate" aria-live="polite"><span data-progress-text></span></p>
+          <ol class="ob-strip" data-strip aria-hidden="true"></ol>
+        </div>
+
+        <form class="form ob-form" method="post" action={onboardLive ? `https://formspree.io/f/${onboardFormId}` : undefined} novalidate data-onboard-form>
+          {t.steps.map((step, i) => (
+            <fieldset class:list={['ob-step', { on: i === 0 }]} data-step={step.id} data-show-if={showIf(step.showIf)}>
+              <legend class="display-l ob-step-title" tabindex="-1">{step.title}.</legend>
+              {step.intro && <p class="body ob-step-intro">{step.intro}</p>}
+              <div class="form-fields">
+                {step.fields.map((f) => <ObField field={f} />)}
+              </div>
+            </fieldset>
+          ))}
+
+          <fieldset class="ob-step ob-final" data-step="send">
+            <legend class="display-l ob-step-title" tabindex="-1">Check and send.</legend>
+            <p class="body ob-step-intro">Read through your answers. Change anything that is wrong, then accept the terms and send.</p>
+            <div class="ob-review" data-review></div>
+
+            <div class="ob-terms">
+              <h2 class="display-m">{terms.title}.</h2>
+              <p class="body">{terms.intro}</p>
+              <ul class="ticks">
+                {terms.items.map((item) => <li><Fig text={item} /></li>)}
+              </ul>
+              <p class="body-s"><a href="/terms" target="_blank">Website terms of use</a> · <a href="/privacy" target="_blank">Privacy policy</a></p>
+            </div>
+            <div class="form-fields">
+              <ObField field={{ id: 'agree_terms', type: 'tick', label: 'I have read these terms and accept them.', required: true }} />
+              <ObField field={{ id: 'agree_authority', type: 'tick', label: 'I am authorised to accept them for the business.', required: true }} />
+              <ObField field={{ id: 'agree_name', type: 'text', label: 'Your full name', required: true, autocomplete: 'name' }} />
+              <ObField field={{ id: 'agree_position', type: 'text', label: 'Your position', required: true, autocomplete: 'organization-title' }} />
+              <ObField field={{ id: 'agree_date', type: 'date', label: 'Date', required: true }} />
+            </div>
+            <p class="body-s ob-stamp">When you send this we record the time and the internet address it came from, with your acceptance.</p>
+          </fieldset>
+
+          <input class="form-pot" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <div class="ob-nav">
+            <button class="key key-2 key-l" type="button" data-back hidden>Back</button>
+            <button class="key key-l" type="button" data-next>Next</button>
+            <button class="key key-l form-submit" type="submit" data-send data-label="Send">Send</button>
+          </div>
+          <p class="form-status" role="alert" data-status hidden></p>
+          <p class="form-legal">This site is protected by reCAPTCHA. <a href="/privacy">How we handle your details</a> · <a href="/terms">Terms</a></p>
+          <noscript><p class="form-legal">This form needs JavaScript to send. Please turn it on, or reply to the email we sent you.</p></noscript>
+        </form>
+
+        <div class="form-thanks ob-done" tabindex="-1" data-done hidden>
+          <p class="display-m">Thank you. That is with us.</p>
+          <h2 class="display-s">What happens next</h2>
+          <ol class="ticks">
+            {t.next.map((n) => <li>{n}</li>)}
+          </ol>
+        </div>
+      </div>
+    </section>
+    <script type="application/json" id="ob-definition" is:inline set:html={JSON.stringify(definition)} />
+  </Base>
+) : (
+  <Base title="Client onboarding" description="Onboarding forms for KEYSTROKE clients." page="onboard" noindex minimal band="none">
+    <section class="page-head ob-head">
+      <div class="wrap">
+        <p class="plate ob-eyebrow">Client onboarding</p>
+        <h1 class="display-xl">Onboarding forms.</h1>
+        <p class="lede">If we sent you a link, open that one. Each form is for one service.</p>
+      </div>
+    </section>
+    <section class="page-body">
+      <div class="wrap">
+        <ul class="ob-index">
+          {templates.map((tpl) => (
+            <li>
+              <a class="display-s" href={`/onboard/${tpl.id}`}>{tpl.name}</a>
+              <p class="body-s">{tpl.summary}</p>
+              <p class="ob-index-link"><span class="figure" data-link>{`${origin ?? ''}/onboard/${tpl.id}`}</span> <button class="key key-2 ob-copy" type="button" data-copy={`${origin ?? ''}/onboard/${tpl.id}`}>Copy link</button></p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  </Base>
+)}
+
+<script>
+  import '../../scripts/onboard.ts';
+</script>

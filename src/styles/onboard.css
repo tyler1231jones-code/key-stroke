@@ -1,0 +1,123 @@
+/* The onboarding forms (/onboard). Built from the site's own form styles in
+   parts.css; this adds steps, choices, uploads, groups, access blocks and the
+   review. Tokens only, radii of 6px or less, no circles: radio buttons and
+   tick boxes are drawn square. */
+
+/* The page script sets hidden on steps, notes and buttons; nothing here may override it. */
+.ob [hidden] { display: none !important; }
+
+.ob-head { padding-bottom: var(--space-8); }
+.ob-eyebrow { color: var(--ink-muted); margin-bottom: var(--space-4); }
+.ob-body { padding-top: 0; }
+.ob { display: grid; gap: var(--space-12); max-width: 880px; }
+.foot-min .foot-line { margin-top: 0; }
+
+/* Before you start */
+.ob-intro { display: grid; gap: var(--space-6); }
+.ob-intro-grid { display: grid; gap: var(--space-8); padding: var(--space-8); border: 1px solid var(--rule); background: var(--base-100); }
+.ob-intro-grid h2 { margin-bottom: var(--space-3); }
+.ob-bring { margin-top: var(--space-4); }
+.ob-privacy { display: grid; gap: var(--space-3); align-content: start; }
+.ob-kept { color: var(--ink-muted); }
+.ob-resume { padding: var(--space-3) var(--space-4); border-left: 2px solid var(--ink); background: var(--base-100); }
+.ob-link { padding: 0; border: 0; background: none; color: var(--ink); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; min-height: 44px; }
+.ob-link:hover { text-decoration-thickness: 2px; }
+
+/* Progress: a count and a strip, never a bar or a percentage. */
+.ob-progress { display: grid; gap: var(--space-3); scroll-margin-top: calc(var(--bar-h, 72px) + var(--space-4)); }
+.ob-strip { display: flex; gap: 2px; list-style: none; margin: 0; padding: 0; }
+.ob-strip li { flex: 1; height: 8px; background: var(--rule); }
+.ob-strip li.done, .ob-strip li.on { background: var(--ink); }
+
+/* Steps: one at a time with script, all of them in a column without. */
+.ob-form { max-width: none; gap: var(--space-8); }
+.ob-step { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: var(--space-6); }
+.ob-step + .ob-step { padding-top: var(--space-12); border-top: 1px solid var(--rule); }
+.ob-js .ob-step:not(.on) { display: none; }
+.ob-js .ob-step + .ob-step { padding-top: 0; border-top: 0; }
+.ob-step-title { padding: 0; margin-bottom: var(--space-4); outline-offset: 6px; }
+.ob-step-intro { max-width: var(--measure, 66ch); }
+.ob-step > .form-fields { gap: var(--space-8) var(--space-4); }
+
+.ob-help { color: var(--ink-muted); font-size: 15px; line-height: 22px; max-width: var(--measure, 66ch); }
+.ob-field > label + .ob-help, .ob-field > legend + .ob-help { margin-top: calc(var(--space-1) * -1); }
+.ob-note { max-width: var(--measure, 66ch); padding: var(--space-3) var(--space-4); border-left: 2px solid var(--rule); color: var(--ink); font-size: 15px; line-height: 22px; }
+.ob-warn { border-left-color: var(--ink); background: var(--base-100); font-weight: 600; }
+.ob-muted { color: var(--ink-muted); }
+
+/* Choices: square marks, whole rows to tap. */
+.ob-choice, .ob-group, .ob-access { border: 0; margin: 0; padding: 0; min-width: 0; }
+.ob-choice > legend, .ob-group > legend, .ob-access > legend { padding: 0; margin-bottom: var(--space-2); font-size: 16px; line-height: 25px; font-weight: 600; }
+.ob-options { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+.ob-option { display: flex; gap: var(--space-3); align-items: flex-start; min-height: 48px; padding: var(--space-3) var(--space-4); border: 1px solid var(--rule); background: var(--base-100); cursor: pointer; font-size: 16px; line-height: 24px; }
+.ob-option:hover { border-color: var(--ink-muted); }
+.ob-option:has(input:checked) { border-color: var(--ink); }
+/* The site's .field input rule (full width, 56px tall) must not reach these marks. */
+.field .ob-option input, .ob-option input { appearance: none; -webkit-appearance: none; flex: none; display: grid; place-content: center; width: 20px; height: 20px; min-height: 0; padding: 0; margin: 2px 0 0; border: 1px solid var(--ink-muted); border-radius: 0; background: var(--base-000); cursor: pointer; }
+.ob-option input::before { content: ""; width: 10px; height: 10px; background: var(--ink); transform: scale(0); transition: transform var(--dur-1, 0.15s) linear; }
+.ob-option input:checked::before { transform: scale(1); }
+.field .ob-option input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-color: var(--ink); }
+.ob-other { margin-top: var(--space-3); }
+.ob-tick .ob-option { border-color: var(--rule); }
+
+/* Uploads */
+.ob-file input[type="file"] { min-height: 56px; padding: var(--space-3); background: var(--base-100); color: var(--ink); border: 1px dashed var(--rule); font: inherit; font-size: 15px; width: 100%; }
+.ob-file input[type="file"]::file-selector-button { margin-right: var(--space-4); padding: var(--space-2) var(--space-4); border: 1px solid var(--rule); background: var(--base-000); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
+.ob-filelist { display: grid; gap: var(--space-1); list-style: none; margin: 0; padding: 0; font-size: 15px; line-height: 22px; word-break: break-word; }
+.ob-filelist:empty { display: none; }
+
+/* Colour */
+.ob-colour { width: 96px !important; min-height: 56px; padding: var(--space-1) !important; cursor: pointer; }
+
+/* Repeatable groups */
+.ob-items { display: grid; gap: var(--space-4); }
+.ob-item { display: grid; gap: var(--space-4); padding: var(--space-4); border: 1px solid var(--hairline); background: var(--base-100); }
+.ob-item-label { color: var(--ink-muted); }
+.ob-add { justify-self: start; margin-top: var(--space-3); }
+.ob-remove { justify-self: start; }
+
+/* Access blocks */
+.ob-access { display: grid; gap: var(--space-4); padding: var(--space-6); border: 1px solid var(--rule); background: var(--base-100); }
+.ob-access > legend { float: left; width: 100%; margin-bottom: 0; }
+.ob-access-steps { display: grid; gap: var(--space-3); margin: 0; padding-left: var(--space-6); max-width: var(--measure, 66ch); }
+.ob-access-steps li { padding-left: var(--space-1); }
+.ob-access-steps li::marker { font-family: var(--font-data); color: var(--ink-muted); }
+.ob-access-email { color: var(--readout); font-weight: 600; overflow-wrap: anywhere; }
+.ob-ask { font-weight: 600; }
+.ob-access .ob-option { background: var(--base-000); }
+
+/* Check and send */
+.ob-review { display: grid; gap: var(--space-6); }
+.ob-review-step { display: grid; gap: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--rule); }
+.ob-review-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--space-2) var(--space-6); }
+.ob-review dl { display: grid; gap: var(--space-3); margin: 0; }
+.ob-review dl > div { display: grid; gap: var(--space-1); }
+.ob-review dt { color: var(--ink-muted); font-size: 15px; line-height: 22px; }
+.ob-review dd { margin: 0; white-space: pre-wrap; word-break: break-word; }
+.ob-terms { display: grid; gap: var(--space-4); padding: var(--space-8); border: 1px solid var(--rule); }
+.ob-stamp { color: var(--ink-muted); }
+
+/* Back, Next and Send */
+.ob-nav { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+.ob-nav [data-next], .ob-nav [data-send] { margin-left: auto; min-width: 200px; }
+html:not(.ob-js) .ob-nav [data-next], html:not(.ob-js) .ob-nav [data-back] { display: none; }
+.ob-done { max-width: 880px; }
+.ob-done .ticks { max-width: var(--measure, 66ch); }
+
+/* /onboard: the list of forms */
+.ob-index { display: grid; gap: var(--space-8); list-style: none; margin: 0; padding: 0; max-width: 880px; }
+.ob-index li { display: grid; gap: var(--space-2); padding-top: var(--space-6); border-top: 1px solid var(--rule); }
+.ob-index-link { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-4); word-break: break-all; }
+
+@media (min-width: 720px) {
+  .ob-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ob-intro-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 899px) {
+  .ob-help, .ob-note, .ob-filelist, .ob-review dt { font-size: 16px; line-height: 24px; }
+}
+@media (max-width: 719px) {
+  .ob-intro-grid, .ob-access, .ob-terms { padding: var(--space-4); }
+  .ob-nav > .key { flex: 1; min-width: 0; }
+  .ob-nav [data-next], .ob-nav [data-send] { margin-left: 0; }
+}

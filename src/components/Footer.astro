@@ -4,6 +4,11 @@
 import Logotype from './Logotype.astro';
 import { site, services, has, serviceHref, BOOK_HREF, BOOK_LABEL } from '../lib/data';
 
+interface Props {
+  /** The last line only, with privacy and terms: for a client's working page. */
+  minimal?: boolean;
+}
+const { minimal = false } = Astro.props;
 const year = new Date().getFullYear();
 const company = [
   { label: 'Cases', href: '/cases' },
@@ -16,9 +21,9 @@ const company = [
   { label: 'Terms', href: '/terms' },
 ];
 ---
-<footer class="foot">
+<footer class:list={['foot', { 'foot-min': minimal }]}>
   <div class="wrap">
-    <div class="foot-grid">
+    {!minimal && <div class="foot-grid">
       <div class="foot-about" data-reveal>
         <a class="foot-logo" href="/" aria-label={`${site.name}, home`}><Logotype variant="lockup" reversed /></a>
         <p class="body-s">{site.description}</p>
@@ -43,9 +48,10 @@ const company = [
           {has('serviceArea') && <li>{site.serviceArea}</li>}
         </ul>
       </div>
-    </div>
+    </div>}
     <div class="foot-line">
       <p>{site.origin}{has('location') && <> {site.location}.</>}</p>
+      {minimal && <p><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>}
       <p>&copy; <span class="fig" data-copy-year>{year}</span> {site.name}</p>
     </div>
   </div>

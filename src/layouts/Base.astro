@@ -45,10 +45,12 @@ interface Props {
   schema?: (object | null)[];
   /** Pages that should never be indexed, whatever demo mode says. */
   noindex?: boolean;
+  /** A working page for a client (the onboarding forms): the mark only, no menu, no closing band, no phone bar. */
+  minimal?: boolean;
 }
 const {
   title, description, theme = 'dark', canvas = false, current, page, band = 'close',
-  service, bookHref, crumbs = [], faq, schema = [], noindex = false,
+  service, bookHref, crumbs = [], faq, schema = [], noindex = false, minimal = false,
 } = Astro.props;
 const buildDate = dateInZone(site.timezone);
 // "/audit.html" and "/index.html" are served at "/audit" and "/".
@@ -128,12 +130,12 @@ const jsonLd = [organization(), website(), breadcrumbs(crumbs), faq ? faqSchema(
   <body>
     <a class="skip plate" href="#main">Skip to content</a>
     {canvas && <canvas id="stage" aria-hidden="true"></canvas>}
-    <Nav current={current} />
+    <Nav current={current} minimal={minimal} />
     <main id="main">
       <slot />
-      {band !== 'none' && <ClosingBand service={service} />}
+      {band !== 'none' && !minimal && <ClosingBand service={service} />}
     </main>
-    <Footer />
-    <StickyCta service={service} href={bookHref} />
+    <Footer minimal={minimal} />
+    {!minimal && <StickyCta service={service} href={bookHref} />}
   </body>
 </html>

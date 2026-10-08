@@ -115,7 +115,7 @@ const casesAll = json('cases.json');
 const live = (rows) => (site.demo ? rows : rows.filter((r) => !r.demo));
 const ledger = live(ledgerAll);
 const cases = live(casesAll);
-const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'prices.json', 'legal.json', 'shiftReport.json', 'quiz.json', 'services.json', 'faqs.json'].map(json);
+const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'prices.json', 'legal.json', 'shiftReport.json', 'quiz.json', 'services.json', 'faqs.json', 'onboarding.json'].map(json);
 
 function allowedFor(date) {
   const numbers = new Set([0]);
@@ -247,8 +247,10 @@ for (const file of walk(dist, '.html')) {
   const emoji = text.replace(/[©®™]/g, '').match(/\p{Extended_Pictographic}/u);
   if (emoji) fail(where, `emoji in text: ${emoji[0]}`);
 
-  // Figures. Prices are shown on the Savers page and nowhere else.
-  const savers = /^savers(\.html|\/|$)/.test(where);
+  // Figures. Prices are shown on the Savers page and nowhere else, apart from
+  // the terms a client accepts on an onboarding form (onboarding.json), which
+  // is never indexed or linked from the site.
+  const savers = /^savers(\.html|\/|$)/.test(where) || /^onboard(\.html|\/)/.test(where);
   for (const m of page.all.matchAll(/\$\s?\d[\d,]*(?:\.\d+)?/g)) {
     if (!savers) fail(where, `dollar figure ${m[0]}: prices appear on /savers and nowhere else`);
     else if (!allowedDollars.has(m[0])) fail(where, `dollar figure ${m[0]} is not in a content file`);

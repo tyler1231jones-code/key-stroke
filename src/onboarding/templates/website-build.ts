@@ -1,0 +1,86 @@
+import { defineTemplate } from '../types';
+import { you, currentSite, domain, email, google, timing } from '../shared';
+
+export default defineTemplate({
+  id: 'website-build',
+  name: 'Website build',
+  summary: 'Everything we need to build your new website and move it onto your domain without interrupting your email.',
+  time: 'About 30 minutes. You can stop and come back on the same device.',
+  bring: [
+    'The login to the account your domain is registered with',
+    'The login to your current website and hosting, if you have them',
+    'Your logo files, and any brand colours or fonts',
+    'A list of the pages and services you want on the site',
+  ],
+  steps: [
+    you(),
+    currentSite(),
+    domain(),
+    email(),
+    google(),
+    {
+      id: 'goals',
+      title: 'The new site',
+      intro: 'What the site is for and who it is for.',
+      fields: [
+        { id: 'build_type', type: 'choice', label: 'Which website build did you choose?', required: true, options: ['Built in code by Keystroke', 'WordPress with Elementor', 'Not decided yet'], help: 'A site built in code is run by us after launch, or handed to you as code. A WordPress site is yours to edit, on hosting in your name.' },
+        { id: 'after_launch', type: 'choice', label: 'After launch, who runs the site?', options: ['Keystroke, on a website care plan', 'We take the code and host it ourselves', 'Not sure yet'], showIf: { field: 'build_type', is: 'Built in code by Keystroke' } },
+        { id: 'wp_hosting', type: 'choice', label: 'Where will the WordPress site be hosted?', options: ['We have hosting we want to keep', 'Please set up hosting in our name', 'Not sure yet'], showIf: { field: 'build_type', is: 'WordPress with Elementor' } },
+        { id: 'wp_accounts', type: 'note', text: 'On a WordPress build, every account and licence is held in your name. We set them up on request, and never pay for them on your behalf.', showIf: { field: 'build_type', is: 'WordPress with Elementor' } },
+        { id: 'main_job', type: 'choice', label: 'What is the main job of the new site?', required: true, other: true, options: ['Phone calls', 'Enquiry or quote forms', 'Bookings', 'Online sales', 'Information for existing customers', 'Recruiting staff'] },
+        { id: 'other_jobs', type: 'longtext', label: 'What else should it do?', rows: 3 },
+        { id: 'customers', type: 'longtext', label: 'Who are your customers?', required: true, help: 'Who they are, where they are, and what they are looking for when they find you.' },
+        { id: 'offer', type: 'longtext', label: 'What you sell', required: true, help: 'Your main services or products, most important first.' },
+        { id: 'service_area', type: 'text', label: 'Where you work', help: 'Suburbs, regions, or Australia-wide.', wide: true },
+        { id: 'competitors', type: 'longtext', label: 'Your competitors', help: 'Names or website addresses.', rows: 3 },
+        { id: 'site_works', type: 'longtext', label: 'What works on your current site?', rows: 3, showIf: { field: 'has_site', is: 'Yes' } },
+        { id: 'site_fails', type: 'longtext', label: 'What does not?', rows: 3, showIf: { field: 'has_site', is: 'Yes' } },
+      ],
+    },
+    {
+      id: 'pages',
+      title: 'Pages and features',
+      fields: [
+        { id: 'pages_wanted', type: 'multi', label: 'Which pages do you want?', other: true, required: true, options: ['Home', 'About', 'Services overview', 'A page for each service', 'Projects or gallery', 'Testimonials or reviews', 'Team', 'Questions and answers', 'Blog or news', 'Contact', 'Careers', 'Shop', 'Bookings', 'Privacy policy', 'Terms'] },
+        { id: 'pages_detail', type: 'longtext', label: 'Anything we should know about those pages?', help: 'For example, how many services need their own page.', rows: 3 },
+        { id: 'features', type: 'multi', label: 'Which features does it need?', other: true, options: ['Contact form', 'Quote request form', 'Online bookings', 'Online payments', 'Shop', 'Newsletter sign-up', 'Customer logins', 'Live chat', 'Map and locations', 'Downloadable files', 'More than one language'] },
+        { id: 'enquiries_to', type: 'longtext', label: 'Where should enquiries from the new site go?', required: true, help: 'Email addresses, and any software they should land in.', rows: 3 },
+        { id: 'integrations', type: 'longtext', label: 'Software the site needs to work with', help: 'A CRM, a booking system, accounting, a mailing list.', rows: 3 },
+        { id: 'business_details', type: 'longtext', label: 'Details to show on the site', help: 'Phone, email, address, opening hours, ABN, licence numbers.' },
+        { id: 'industry_rules', type: 'longtext', label: 'Rules in your industry about what a website must show or must not say', help: 'Licence or registration numbers, health advertising rules, financial services wording. Leave blank if none.', rows: 3 },
+        { id: 'legal_pages', type: 'choice', label: 'Privacy policy and terms for the site', options: ['We have wording we want to use', 'We need them written', 'Not sure'], help: 'We set them out on the site. The wording should come from you or your lawyer.' },
+      ],
+    },
+    {
+      id: 'content',
+      title: 'Content and brand',
+      fields: [
+        { id: 'words_by', type: 'choice', label: 'Who writes the words?', required: true, options: ['We will', 'Please write them for us', 'A mix'] },
+        { id: 'photos', type: 'choice', label: 'Photos', options: ['We have good photos', 'We need a photographer', 'Stock photos are fine', 'A mix'] },
+        { id: 'video', type: 'longtext', label: 'Video to use, if any', help: 'Links to YouTube, Vimeo or a shared folder.', rows: 2 },
+        { id: 'testimonials', type: 'text', label: 'Where are your testimonials or reviews?', help: 'Google reviews, emails, a document. Leave blank if you have none yet.', wide: true },
+        { id: 'brand_state', type: 'choice', label: 'Your brand', required: true, options: ['We have a logo and brand colours', 'We have a logo, nothing else', 'We need a brand'] },
+        { id: 'brand_service', type: 'note', text: 'Branding is one of our services. We can quote it with the website, or you can start with a simple logo.', showIf: { field: 'brand_state', is: 'We need a brand' } },
+        { id: 'logo_files', type: 'file', label: 'Logo files', help: 'The best you have: SVG, AI, EPS or PDF. A large PNG if that is all there is.', accept: '.svg,.ai,.eps,.pdf,.png,.jpg,.jpeg', maxFiles: 3, showIf: { field: 'brand_state', is: ['We have a logo and brand colours', 'We have a logo, nothing else'] } },
+        { id: 'brand_colours', type: 'group', label: 'Brand colours', add: 'Add a colour', item: 'Colour', max: 8, showIf: { field: 'brand_state', is: 'We have a logo and brand colours' }, fields: [
+          { id: 'colour', type: 'colour', label: 'Colour' },
+          { id: 'name', type: 'text', label: 'Name or code', help: 'Such as "navy" or a Pantone number.' },
+        ] },
+        { id: 'brand_fonts', type: 'text', label: 'Brand fonts, if you know them', wide: true, showIf: { field: 'brand_state', is: ['We have a logo and brand colours', 'We have a logo, nothing else'] } },
+        { id: 'brand_guide', type: 'file', label: 'Brand guidelines', help: 'If you have them.', accept: '.pdf', maxFiles: 1, showIf: { field: 'brand_state', is: 'We have a logo and brand colours' } },
+        { id: 'liked_sites', type: 'group', label: 'Websites you like', help: 'Any industry. Tell us what you like about each.', add: 'Add a website', item: 'Website', max: 5, fields: [
+          { id: 'url', type: 'url', label: 'Address', placeholder: 'https://' },
+          { id: 'why', type: 'longtext', label: 'What you like about it', rows: 2 },
+        ] },
+        { id: 'not_wanted', type: 'longtext', label: 'Anything you do not want', rows: 3 },
+      ],
+    },
+    timing({ title: 'Timing', dateLabel: 'When would you like the new site live?' }),
+  ],
+  next: [
+    'We read your answers and contact you about anything missing.',
+    'We check the access you have given us, and take a full copy of your current site and its DNS settings before anything changes.',
+    'We send you a plan with dates for the build.',
+    'Your current site and your email stay exactly as they are until the new site is ready to go live.',
+  ],
+});

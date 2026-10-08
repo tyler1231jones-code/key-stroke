@@ -86,6 +86,7 @@ ignores. All of them need `npm run build` first.
 | `/privacy` | The privacy policy, from `legal.json` |
 | `/terms` | The website terms of use, from `legal.json` |
 | `/counting` | The counting method and the ledger. Linked from the footer |
+| `/onboard`, `/onboard/[service]` | The client onboarding forms (see "Onboarding forms"). Not linked, not indexed, and not built until their Formspree id is set |
 
 Old addresses redirect: the four `/practice/*` pages from the first build, and
 the four short service addresses from revision 1 (`/services/automation` and
@@ -210,6 +211,69 @@ quoted individually after a free consultation.") in its place. The prices
 themselves are still in the file. To show one again, set its flag to `true`
 and change `npm run check`, which fails on any dollar figure outside
 `/savers` (`tools/check.mjs`, the dollar rule).
+
+## Onboarding forms
+
+One form per service at `/onboard/<service>`: website build, website care,
+automation, reporting, branding and the Keystroke Audit. `/onboard` lists
+them with a "Copy link" button. You send a client the link; they work through
+it step by step; Send emails every answer to us through Formspree. Nothing
+else is involved: no database, no logins, no change to any email or DNS
+setting. The brief is `docs/onboarding-brief.md`.
+
+**Switching them on.** The pages are not built at all until
+`forms.formspreeOnboardId` in `src/content/site.json` holds the id of the
+Formspree form that receives them. Create a form called "Onboarding" in
+Formspree, give it the same reCAPTCHA setting as the contact form (the same
+secret key, in its settings), put its id in `site.json`, then build, check
+and push. Uploads need a paid Formspree plan.
+
+**Looking at them before that.** `npm run build:onboard` builds the site with
+the forms included. They send nothing in this state: Send prints the
+submission to the browser console and shows the thank-you.
+`node tools/onboard-test.mjs` then fills in every form in a browser, checks
+the show-and-hide rules, the password guard, uploads and resuming, and writes
+what each email would contain to `shots/onboard/`.
+
+**What we receive.** One email per form: the service and the client's
+details; an access checklist (every "give us access" block and whether it is
+done); one block per step with every answer; the agreement (name, position,
+date, the time it was sent and the IP address, from `/api/stamp`); then the
+files as links.
+
+**Changing a form.** Each form is one file in `src/onboarding/templates/`.
+Steps shared by several forms (you and your business, the current website,
+the domain, email, Google, timing) are in `src/onboarding/shared.ts`. To
+change a question, edit its `label` or `help` text. To add one:
+
+1. Copy a field of the same kind from any template and paste it where it
+   should appear.
+2. Give it a new `id`: lower case, words joined by underscores, not used
+   anywhere else in that form. Never rename an `id` once clients are using
+   the form.
+3. Set `type`: `text`, `longtext`, `email`, `tel`, `url`, `date`, `colour`,
+   `choice` (one answer), `multi` (several), `tick`, `file`, `group`
+   (repeatable, such as team members), `access` (how to give us access:
+   never a password field) or `note` (text, not a question).
+4. To show it only after a certain answer, add
+   `showIf: { field: 'the_other_id', is: 'The answer' }` (use `has:` for a
+   multiple choice).
+5. Run `npm run build:onboard`. If anything in a template is wrong, the
+   build stops and says which form and field, in words.
+
+**Adding a form.** Copy the closest template in `src/onboarding/templates/`,
+rename the file and its `id` (the `id` becomes the address), change the
+steps, and add it to the list in `src/onboarding/index.ts`.
+
+**Shared settings** are in `src/content/onboarding.json`: the address
+clients add to their accounts (`accessEmail`), the privacy note, the file
+limits (Formspree takes 10 files of 25 MB a submission) and the terms every
+client accepts. Change `terms.version` whenever the terms change, so each
+email records which version was accepted.
+
+The forms carry `noindex`, are left out of the sitemap, the menu and the
+share images, and have a plain header and footer. `npm run check` allows
+the dollar figure in the terms on these pages and nowhere else but `/savers`.
 
 ## Service demonstrations
 
@@ -343,6 +407,7 @@ agent, price, question or product is written into a template.
 | `products.json` | The price switch and the quote line, the audit and its three steps, the build ranges, the quiz items, the estimate bands, Keystroke Savers |
 | `prices.json` | The published price list, read by `/savers` only |
 | `legal.json` | The privacy policy and the website terms of use |
+| `onboarding.json` | Settings shared by the onboarding forms: the access address, the privacy note, file limits, the terms clients accept |
 | `signatures.example.json` | The shape of `signatures.json` (kept out of git), which `npm run signatures` reads |
 | `faqs.json` | The questions and answers on `/audit`, `/savers` and the four service pages |
 | `demos.json` | The invented businesses and sample text in the four demonstrations |

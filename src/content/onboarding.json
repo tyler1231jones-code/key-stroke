@@ -1,0 +1,22 @@
+{
+  "_note": "Settings shared by every onboarding form. The forms themselves are in src/onboarding/templates/. accessEmail is the address clients add to their accounts; it appears in every access instruction.",
+  "accessEmail": "tyler@key-stroke.com.au",
+  "privacy": "What you enter goes to KEYSTROKE through Formspree, the service that runs our forms, and is used only to set up and do your work. Do not type passwords or codes into this form: where we need access, we tell you how to add us instead.",
+  "keptOnDevice": "What you type is kept in this browser on this device until you send it, so you can close the page and come back. Files are not kept: add them again before you send.",
+  "files": {
+    "maxFiles": 10,
+    "maxFileMb": 25,
+    "maxTotalMb": 90
+  },
+  "terms": {
+    "version": "2026-10-09",
+    "title": "Our terms",
+    "intro": "These are the commercial terms for the work. The full website terms and our privacy policy are linked below.",
+    "items": [
+      "All prices exclude GST, which is added at 10%.",
+      "A 50% deposit is paid before work starts, and the other 50% on completion.",
+      "Additional work outside the agreed scope is $165 an hour. We always propose it to you first, and none of it is done until you approve it.",
+      "You can cancel at any time with 30 days' notice."
+    ]
+  }
+}

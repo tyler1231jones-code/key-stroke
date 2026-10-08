@@ -5,6 +5,8 @@
 //                     of the answers written by Claude out
 //   GET  /api/health  whether the two secrets are set. Says yes or no, never
 //                     the values.
+//   GET  /api/stamp   the time and the visitor's IP address, recorded with an
+//                     onboarding form's acceptance of the terms
 //
 // One quiz request works like this:
 //
@@ -266,6 +268,11 @@ export default {
     const { pathname } = new URL(request.url);
     if (pathname === '/api/quiz') {
       return request.method === 'POST' ? quizResult(request, env) : json({ error: 'method' }, 405);
+    }
+    // The onboarding forms record when, and from which address, a client
+    // accepted the terms. Read by the page just before it sends.
+    if (pathname === '/api/stamp') {
+      return json({ at: new Date().toISOString(), ip: request.headers.get('cf-connecting-ip') ?? null });
     }
     if (pathname === '/api/health') {
       return json({ anthropicKey: Boolean(env.ANTHROPIC_API_KEY), recaptchaSecret: Boolean(env.RECAPTCHA_SECRET ?? env.RECAPTCHA_SECRET_KEY), rateLimit: Boolean(env.QUIZ_LIMIT) });

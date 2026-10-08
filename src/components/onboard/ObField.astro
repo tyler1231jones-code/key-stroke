@@ -1,0 +1,116 @@
+---
+// One field of an onboarding form, of any type. Simple fields go through
+// ObInput; this adds choices, ticks, uploads, repeatable groups, access
+// blocks and notes. Show-and-hide rules ride on data-show-if and are applied
+// by src/scripts/onboard.ts.
+import type { Field, ShowIf } from '../../onboarding/types';
+import { ACCESS_STATUS } from '../../onboarding/types';
+import { onboarding } from '../../onboarding';
+import ObInput from './ObInput.astro';
+
+interface Props {
+  field: Field;
+}
+const { field: f } = Astro.props;
+const uid = `ob-${f.id}`;
+const errId = `${uid}-error`;
+const list = <T,>(v: T | T[] | undefined): T[] => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
+const showIf = (s: ShowIf | undefined) =>
+  s ? JSON.stringify(list(s).map((w) => ({ ...w, is: w.is === undefined ? undefined : list(w.is), has: w.has === undefined ? undefined : list(w.has) }))) : undefined;
+const wrap = { 'data-show-if': showIf(f.showIf) };
+const help = 'help' in f ? f.help : undefined;
+const required = 'required' in f && f.required;
+const access = onboarding.accessEmail;
+// "{access}" in an instruction becomes the access address.
+const withAccess = (text: string) => text.split('{access}');
+---
+{f.type === 'note' ? (
+  <p class:list={['ob-note', 'field-wide', { 'ob-warn': f.tone === 'warn' }]} data-field={f.id} {...wrap}>{f.text}</p>
+) : f.type === 'choice' || f.type === 'multi' ? (
+  <fieldset class="field ob-field ob-choice field-wide" data-field={f.id} data-kind={f.type} data-required={required ? '' : undefined} aria-describedby={errId} {...wrap}>
+    <legend>{f.label}{!required && <span class="opt"> optional</span>}</legend>
+    {help && <p class="ob-help">{help}</p>}
+    <div class="ob-options">
+      {[...f.options, ...(f.other ? ['Other'] : [])].map((option, i) => (
+        <label class="ob-option">
+          <input type={f.type === 'choice' ? 'radio' : 'checkbox'} name={f.id} value={option} id={`${uid}-${i}`} />
+          <span>{option}</span>
+        </label>
+      ))}
+    </div>
+    {f.other && (
+      <div class="field ob-other" data-other-for={f.id} hidden>
+        <label for={`${uid}-other`}>Other: please say</label>
+        <input id={`${uid}-other`} name={`${f.id}_other`} type="text" />
+      </div>
+    )}
+    <p class="field-error" id={errId} hidden></p>
+  </fieldset>
+) : f.type === 'tick' ? (
+  <div class="field ob-field ob-tick field-wide" data-field={f.id} data-kind="tick" data-required={required ? '' : undefined} {...wrap}>
+    <label class="ob-option"><input type="checkbox" name={f.id} value="Yes" id={uid} aria-describedby={errId} /><span>{f.label}</span></label>
+    {help && <p class="ob-help">{help}</p>}
+    <p class="field-error" id={errId} hidden></p>
+  </div>
+) : f.type === 'file' ? (
+  <div class="field ob-field ob-file field-wide" data-field={f.id} data-kind="file" data-max={f.maxFiles} {...wrap}>
+    <label for={uid}>{f.label}{!required && <span class="opt"> optional</span>}</label>
+    {help && <p class="ob-help" id={`${uid}-help`}>{help}</p>}
+    <input id={uid} name={f.id} type="file" accept={f.accept} multiple={f.maxFiles > 1} aria-describedby={`${uid}-help ${uid}-limits ${errId}`} />
+    <p class="ob-help" id={`${uid}-limits`}>Up to <span class="fig">{f.maxFiles}</span> {f.maxFiles === 1 ? 'file' : 'files'}, <span class="fig">{onboarding.files.maxFileMb}</span> MB each. Larger files: use a shared-folder link.</p>
+    <ul class="ob-filelist" aria-live="polite"></ul>
+    <p class="field-error" id={errId} hidden></p>
+  </div>
+) : f.type === 'group' ? (
+  <fieldset class="field ob-field ob-group field-wide" data-field={f.id} data-kind="group" data-max={f.max} data-item={f.item} data-required={required ? '' : undefined} aria-describedby={errId} {...wrap}>
+    <legend>{f.label}{!required && <span class="opt"> optional</span>}</legend>
+    {help && <p class="ob-help">{help}</p>}
+    <div class="ob-items">
+      <div class="ob-item" data-item-index="0">
+        <p class="plate ob-item-label">{f.item} <span class="fig">1</span></p>
+        <div class="form-fields">
+          {f.fields.map((g) => <ObInput field={{ ...g, required: false }} name={`${f.id}.0.${g.id}`} uid={`${uid}-0-${g.id}`} />)}
+        </div>
+      </div>
+    </div>
+    <template data-item-template>
+      <div class="ob-item" data-item-index="__n__">
+        <p class="plate ob-item-label">{f.item} <span class="fig">__label__</span></p>
+        <div class="form-fields">
+          {f.fields.map((g) => <ObInput field={{ ...g, required: false }} name={`${f.id}.__n__.${g.id}`} uid={`${uid}-__n__-${g.id}`} />)}
+        </div>
+        <button class="key key-2 ob-remove" type="button" data-remove>Remove</button>
+      </div>
+    </template>
+    <button class="key key-2 ob-add" type="button" data-add>{f.add}</button>
+    <p class="field-error" id={errId} hidden></p>
+  </fieldset>
+) : f.type === 'access' ? (
+  <fieldset class="field ob-field ob-access field-wide" data-field={f.id} data-kind="access" data-required={required ? '' : undefined} aria-describedby={errId} {...wrap}>
+    <legend>{f.label}</legend>
+    {help && <p class="ob-help">{help}</p>}
+    <ol class="ob-access-steps">
+      {f.steps.map((step) => (
+        <li>{withAccess(step).map((part, i) => <>{i > 0 && <strong class="ob-access-email">{access}</strong>}{part}</>)}</li>
+      ))}
+    </ol>
+    <p class="ob-help">Do not type passwords or codes into this form.</p>
+    <p class="ob-ask">Where are you up to?</p>
+    <div class="ob-options">
+      {ACCESS_STATUS.map((option, i) => (
+        <label class="ob-option">
+          <input type="radio" name={f.id} value={option} id={`${uid}-${i}`} />
+          <span>{option}</span>
+        </label>
+      ))}
+    </div>
+    <div class="field">
+      <label for={`${uid}-note`}>Anything we should know <span class="opt">optional</span></label>
+      <p class="ob-help">Such as the account name, or the address you added us from.</p>
+      <input id={`${uid}-note`} name={`${f.id}_note`} type="text" />
+    </div>
+    <p class="field-error" id={errId} hidden></p>
+  </fieldset>
+) : (
+  <ObInput field={f} name={f.id} uid={uid} wrap={wrap} />
+)}
