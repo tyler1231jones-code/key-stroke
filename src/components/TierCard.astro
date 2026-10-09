@@ -19,7 +19,7 @@ const H = level;
   <H class="display-m">{tier.name}</H>
   {prices && (
     <>
-      <p class="tier-price"><span class="counter-m">{tier.monthly}</span><span class="unit">a month</span></p>
+      <p class="tier-price"><span class="counter-m">{tier.monthly}</span><span class="unit">a month, excluding GST</span></p>
       {tier.hours > 0 && <p class="tier-facts tier-price"><span class="counter-s">{tier.hours}</span> <span class="unit">hours of our time each month</span></p>}
     </>
   )}

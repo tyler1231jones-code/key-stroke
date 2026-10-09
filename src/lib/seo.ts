@@ -6,7 +6,8 @@
 //   - No markup that presents a case as real work: the cases are mock until
 //     demo mode is off, so they are never described in structured data.
 //   - Location and service area are stated only once the principals have set
-//     them in site.json. Nothing is guessed.
+//     them in site.json. Until then the area served is Australia, which the
+//     site already says. No town is guessed.
 import faqsJson from '../content/faqs.json';
 import { site, services, products, origin, has, serviceHref, type Service } from './data';
 
@@ -37,8 +38,10 @@ export function faqsFor(page: string): Faq[] {
   return (list as Faq[]).filter((f) => f.a && f.a !== 'TODO');
 }
 
+// Until a service area is set, the country is stated: the site says the firm is
+// Australian owned and works with Australian businesses. No town is guessed.
 const place = () => ({
-  ...(has('serviceArea') ? { areaServed: site.serviceArea } : {}),
+  areaServed: has('serviceArea') ? site.serviceArea : { '@type': 'Country', name: 'Australia' },
   ...(has('location') ? { address: { '@type': 'PostalAddress', addressLocality: site.location, addressCountry: 'AU' } } : {}),
 });
 
@@ -51,6 +54,9 @@ export function organization() {
     url: abs('/'),
     logo: abs('/og/logo.png'),
     description: site.description,
+    slogan: site.tagline,
+    // What the firm does, in the words a search engine or an AI tool can match a question to.
+    knowsAbout: [...services.map((s) => s.name), ...services.flatMap((s) => s.products.map((p) => p.name))],
     ...(has('email') ? { email: site.email } : {}),
     ...place(),
   };
@@ -137,6 +143,7 @@ export function saversSchema() {
           '@type': 'UnitPriceSpecification',
           price,
           priceCurrency: 'AUD',
+          valueAddedTaxIncluded: false,
           unitCode: 'MON',
           unitText: 'month',
         },

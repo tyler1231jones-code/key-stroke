@@ -308,6 +308,24 @@ function checkCss(where, cssText) {
 
 for (const file of walk(dist, '.css')) checkCss(relative(dist, file).replace(/\\/g, '/'), readFileSync(file, 'utf8'));
 
+/* ---------- The files for AI tools (/llms.txt, /llms-full.txt) ---------- */
+// Plain text, not pages, but the same voice and the same price rule apply.
+for (const name of ['llms.txt', 'llms-full.txt']) {
+  const file = join(dist, name);
+  if (!existsSync(file)) continue;
+  let text = readFileSync(file, 'utf8');
+  for (const line of APPROVED) text = text.split(line).join(' ');
+  for (const word of BANNED) {
+    const m = text.match(word);
+    if (m) fail(name, `banned word "${m[0]}"`);
+  }
+  if (/\bTODO\b/.test(text)) fail(name, 'prints TODO');
+  if (/!(?!\[)/.test(text.replace(/\[[^\]]*\]\([^)]*\)/g, ''))) fail(name, 'exclamation mark');
+  const dollar = text.match(/\$\s?\d/);
+  if (dollar) fail(name, 'a price: prices are on /savers and nowhere else');
+  for (const [pattern, what] of INTERNAL) if (pattern.test(text)) fail(name, `uses ${what}, an internal term`);
+}
+
 /* ---------- Config ---------- */
 
 for (const [key, value] of Object.entries(site)) {

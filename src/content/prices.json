@@ -1,5 +1,5 @@
 {
-  "currency": "All prices are in Australian dollars.",
+  "currency": "All prices are in Australian dollars and exclude GST, which is added at 10%.",
   "rest": "Everything else is quoted on hours and given to you as a fixed total before work starts.",
   "care": {
     "title": "Website care",

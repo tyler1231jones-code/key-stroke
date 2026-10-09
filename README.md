@@ -63,6 +63,8 @@ Other scripts:
 | `npm run stills` | Re-renders the no-WebGL still for the audit page in `public/stills/` |
 | `npm run ledger` | Prints the totals the site computes from the ledger, for today or a given date |
 | `npm run check:types` | `astro check` |
+| `node tools/browsers.mjs` | Every main page in Chrome, Edge, Firefox and Safari's engine (WebKit), at desktop and phone size: errors, failed requests, fonts, sideways scroll, 3D. `--live` for the live site, `--browser=edge` for one. See `AUDIT-browsers.md` |
+| `node tools/onboard-test.mjs` | Fills in every onboarding form in a browser, with Formspree and reCAPTCHA intercepted |
 
 The audit scripts write their measurements to `shots/audit/`, which git
 ignores. All of them need `npm run build` first.
@@ -321,6 +323,10 @@ npm run build && npm run og && npm run build
   `"TODO"` keeps its question off the page and out of the structured data.
 - `analyticsToken` in `site.json` is the Cloudflare Web Analytics token. No
   analytics script is loaded until it is set. It uses no cookies.
+- `/llms.txt` and `/llms-full.txt` describe the site in plain Markdown for AI
+  tools. They are written at build from the content files
+  (`src/lib/llms.ts`), leave out anything still marked demo, and carry no
+  prices. `npm run check` reads them too. See `AUDIT-ai-search.md`.
 
 ## Deploy to Cloudflare
 
