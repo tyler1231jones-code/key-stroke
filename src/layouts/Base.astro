@@ -47,16 +47,20 @@ interface Props {
   noindex?: boolean;
   /** A working page for a client (the onboarding forms): the mark only, no menu, no closing band, no phone bar. */
   minimal?: boolean;
+  /** A share image other than the page's own /og/<page>.png, such as a product's GIF. */
+  shareImage?: { src: string; width: number; height: number };
 }
 const {
   title, description, theme = 'dark', canvas = false, current, page, band = 'close',
-  service, bookHref, crumbs = [], faq, schema = [], noindex = false, minimal = false,
+  service, bookHref, crumbs = [], faq, schema = [], noindex = false, minimal = false, shareImage,
 } = Astro.props;
 const buildDate = dateInZone(site.timezone);
 // "/audit.html" and "/index.html" are served at "/audit" and "/".
 const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '/').replace(/(.)\/+$/, '$1');
 const canonical = origin ? abs(path) : null;
-const image = abs(`/og/${shareKey(path)}.png`);
+const image = abs(shareImage?.src ?? `/og/${shareKey(path)}.png`);
+const imageWidth = shareImage?.width ?? 1200;
+const imageHeight = shareImage?.height ?? 630;
 const jsonLd = [organization(), website(), breadcrumbs(crumbs), faq ? faqSchema(faqsFor(faq)) : null, ...schema].filter(Boolean);
 ---
 <!doctype html>
@@ -83,8 +87,8 @@ const jsonLd = [organization(), website(), breadcrumbs(crumbs), faq ? faqSchema(
         <meta property="og:description" content={description} />
         {canonical && <meta property="og:url" content={canonical} />}
         <meta property="og:image" content={image} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
+        <meta property="og:image:width" content={String(imageWidth)} />
+        <meta property="og:image:height" content={String(imageHeight)} />
         <meta property="og:image:alt" content={`${site.name}: ${title}`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={fullTitle(title)} />

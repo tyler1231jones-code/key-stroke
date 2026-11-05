@@ -4,6 +4,7 @@
 // requires.
 import type { APIRoute } from 'astro';
 import { services, cases, serviceHref } from '../lib/data';
+import { products, productHref } from '../lib/catalogue';
 import { abs } from '../lib/seo';
 
 export const GET: APIRoute = () => {
@@ -11,6 +12,9 @@ export const GET: APIRoute = () => {
     '/',
     '/services',
     ...services.map(serviceHref),
+    // Live products only: the catalogue leaves the rest out.
+    '/products',
+    ...products.map(productHref),
     '/cases',
     ...cases.map((c) => `/cases/${c.id}`),
     '/audit',

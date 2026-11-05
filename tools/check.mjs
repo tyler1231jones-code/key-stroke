@@ -115,7 +115,7 @@ const casesAll = json('cases.json');
 const live = (rows) => (site.demo ? rows : rows.filter((r) => !r.demo));
 const ledger = live(ledgerAll);
 const cases = live(casesAll);
-const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'prices.json', 'legal.json', 'shiftReport.json', 'quiz.json', 'services.json', 'faqs.json', 'onboarding.json'].map(json);
+const sources = ['site.json', 'cases.json', 'ledger.json', 'crew.json', 'products.json', 'prices.json', 'legal.json', 'shiftReport.json', 'quiz.json', 'services.json', 'faqs.json', 'onboarding.json', 'catalogue.json'].map(json);
 
 function allowedFor(date) {
   const numbers = new Set([0]);
@@ -231,8 +231,13 @@ for (const file of walk(dist, '.html')) {
   // They may name the ledger, demonstration builds and software agents; they
   // still may not print TODO.
   const legalDoc = /^(privacy|terms)(\.html|\/|$)/.test(where);
+  // The products pages print the catalogue (catalogue.json) word for word,
+  // and its copy names staff ranges ("5–50 staff") and keeps "Not a person."
+  // on the crew products. The principals wrote it; it is not changed here.
+  const catalogue = /^products(\.html|\/)/.test(where);
   for (const [pattern, what] of NOT_FOR_CUSTOMERS) {
     if (legalDoc && what !== 'prints TODO') continue;
+    if (catalogue && (what.startsWith('limits who') || what.includes('Not a person'))) continue;
     const m = page.text.match(pattern);
     if (m) fail(where, `${what}: "${page.text.split('\n').find((l) => pattern.test(l))?.trim().slice(0, 80)}"`);
   }
@@ -250,7 +255,9 @@ for (const file of walk(dist, '.html')) {
   // Figures. Prices are shown on the Savers page and nowhere else, apart from
   // the terms a client accepts on an onboarding form (onboarding.json), which
   // is never indexed or linked from the site.
-  const savers = /^savers(\.html|\/|$)/.test(where) || /^onboard(\.html|\/)/.test(where);
+  // Since the products showcase (November 2026) each product's price is on
+  // its own page and on /products, from catalogue.json.
+  const savers = /^savers(\.html|\/|$)/.test(where) || /^onboard(\.html|\/)/.test(where) || catalogue;
   for (const m of page.all.matchAll(/\$\s?\d[\d,]*(?:\.\d+)?/g)) {
     if (!savers) fail(where, `dollar figure ${m[0]}: prices appear on /savers and nowhere else`);
     else if (!allowedDollars.has(m[0])) fail(where, `dollar figure ${m[0]} is not in a content file`);

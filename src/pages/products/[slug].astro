@@ -1,0 +1,120 @@
+---
+// /products/<slug>: one live product, the use case in full. Every word and
+// price comes from the catalogue as written (src/lib/catalogue.ts). Products
+// that are not live get no page, so their addresses return the site's 404.
+import Base from '../../layouts/Base.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import ProductLoop from '../../components/ProductLoop.astro';
+import BookButton from '../../components/BookButton.astro';
+import { products, practiceOf, practiceLabel, productsIn, productHref, neighbours, firstSentence, SYSTEMS_NOTE, type Product } from '../../lib/catalogue';
+import { abs } from '../../lib/seo';
+import '../../styles/pages.css';
+import '../../styles/products.css';
+
+export function getStaticPaths() {
+  return products.map((product) => ({ params: { slug: product.slug }, props: { product } }));
+}
+
+const { product: p } = Astro.props as { product: Product };
+const practice = practiceOf(p);
+const more = productsIn(p.practice).filter((x) => x.slug !== p.slug);
+const { prev, next } = neighbours(p);
+
+// The headline and the first sentence of what we build, kept to a length a results page shows.
+const fullDescription = `${p.headline} ${firstSentence(p.whatWeBuild)}`;
+const description = fullDescription.length <= 155 ? fullDescription : `${fullDescription.slice(0, 152).replace(/\s+\S*$/, '')}…`;
+
+const prices = p.price.match(/\$[\d,]+/g)?.map((v) => Number(v.replace(/[$,]/g, ''))) ?? [];
+const service = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: p.name,
+  description: p.whatWeBuild,
+  url: abs(productHref(p)),
+  provider: { '@id': abs('/#organization') },
+  areaServed: { '@type': 'Country', name: 'Australia' },
+  ...(prices.length
+    ? {
+        offers: {
+          '@type': 'Offer',
+          url: abs(productHref(p)),
+          priceSpecification: {
+            '@type': 'PriceSpecification',
+            priceCurrency: 'AUD',
+            minPrice: Math.min(...prices),
+            maxPrice: Math.max(...prices),
+            valueAddedTaxIncluded: false,
+          },
+        },
+      }
+    : {}),
+};
+---
+<Base
+  title={p.name}
+  description={description}
+  current="products"
+  page="product"
+  band="none"
+  crumbs={[{ name: 'Products', href: '/products' }, { name: p.name, href: productHref(p) }]}
+  schema={[service]}
+  shareImage={{ src: `/img/products/${p.animation}.gif`, width: 480, height: 300 }}
+>
+  <section class="page-head">
+    <div class="wrap">
+      <nav class="plate crumb" aria-label="Breadcrumb">
+        <a href="/products">Products</a><span aria-hidden="true">/</span><a href={`/products#${practice.id}`}>{practiceLabel(practice)}</a>
+      </nav>
+      <p class="plate prod-eyebrow">{practiceLabel(practice)}</p>
+      <h1 class="display-xl">{p.name}</h1>
+      <p class="lede">{p.headline}</p>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="wrap prod-page">
+      <ProductLoop animation={p.animation} size="hero" />
+
+      <dl class="prod-facts">
+        <div><dt class="plate">The problem</dt><dd class="body">{p.headline}</dd></div>
+        <div><dt class="plate">What we build</dt><dd class="body">{p.whatWeBuild}</dd></div>
+        <div><dt class="plate">Who it's for</dt><dd class="body">{p.forWho}</dd></div>
+        <div><dt class="plate">What you receive</dt><dd class="body">{p.deliverable}</dd></div>
+        <div><dt class="plate">Tools</dt><dd class="prod-tools">{p.tools.join(' / ')}</dd></div>
+        {p.worksWith.trim() && (
+          <div><dt class="plate">Works with</dt><dd class="body">{p.worksWith}. {SYSTEMS_NOTE}</dd></div>
+        )}
+      </dl>
+
+      <div class="prod-price">
+        <p class="prod-price-figure">{p.price}</p>
+        <p class="plate prod-price-kind">{p.priceType === 'fixed' ? 'Fixed' : 'Launch'} price · ex GST</p>
+        <p class="body">Quoted as a fixed total once we have scoped it. 50% before we start, 50% on completion.</p>
+      </div>
+
+      <div class="prod-close">
+        <p class="body">Start with a free consultation and a quick initial audit.</p>
+        <BookButton />
+      </div>
+
+      {more.length > 0 && (
+        <section class="prod-more" aria-labelledby="more-h">
+          <h2 class="display-m" id="more-h">More from {practice.name}</h2>
+          <div class="pgrid">
+            {more.map((m) => <ProductCard product={m} />)}
+          </div>
+        </section>
+      )}
+
+      <nav class="prod-step" aria-label="Other products">
+        <a href={productHref(prev)}><span class="plate">Previous</span><span class="display-s">{prev.name}</span></a>
+        <a href={productHref(next)}><span class="plate">Next</span><span class="display-s">{next.name}</span></a>
+      </nav>
+    </div>
+  </section>
+  <script is:inline src="/js/keystroke-anim.js" defer></script>
+</Base>
+
+<script>
+  import '../../scripts/page.ts';
+</script>

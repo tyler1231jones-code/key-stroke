@@ -24,8 +24,9 @@ async function pages(dir, base = '') {
   const found = [];
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
-      // The onboarding forms are never shared or indexed, so they have no share image.
-      if (['_astro', 'stills', 'og', 'fonts', 'onboard'].includes(entry.name)) continue;
+      // The onboarding forms are never shared or indexed, so they have no share
+      // image. Each product page shares its own loop as a GIF (public/img/products).
+      if (['_astro', 'stills', 'og', 'fonts', 'onboard', 'products', 'img', 'js', 'email'].includes(entry.name)) continue;
       found.push(...(await pages(join(dir, entry.name), `${base}/${entry.name}`)));
     } else if (entry.name.endsWith('.html') && entry.name !== 'onboard.html') {
       const html = await readFile(join(dir, entry.name), 'utf8');

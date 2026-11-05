@@ -1,0 +1,89 @@
+---
+// /products: every live product, grouped by practice, each with its loop and
+// its price. Product copy and prices come from the catalogue
+// (src/lib/catalogue.ts) as written. The filter row is plain links without
+// script (src/scripts/products.ts). No reveals or scroll motion here: the
+// loops are the only movement.
+import Base from '../../layouts/Base.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import BookButton from '../../components/BookButton.astro';
+import Fig from '../../components/Fig.astro';
+import { practices, products, productsIn, practiceLabel, serviceOf, productHref, SYSTEMS_NOTE } from '../../lib/catalogue';
+import { abs } from '../../lib/seo';
+import '../../styles/pages.css';
+import '../../styles/products.css';
+
+const list = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'What KEYSTROKE builds',
+  numberOfItems: products.length,
+  itemListElement: products.map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p.name, url: abs(productHref(p)) })),
+};
+---
+<Base
+  title="Products: what we build and what it costs"
+  description="Every product KEYSTROKE builds: reporting, automation, software and brand work, each with the problem it solves and its price."
+  current="products"
+  page="products"
+  band="none"
+  crumbs={[{ name: 'Products', href: '/products' }]}
+  schema={[list]}
+>
+  <section class="page-head">
+    <div class="wrap">
+      <p class="plate prod-eyebrow">KS / Products</p>
+      <h1 class="display-xl">What we build.</h1>
+      <div class="prod-intro">
+        <p class="lede"><Fig text={`${products.length} things we build for businesses. Each one starts with a problem you can see from the front desk and ends with fewer keystrokes. Every price is on the page.`} /></p>
+        <p class="body prod-note">{SYSTEMS_NOTE}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="wrap">
+      <nav class="filter prod-filter" aria-label="Show products by practice">
+        <a class="chip" href="#all" data-filter="all">All</a>
+        {practices.map((p) => (
+          <a class="chip" href={`#${p.id}`} data-filter={p.id}><span class="fig">{p.number}</span>{serviceOf(p)?.name ?? p.name}</a>
+        ))}
+      </nav>
+      <p class="body-s prod-price-line">Launch prices, ex GST. Each job is quoted as a fixed total once we have scoped it.</p>
+      <p class="vh" id="prod-status" role="status" aria-live="polite"></p>
+
+      <div id="all">
+        {practices.map((p) => {
+          const items = productsIn(p.id);
+          const service = serviceOf(p);
+          return (
+            <section class="pgroup" id={p.id} aria-labelledby={`${p.id}-h`}>
+              <header class="pgroup-head">
+                <p class="plate pgroup-label">{practiceLabel(p)}{service && <> · <a href={service.href}>{service.name}</a></>}</p>
+                <h2 class="display-l" id={`${p.id}-h`}>{p.line}</h2>
+                <p class="body">{p.intro}</p>
+                <p class="plate pgroup-count"><span class="fig">{items.length}</span> {items.length === 1 ? 'product' : 'products'}</p>
+              </header>
+              <div class="pgrid">
+                {items.map((item) => <ProductCard product={item} />)}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
+      <p class="body-s prod-small">Animations are demonstrations with sample data.</p>
+
+      <div class="prod-close">
+        <h2 class="display-m">Not sure which one?</h2>
+        <p class="body">Start with a free consultation and a quick initial audit. We look at how the work is done now and tell you which of these would make the most difference.</p>
+        <BookButton />
+      </div>
+    </div>
+  </section>
+  <script is:inline src="/js/keystroke-anim.js" defer></script>
+</Base>
+
+<script>
+  import '../../scripts/products.ts';
+</script>
