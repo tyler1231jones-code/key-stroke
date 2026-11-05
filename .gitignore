@@ -40,3 +40,5 @@ pnpm-debug.log*
 HANDOVER.md
 /src/content/signatures.json
 /signatures/
+# Handoff packs: their files are copied into src/ and public/ where used.
+/_handoff/
