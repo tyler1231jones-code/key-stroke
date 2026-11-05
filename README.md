@@ -218,15 +218,18 @@ and change `npm run check`, which fails on any dollar figure outside
 
 `/products` lists every live product by practice; `/products/<slug>` is one
 product in full. The single source is `src/content/catalogue.json`, the
-product catalogue as supplied (it was `products.json` in the handoff pack;
-the site's own `products.json` holds the quiz items and Savers). To change a
-product, replace that file with the new catalogue; nothing else holds
-product text or prices. Only products with `"live": true` appear; the others
+product catalogue (it was `products.json` in the handoff pack; the site's own
+`products.json` holds the quiz items and Savers). Nothing else holds product
+text or prices. It was edited on 5 November 2026 (business sizes removed,
+times as 07:00 AEST, Systems link-up's works-with line), so make the same
+edits in the source catalogue, or a fresh copy of it will bring the old
+wording back. Only products with `"live": true` appear; the others
 get no page and stay out of the sitemap. `proof` and `standardPrice` are
 never shown.
 
 Each product has a looping animation drawn by `public/js/keystroke-anim.js`
-(the handoff script, unchanged) into `<div data-ks="...">`, through
+(the handoff script, with the crew units and one time corrected; see its
+header) into `<div data-ks="...">`, through
 `src/components/ProductLoop.astro`. Pages that show loops load the script
 once with `defer`. Its GIFs in `public/img/products/` are share images only.
 Quiz results put a loop and a link beside each item that maps to a product

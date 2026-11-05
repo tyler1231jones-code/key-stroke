@@ -3,7 +3,9 @@
    Colours follow the Instrument tokens. Override any of --ks-base-000, --ks-base-100,
    --ks-hair, --ks-rule, --ks-ink, --ks-mut, --ks-read, --ks-live, --ks-sig on a parent.
    Motion is stepwise and linear (180 ms ticks). Reduced-motion users see the finished state.
-   Animations only run while on screen. */
+   Animations only run while on screen.
+   Site edits, 5 Nov 2026: the crew units match the crew page (intake is unit 02,
+   reconcile unit 01) and the reconciliation time reads 07:00. */
 (function () {
   "use strict";
   var NS = "http://www.w3.org/2000/svg", TICK = 180, uid = 0;
@@ -260,7 +262,7 @@
   def("inbox-intake", { label: "Inbox intake: a crew unit files bills and enquiries from the inbox", ticks: 40, build: function (s) {
     var o = { rows: [] };
     T(s, 16, 22, "INBOX");
-    o.lv = live(s, 140, 13); T(s, 154, 21, "UNIT 03 / INTAKE"); T(s, 154, 32, "NOT A PERSON.");
+    o.lv = live(s, 140, 13); T(s, 154, 21, "UNIT 02 / INTAKE"); T(s, 154, 32, "NOT A PERSON.");
     T(s, 140, 54, "FILED · SHAREPOINT"); T(s, 140, 112, "DRAFT BILLS · XERO");
     var slots = [60, 74, 88], dslots = [118, 132], fi = 0, di = 0;
     for (var i = 0; i < 5; i++) {
@@ -348,7 +350,7 @@
 
   def("reconciliation", { label: "Overnight reconciliation: a crew unit matches the bank feed before morning", ticks: 42, build: function (s) {
     var o = { pairs: [] };
-    o.lv = live(s, 16, 12); T(s, 30, 20, "UNIT 07 / RECONCILE");
+    o.lv = live(s, 16, 12); T(s, 30, 20, "UNIT 01 / RECONCILE");
     o.clock = T(s, 224, 21, "02:00", "t-fig", "end");
     T(s, 16, 40, "BANK"); T(s, 140, 40, "LEDGER");
     o.bank = []; o.led = [];
@@ -358,7 +360,7 @@
     map.forEach(function (m) {
       o.pairs.push({ b: m[0], l: m[1], line: L(s, 100, 50.5 + m[0] * 13, 140, 50.5 + m[1] * 13, "s-ink") });
     });
-    o.exc = T(s, 16, 140, "1 EXCEPTION FOR 7AM", "t-plate f-ink");
+    o.exc = T(s, 16, 140, "1 EXCEPTION FOR 07:00", "t-plate f-ink");
     T(s, 170, 128, "UNMATCHED");
     o.d = D(s, 170, 146, 2, 16, true);
     o.times = ["02:00", "02:40", "03:20", "04:10", "05:00", "05:40"];

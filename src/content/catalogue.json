@@ -41,7 +41,7 @@
       "name": "Monthly reporting pack",
       "headline": "Month-end takes a week, and the report arrives too late to act on.",
       "whatWeBuild": "A monthly pack built from the accounting system: profit and loss, cash, debtors and margin by job type, refreshed on the first business day. One page per question the owner asks.",
-      "forWho": "Any business of 5–50 staff on Xero or MYOB; strongest fit for trades and professional services.",
+      "forWho": "Any business on Xero or MYOB; strongest fit for trades and professional services.",
       "tools": [
         "Power BI",
         "Excel",
@@ -95,7 +95,7 @@
         "Cloudflare Workers",
         "Xero API"
       ],
-      "deliverable": "A dashboard link and a 7am summary email.",
+      "deliverable": "A dashboard link and a summary email at 07:00 AEST.",
       "worksWith": "Accounting system and job or CRM system",
       "price": "$2,000–$2,950",
       "priceType": "launch",
@@ -227,7 +227,7 @@
       "name": "Approvals routing",
       "headline": "Things wait in an inbox for approval.",
       "whatWeBuild": "Purchase orders, quotes over a set value and leave requests are routed to the right person in Teams or Outlook with one-tap approve, and every decision is logged.",
-      "forWho": "Businesses of 10–50 staff where the owner signs off everything.",
+      "forWho": "Businesses where the owner signs off everything.",
       "tools": [
         "Power Automate",
         "Teams",
@@ -281,7 +281,7 @@
         "Cloudflare Workers"
       ],
       "deliverable": "The integration, a map of which system owns which record, and a failure alert.",
-      "worksWith": "Every system involved, and whether each one offers API access",
+      "worksWith": "Systems that offer API access",
       "price": "$4,950–$9,900",
       "priceType": "launch",
       "standardPrice": "$6,600–$13,200",
@@ -296,7 +296,7 @@
       "order": 6,
       "name": "Overnight reconciliation",
       "headline": "Someone matches the bank feed by hand every Monday.",
-      "whatWeBuild": "A crew unit matches bank lines to invoices and bills overnight and leaves an exceptions list at 7am. Not a person.",
+      "whatWeBuild": "A crew unit matches bank lines to invoices and bills overnight and leaves an exceptions list at 07:00 AEST. Not a person.",
       "forWho": "Businesses with high transaction volume and a bookkeeper doing it by hand.",
       "tools": [
         "Xero API",
@@ -437,7 +437,7 @@
       "name": "Job and time tracking app",
       "headline": "Timesheets are on paper, or in a tool nobody uses.",
       "whatWeBuild": "A phone-first app built for how this crew logs time, materials and photos against a job. Feeds the job costing report.",
-      "forWho": "Trades and field crews of 5–30.",
+      "forWho": "Trades and field crews.",
       "tools": [
         "Web app",
         "Cloudflare D1",

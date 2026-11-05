@@ -232,12 +232,11 @@ for (const file of walk(dist, '.html')) {
   // still may not print TODO.
   const legalDoc = /^(privacy|terms)(\.html|\/|$)/.test(where);
   // The products pages print the catalogue (catalogue.json) word for word,
-  // and its copy names staff ranges ("5–50 staff") and keeps "Not a person."
-  // on the crew products. The principals wrote it; it is not changed here.
+  // and it keeps "Not a person." on the two crew products.
   const catalogue = /^products(\.html|\/)/.test(where);
   for (const [pattern, what] of NOT_FOR_CUSTOMERS) {
     if (legalDoc && what !== 'prints TODO') continue;
-    if (catalogue && (what.startsWith('limits who') || what.includes('Not a person'))) continue;
+    if (catalogue && what.includes('Not a person')) continue;
     const m = page.text.match(pattern);
     if (m) fail(where, `${what}: "${page.text.split('\n').find((l) => pattern.test(l))?.trim().slice(0, 80)}"`);
   }

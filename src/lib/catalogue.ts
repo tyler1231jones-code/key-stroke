@@ -1,7 +1,8 @@
-// The product catalogue: src/content/catalogue.json, copied unchanged from the
-// handoff pack (its products.json; the site already had a products.json for
-// the quiz and Savers). Pages render product copy and prices from it and
-// nowhere else; nothing here rewrites what it says.
+// The product catalogue: src/content/catalogue.json, from the handoff pack
+// (its products.json; the site already had a products.json for the quiz and
+// Savers). Edited on 5 November 2026 at the principals' request: no business
+// sizes, times as 07:00 AEST, Systems link-up's works-with line. Pages render
+// product copy and prices from it and nowhere else; nothing here rewrites it.
 //
 //   - Only products marked "live": true appear, get a page or reach the sitemap.
 //   - Order: the practices in their own order (count, clear, build, face), then
@@ -46,9 +47,7 @@ export function worksWithLine(p: Product): string | null {
   const w = p.worksWith.trim();
   if (!w) return null;
   const lowered = PROPER.test(w) ? w : w.charAt(0).toLowerCase() + w.slice(1);
-  // "Every system involved ..." does not take "your".
-  const phrase = /^every\b/i.test(lowered) ? lowered : `your ${lowered}`;
-  return `Works with ${phrase.replace(/\.$/, '')}.`;
+  return `Works with your ${lowered.replace(/\.$/, '')}.`;
 }
 
 /** The first sentence of a passage, for meta descriptions. */
