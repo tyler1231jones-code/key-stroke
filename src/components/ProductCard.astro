@@ -1,0 +1,25 @@
+---
+// A product on the products page and under "More from" on a product page.
+// The whole card links to the product. Name, headline, works-with line and
+// price come from the catalogue as written.
+import ProductLoop from './ProductLoop.astro';
+import { practiceOf, practiceLabel, productHref, priceKind, worksWithLine, type Product } from '../lib/catalogue';
+
+interface Props {
+  product: Product;
+  level?: 'h2' | 'h3';
+}
+const { product: p, level = 'h3' } = Astro.props;
+const H = level;
+const works = worksWithLine(p);
+---
+<article class="pcard" data-practice={p.practice}>
+  <ProductLoop animation={p.animation} />
+  <div class="pcard-body">
+    <p class="plate pcard-eyebrow">{practiceLabel(practiceOf(p))}</p>
+    <H class="display-s pcard-name"><a class="card-link" href={productHref(p)}>{p.name}</a></H>
+    <p class="body-s pcard-headline">{p.headline}</p>
+    {works && <p class="pcard-works">{works}</p>}
+  </div>
+  <p class="pcard-price"><span class="pcard-figure">{p.price}</span><span class="pcard-kind">{priceKind(p)}</span></p>
+</article>

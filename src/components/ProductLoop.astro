@@ -1,0 +1,22 @@
+---
+// One product's looping animation. The box holds its 240:150 shape before
+// /js/keystroke-anim.js draws into it, so nothing moves when it arrives. The
+// script runs a loop only while it is on screen, shows the finished frame to
+// visitors who ask for reduced motion, and labels its own SVG for screen
+// readers, so nothing here adds alt text. The page must load the script.
+interface Props {
+  /** The catalogue's `animation` id. */
+  animation: string;
+  /** card: full card width. hero: the product page, up to 640px, in a base-900 housing. mini: beside a quiz result. */
+  size?: 'card' | 'hero' | 'mini';
+}
+const { animation, size = 'card' } = Astro.props;
+---
+{size === 'hero' ? (
+  <figure class="ks-housing">
+    <figcaption class="plate">Demonstration · sample data</figcaption>
+    <div class="ks-anim-host ks-loop ks-loop-hero"><div data-ks={animation}></div></div>
+  </figure>
+) : (
+  <div class:list={['ks-anim-host', 'ks-loop', `ks-loop-${size}`]}><div data-ks={animation}></div></div>
+)}
