@@ -214,6 +214,26 @@ themselves are still in the file. To show one again, set its flag to `true`
 and change `npm run check`, which fails on any dollar figure outside
 `/savers` (`tools/check.mjs`, the dollar rule).
 
+## Products
+
+`/products` lists every live product by practice; `/products/<slug>` is one
+product in full. The single source is `src/content/catalogue.json`, the
+product catalogue as supplied (it was `products.json` in the handoff pack;
+the site's own `products.json` holds the quiz items and Savers). To change a
+product, replace that file with the new catalogue; nothing else holds
+product text or prices. Only products with `"live": true` appear; the others
+get no page and stay out of the sitemap. `proof` and `standardPrice` are
+never shown.
+
+Each product has a looping animation drawn by `public/js/keystroke-anim.js`
+(the handoff script, unchanged) into `<div data-ks="...">`, through
+`src/components/ProductLoop.astro`. Pages that show loops load the script
+once with `defer`. Its GIFs in `public/img/products/` are share images only.
+Quiz results put a loop and a link beside each item that maps to a product
+(`QUIZ_PRODUCT` in `src/lib/catalogue.ts`). Prices are allowed on the
+products pages; `npm run check` still refuses them anywhere else but
+`/savers`. `node tools/products-test.mjs` checks the showcase end to end.
+
 ## Onboarding forms
 
 One form per service at `/onboard/<service>`: website build, website care,

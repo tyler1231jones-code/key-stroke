@@ -24,6 +24,7 @@
 .prod-note { padding-left: var(--space-4); border-left: 2px solid var(--rule); max-width: var(--measure, 66ch); }
 .prod-price-line { color: var(--ink-muted); }
 .prod-filter { margin-top: var(--space-8); }
+.prod-filter .chip { text-decoration: none; }
 .chip[aria-current="true"] { background: var(--readout); color: var(--base-900); box-shadow: var(--shadow-press); transform: translateY(1px); font-weight: 600; }
 .chip .fig { margin-right: var(--space-2); }
 .pgroup { display: grid; gap: var(--space-6); padding-top: var(--space-19); scroll-margin-top: calc(var(--bar-h, 72px) + var(--space-4)); }
@@ -34,9 +35,11 @@
 .prod-small { color: var(--ink-muted); margin-top: var(--space-12); }
 .prod-close { display: grid; gap: var(--space-6); justify-items: start; margin-top: var(--space-19); padding-top: var(--space-12); border-top: 1px solid var(--rule); }
 
-/* The card grid: 2px gaps that show the hairline behind. */
-.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 2px; background: var(--hairline); border: 2px solid var(--hairline); }
-.pcard { position: relative; display: grid; grid-template-rows: auto 1fr auto; background: var(--base-000); min-width: 0; }
+/* The card grid: 2px hairlines between cards. They are drawn on the cards
+   (top and left on the grid, right and bottom on each card), so the empty
+   cells at the end of a short last row stay as plain page. */
+.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0; border-top: 2px solid var(--hairline); border-left: 2px solid var(--hairline); }
+.pcard { position: relative; display: grid; grid-template-rows: auto 1fr auto; background: var(--base-000); min-width: 0; border-right: 2px solid var(--hairline); border-bottom: 2px solid var(--hairline); }
 .pcard:has(.card-link:hover) { outline: 1px solid var(--ink); outline-offset: -1px; z-index: 1; }
 .pcard:has(.card-link:focus-visible) { outline: 2px solid var(--focus); outline-offset: -2px; z-index: 1; }
 .pcard-body { display: grid; gap: var(--space-2); align-content: start; padding: var(--space-4) var(--space-4) var(--space-6); }
