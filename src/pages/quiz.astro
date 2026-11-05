@@ -9,9 +9,20 @@ import Fig from '../components/Fig.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
 import { questions } from '../lib/quiz';
 import { products } from '../lib/data';
+import { QUIZ_PRODUCT, productBySlug, productHref } from '../lib/catalogue';
 import '../styles/pages.css';
+import '../styles/products.css';
 
 const available = products.items.length > 0;
+// Which product page and loop sit beside each quiz item in the result. Only
+// these few fields go into the page, so the catalogue (and its prices) stays
+// out of the quiz's script.
+const quizProducts = Object.fromEntries(
+  Object.entries(QUIZ_PRODUCT).flatMap(([item, slug]) => {
+    const p = productBySlug(slug);
+    return p ? [[item, { href: productHref(p), animation: p.animation, name: p.name }]] : [];
+  }),
+);
 ---
 <Base
   title="90-second quiz: what should your business fix?"
@@ -63,6 +74,7 @@ const available = products.items.length > 0;
       )}
 
       <div class="result" id="quiz-result" hidden></div>
+      <script type="application/json" id="quiz-products" is:inline set:html={JSON.stringify(quizProducts)} />
 
       {/* Below the result, never in front of it. */}
       <div class="quiz-enquiry result-block" id="quiz-enquiry" data-reveal hidden>
@@ -76,6 +88,7 @@ const available = products.items.length > 0;
       </div>
     </div>
   </section>
+  <script is:inline src="/js/keystroke-anim.js" defer></script>
 </Base>
 
 <script>

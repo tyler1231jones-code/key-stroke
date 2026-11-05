@@ -26,6 +26,21 @@ const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const form = document.getElementById('quiz-form') as HTMLFormElement | null;
 const frame = document.getElementById('quiz-frame');
 const resultEl = document.getElementById('quiz-result');
+
+// The product beside each recommended item (quiz.astro writes the map from the
+// catalogue), and the loop script that draws it (/js/keystroke-anim.js).
+declare global {
+  interface Window {
+    KSAnim?: { mountAll(root?: ParentNode): void };
+  }
+}
+const productFor: Record<string, { href: string; animation: string; name: string }> = (() => {
+  try {
+    return JSON.parse(document.getElementById('quiz-products')?.textContent ?? '{}');
+  } catch {
+    return {};
+  }
+})();
 const top = document.getElementById('quiz-top');
 const next = document.getElementById('quiz-next') as HTMLButtonElement | null;
 const back = document.getElementById('quiz-back') as HTMLButtonElement | null;
@@ -255,6 +270,20 @@ function show(r: Result, code: string, a: Answers, advice: Advice | null = null)
         body.appendChild(link);
       }
       li.appendChild(body);
+      // The product it maps to: a small loop and a link to its page. Nothing when it maps to none.
+      const product = productFor[item.id];
+      if (product) {
+        const side = el('div', 'result-item-loop');
+        const host = el('div', 'ks-anim-host ks-loop ks-loop-mini');
+        const loop = document.createElement('div');
+        loop.dataset.ks = product.animation;
+        host.appendChild(loop);
+        side.appendChild(host);
+        const link = el('a', 'more body-s', product.name);
+        link.href = product.href;
+        side.appendChild(link);
+        li.appendChild(side);
+      }
       list.appendChild(li);
     });
     block.appendChild(list);
@@ -270,6 +299,9 @@ function show(r: Result, code: string, a: Answers, advice: Advice | null = null)
   if (advice?.firstStep) exits.appendChild(el('p', 'body', advice.firstStep));
   if (r.next) exits.appendChild(el('p', 'body', r.next));
   if (advice) exits.appendChild(el('p', 'body-s muted', 'This result was written by Claude, an AI model, from your nine answers. We check it with you in the free consultation before anything is quoted.'));
+  const all = el('a', 'more result-all', 'See everything we build');
+  all.href = '/products';
+  exits.appendChild(all);
   resultEl.appendChild(exits);
 
   // The form under the result carries the answers and the result with it.
@@ -291,6 +323,9 @@ function show(r: Result, code: string, a: Answers, advice: Advice | null = null)
   }
 
   resultEl.hidden = false;
+  // The loops: if the loop script has already run, mount the new ones now;
+  // if it has not, it mounts every loop on the page itself when it runs.
+  window.KSAnim?.mountAll(resultEl);
   h.focus({ preventScroll: true });
   window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   // The blocks below the first screen arrive as they are reached.
