@@ -2,7 +2,7 @@
 // The footer: what KEYSTROKE is, where everything lives, and how to reach it.
 // A contact detail that is not set yet in site.json is left out.
 import Logotype from './Logotype.astro';
-import { site, services, has, serviceHref, BOOK_HREF, BOOK_LABEL } from '../lib/data';
+import { site, services, crew, has, serviceHref, BOOK_HREF, BOOK_LABEL } from '../lib/data';
 
 interface Props {
   /** The last line only, with privacy and terms: for a client's working page. */
@@ -20,7 +20,7 @@ const company = [
   { label: 'Counting method', href: '/counting' },
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
-];
+].filter((link) => link.href !== '/crew' || crew.length > 0); // Crew once an agent runs for clients
 ---
 <footer class:list={['foot', { 'foot-min': minimal }]}>
   <div class="wrap">

@@ -1,5 +1,5 @@
 {
-  "demo": true,
+  "demo": false,
   "name": "KEYSTROKE",
   "tagline": "Let us push the buttons for you.",
   "description": "We find the admin your team does by hand and rebuild it so it runs itself. Then we build the reports, the software, the website and the brand to go with it.",

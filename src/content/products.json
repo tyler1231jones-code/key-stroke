@@ -70,7 +70,7 @@
         "003",
         "007"
       ],
-      "demo": true
+      "demo": false
     },
     {
       "id": "job-costing",
@@ -82,7 +82,7 @@
         "001",
         "007"
       ],
-      "demo": true
+      "demo": false
     },
     {
       "id": "re-entry",
@@ -94,7 +94,7 @@
         "002",
         "004"
       ],
-      "demo": true
+      "demo": false
     },
     {
       "id": "integration",
@@ -105,7 +105,7 @@
       "cases": [
         "008"
       ],
-      "demo": true
+      "demo": false
     },
     {
       "id": "application",
@@ -117,7 +117,7 @@
         "005",
         "006"
       ],
-      "demo": true
+      "demo": false
     },
     {
       "id": "identity",
@@ -129,7 +129,7 @@
         "010",
         "009"
       ],
-      "demo": true
+      "demo": false
     }
   ],
   "estimates": {

@@ -1,6 +1,6 @@
 ---
 import Logotype from './Logotype.astro';
-import { BOOK_HREF, BOOK_LABEL } from '../lib/data';
+import { BOOK_HREF, BOOK_LABEL, crew } from '../lib/data';
 
 interface Props {
   /** The key of the header item the current page belongs to. */
@@ -11,6 +11,8 @@ interface Props {
 const { current, minimal = false } = Astro.props;
 
 // Each item is its own page. The live underline marks the one the visitor is on.
+// Crew is listed only once an agent runs for clients (a crew.json record not
+// marked demo).
 const items = [
   { key: 'services', label: 'Services', href: '/services' },
   { key: 'products', label: 'Products', href: '/products' },
@@ -19,7 +21,7 @@ const items = [
   { key: 'crew', label: 'Crew', href: '/crew' },
   { key: 'savers', label: 'Savers', href: '/savers' },
   { key: 'quiz', label: 'Quiz', href: '/quiz' },
-];
+].filter((item) => item.key !== 'crew' || crew.length > 0);
 ---
 <header class="bar">
   <div class="wrap">

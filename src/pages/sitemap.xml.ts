@@ -3,7 +3,7 @@
 // absolute once the domain is set in site.json, which `npm run deploy`
 // requires.
 import type { APIRoute } from 'astro';
-import { services, cases, serviceHref } from '../lib/data';
+import { services, cases, crew, serviceHref } from '../lib/data';
 import { products, productHref } from '../lib/catalogue';
 import { abs } from '../lib/seo';
 
@@ -18,7 +18,8 @@ export const GET: APIRoute = () => {
     '/cases',
     ...cases.map((c) => `/cases/${c.id}`),
     '/audit',
-    '/crew',
+    // The crew page once an agent runs for clients; until then it is noindex.
+    ...(crew.length > 0 ? ['/crew'] : []),
     '/savers',
     '/quiz',
     '/contact',
