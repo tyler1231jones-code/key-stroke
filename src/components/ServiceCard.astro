@@ -5,6 +5,7 @@
 import ServiceIcon from './ServiceIcon.astro';
 import Demo from './demos/Demo.astro';
 import { serviceHref, type Service } from '../lib/data';
+import { countByPractice } from '../lib/catalogue';
 
 interface Props {
   item: Service;
@@ -15,6 +16,8 @@ interface Props {
 }
 const { item, full = false, level = 'h3', index = 0 } = Astro.props;
 const H = level;
+// How many products this service's practice has on /products, and the link to that group.
+const productCount = countByPractice[item.practice] ?? 0;
 ---
 <article class:list={['card', 'scard', { 'scard-demo': !full }]} data-reveal="card" style={`--i:${index}`}>
   {full ? <ServiceIcon slug={item.id} /> : <Demo kind={item.id} compact />}
@@ -26,5 +29,8 @@ const H = level;
       {item.products.map((p) => <li>{p.name}</li>)}
     </ul>
   ) : <span></span>}
+  {productCount > 0 && (
+    <a class="plate scard-products" href={`/products#${item.practice}`}><span class="fig">{productCount}</span> {productCount === 1 ? 'product' : 'products'}</a>
+  )}
   <p class="scard-go" aria-hidden="true">See the service</p>
 </article>

@@ -87,6 +87,7 @@
 /* ============ Below the hero ============ */
 .home-alt { background: var(--base-900); }
 .start-price { margin-top: var(--space-12); }
+.home-products { margin-top: var(--space-4); }
 .origin { background: var(--base-900); border-top: 1px solid var(--rule); padding-block: var(--space-12); }
 .origin .wrap { display: grid; gap: var(--space-3); }
 .origin .display-m { color: var(--readout); }

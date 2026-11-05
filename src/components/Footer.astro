@@ -11,6 +11,7 @@ interface Props {
 const { minimal = false } = Astro.props;
 const year = new Date().getFullYear();
 const company = [
+  { label: 'Products', href: '/products' },
   { label: 'Cases', href: '/cases' },
   { label: 'Audit', href: '/audit' },
   { label: 'Crew', href: '/crew' },

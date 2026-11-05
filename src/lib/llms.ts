@@ -12,6 +12,7 @@ import casesJson from '../content/cases.json';
 import { site, services, products, has, serviceHref, type Service } from './data';
 import { abs, faqsFor } from './seo';
 import { num, sentenceCase } from './format';
+import { products as catalogue, productHref, practiceOf, practiceLabel } from './catalogue';
 
 const realCases = casesJson.filter((c) => !c.demo);
 const serviceName = (id: string) => services.find((s) => s.id === id)?.name ?? '';
@@ -40,6 +41,11 @@ export function llmsIndex(): string {
     '## Services',
     '',
     ...services.map((s) => `- [${s.name}](${abs(serviceHref(s))}): ${s.line} ${s.what}`),
+    '',
+    '## Products',
+    '',
+    `- [All products](${abs('/products')}): everything we build, with the price of each on its page.`,
+    ...catalogue.map((p) => `- [${p.name}](${abs(productHref(p))}): ${p.headline} ${p.whatWeBuild}`),
     '',
     '## Getting started',
     '',
@@ -92,6 +98,23 @@ export function llmsFull(): string {
     ...head(),
     '',
     ...services.flatMap(serviceFull),
+    '## Products',
+    '',
+    `${abs('/products')}. Each product's page gives its price.`,
+    '',
+    ...catalogue.flatMap((p) => [
+      `### ${p.name}`,
+      '',
+      `${abs(productHref(p))} (${practiceLabel(practiceOf(p))})`,
+      '',
+      `The problem: ${p.headline}`,
+      `What we build: ${p.whatWeBuild}`,
+      `Who it is for: ${p.forWho}`,
+      `What you receive: ${p.deliverable}`,
+      `Tools: ${p.tools.join(' / ')}`,
+      ...(p.worksWith.trim() ? [`Works with: ${p.worksWith}`] : []),
+      '',
+    ]),
     `## ${audit.name}`,
     '',
     abs('/audit'),
