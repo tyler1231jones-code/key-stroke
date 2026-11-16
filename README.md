@@ -80,9 +80,9 @@ ignores. All of them need `npm run build` first.
 | `/services/websites-and-software` | Websites and software |
 | `/services/branding-and-graphic-design` | Branding and graphic design |
 | `/cases`, `/cases/[id]` | Every case as a card, and each case in full |
-| `/audit` | The Keystroke Audit (fixed price; the price is on `/savers`). Ends on the form, `/audit#book` |
+| `/audit` | The Keystroke Audit (fixed price, quoted once scoped). Ends on the form, `/audit#book` |
 | `/crew` | The five AI agents |
-| `/savers` | Keystroke Savers: the only page with prices. Ends on the form, `/savers#enquire` |
+| `/savers` | Keystroke Savers: the retainer plans and website builds, with prices. Ends on the form, `/savers#enquire` |
 | `/quiz` | Nine questions. The form sits under the result |
 | `/contact` | The form. Every "Book a free consultation" button comes here |
 | `/privacy` | The privacy policy, from `legal.json` |
@@ -196,13 +196,15 @@ committed.
 
 ## Prices
 
-Prices are shown on `/savers` and nowhere else. The published price list
-(Keystroke Savers, website care, the two website builds, the free initial
-audit and the Keystroke Audit) is `src/content/prices.json`, which only
-`/savers` reads. Other pages say the Keystroke Audit is fixed price and link
-to it there; the free part is the first conversation and a quick initial
-audit (`products.json`, `audit.free`). `src/content/products.json` also has
-the older switch:
+Since 16 November 2026 the only published prices are the retainer plans
+(Keystroke Savers and website care) and the two website builds. They are on
+`/savers`; the website builds' prices also show on `/products` and their
+product cards. Every other product, and the Keystroke Audit, is quoted once
+scoped, with no figure on the site. The published price list is
+`src/content/prices.json`, which only `/savers` reads; its audits block
+shows the initial audit as free and the Keystroke Audit as quoted. The free
+part is the first conversation and a quick initial audit (`products.json`,
+`audit.free`). `src/content/products.json` also has the older switch:
 
 ```json
 "display": { "audit": false, "builds": false, "cases": false, "quiz": false, "savers": true }
@@ -212,7 +214,8 @@ Where a price is switched off, the page says `quoteLine` ("Every job is
 quoted individually after a free consultation.") in its place. The prices
 themselves are still in the file. To show one again, set its flag to `true`
 and change `npm run check`, which fails on any dollar figure outside
-`/savers` (`tools/check.mjs`, the dollar rule).
+`/savers`, apart from the website builds' prices on the products pages
+(`tools/check.mjs`, the dollar rule).
 
 ## Products
 
@@ -225,7 +228,9 @@ times as 07:00 AEST, Systems link-up's works-with line), so make the same
 edits in the source catalogue, or a fresh copy of it will bring the old
 wording back. Only products with `"live": true` appear; the others
 get no page and stay out of the sitemap. `proof` and `standardPrice` are
-never shown.
+never shown, and `price` only for the products in `PRICED`
+(`src/lib/catalogue.ts`: the website builds). The rest say "Quoted once
+scoped".
 
 Each product has a looping animation drawn by `public/js/keystroke-anim.js`
 (the handoff script, with the crew units and one time corrected; see its
@@ -233,9 +238,9 @@ header) into `<div data-ks="...">`, through
 `src/components/ProductLoop.astro`. Pages that show loops load the script
 once with `defer`. Its GIFs in `public/img/products/` are share images only.
 Quiz results put a loop and a link beside each item that maps to a product
-(`QUIZ_PRODUCT` in `src/lib/catalogue.ts`). Prices are allowed on the
-products pages; `npm run check` still refuses them anywhere else but
-`/savers`. `node tools/products-test.mjs` checks the showcase end to end.
+(`QUIZ_PRODUCT` in `src/lib/catalogue.ts`). On the products pages
+`npm run check` allows the website builds' prices and no other; anywhere
+else it allows prices only on `/savers`. `node tools/products-test.mjs` checks the showcase end to end.
 
 ## Onboarding forms
 

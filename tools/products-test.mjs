@@ -2,8 +2,10 @@
 //
 // Checks the products showcase in a real browser against the built site:
 //   - /products shows every live product (6 / 7 / 6 / 8 by practice) and no others
-//   - every name, headline and price on /products and on each product page
-//     matches src/content/catalogue.json exactly, and no standard price shows
+//   - every name and headline on /products and on each product page matches
+//     src/content/catalogue.json exactly; only the website builds show their
+//     price (as written), every other product says it is quoted, and no
+//     standard price shows
 //   - products that are not live have no page (404) and are not in the sitemap
 //   - the filter row and #count ... #face links; all groups without script
 //   - at 400px: no sideways scroll, one column of cards, loops fully visible
@@ -25,6 +27,8 @@ const catalogue = JSON.parse(await readFile(join(root, 'src', 'content', 'catalo
 const order = catalogue.practices.map((p) => p.id);
 const live = catalogue.products.filter((p) => p.live).sort((a, b) => order.indexOf(a.practice) - order.indexOf(b.practice) || a.order - b.order);
 const hidden = catalogue.products.filter((p) => !p.live);
+// The products whose price is published (PRICED in src/lib/catalogue.ts).
+const PRICED = new Set(['website-build']);
 
 const failures = [];
 const ok = (cond, what) => {
@@ -72,9 +76,12 @@ console.log('\n/products');
   ok(per.count === 6 && per.clear === 7 && per.build === 6 && per.face === 8, `by practice: ${order.map((id) => per[id]).join(' / ')} (expected 6 / 7 / 6 / 8)`);
   const mismatch = live.filter((p, i) => {
     const c = cards[i];
-    return !c || c.name !== p.name || c.headline !== p.headline || c.price !== p.price || c.kind !== `${p.priceType} · ex GST`;
+    const price = PRICED.has(p.slug)
+      ? c?.price === p.price && c?.kind === `${p.priceType} · ex GST`
+      : c?.price === undefined && c?.kind === 'Quoted once scoped';
+    return !c || c.name !== p.name || c.headline !== p.headline || !price;
   });
-  ok(mismatch.length === 0, `every card's name, headline, price and price type match the catalogue, in catalogue order${mismatch.length ? `: ${mismatch.map((p) => p.slug).join(', ')}` : ''}`);
+  ok(mismatch.length === 0, `every card's name and headline match the catalogue, in catalogue order; only the website builds show a price${mismatch.length ? `: ${mismatch.map((p) => p.slug).join(', ')}` : ''}`);
   ok(!cards.some((c) => hidden.some((h) => h.name === c.name)), 'products that are not live are not listed');
   ok((await page.$$eval('.pcard [data-ks] svg', (s) => s.length)) === 27, 'every card has its loop drawn');
   const cls = await page.evaluate(() => window.__cls);
@@ -133,10 +140,11 @@ console.log('\nproduct pages');
       og: document.querySelector('meta[property="og:image"]')?.getAttribute('content') ?? '',
     }));
     const fields = [p.whatWeBuild, p.forWho, p.deliverable, p.tools.join(' / ')];
-    if (res?.status() !== 200 || seen.h1 !== p.name || seen.lede !== p.headline || seen.price !== p.price || !fields.every((f) => seen.text.includes(f)) || !seen.og.endsWith(`/img/products/${p.animation}.gif`)) wrong.push(p.slug);
+    if (res?.status() !== 200 || seen.h1 !== p.name || seen.lede !== p.headline || seen.price !== (PRICED.has(p.slug) ? p.price : undefined) || !fields.every((f) => seen.text.includes(f)) || !seen.og.endsWith(`/img/products/${p.animation}.gif`)) wrong.push(p.slug);
     if (p.standardPrice && seen.text.includes(p.standardPrice)) wrong.push(`${p.slug} shows its standard price`);
+    if (!PRICED.has(p.slug) && seen.text.includes(p.price)) wrong.push(`${p.slug} shows its price`);
   }
-  ok(wrong.length === 0, `all 27 product pages match the catalogue (name, headline, price, what we build, who for, deliverable, tools, share image)${wrong.length ? `: ${wrong.join(', ')}` : ''}`);
+  ok(wrong.length === 0, `all 27 product pages match the catalogue (name, headline, price only on the website builds, what we build, who for, deliverable, tools, share image)${wrong.length ? `: ${wrong.join(', ')}` : ''}`);
   await page.goto(`${url}/products/inbox-intake`, { waitUntil: 'load' });
   await page.waitForTimeout(800);
   await page.screenshot({ path: join(out, 'product-desktop.png'), fullPage: true });

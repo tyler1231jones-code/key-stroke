@@ -8,6 +8,10 @@
 //   - Order: the practices in their own order (count, clear, build, face), then
 //     each product's `order`.
 //   - `proof`, `standardPrice` and hour figures are never shown.
+//   - Only the website builds show their price (PRICED). Every other product
+//     is quoted once scoped; its price stays in the catalogue, unshown. On
+//     16 November 2026 the owner removed every price from the site but the
+//     retainer plans and the website builds.
 import data from '../content/catalogue.json';
 import { services, serviceHref } from './data';
 
@@ -34,6 +38,13 @@ export function serviceOf(p: Practice) {
   const s = services.find((x) => x.practice === p.id);
   return s ? { name: s.name, href: serviceHref(s) } : null;
 }
+
+/** Products whose price is published, by slug: the website builds, priced on /savers too. */
+export const PRICED = new Set(['website-build']);
+export const showsPrice = (p: Product): boolean => PRICED.has(p.slug);
+
+/** Said in place of a price on every other product. */
+export const QUOTED = 'Quoted as a fixed total once we have scoped it, after a free consultation.';
 
 /** "launch · ex GST" or "fixed · ex GST". */
 export const priceKind = (p: Product): string => `${p.priceType === 'fixed' ? 'fixed' : 'launch'} · ex GST`;

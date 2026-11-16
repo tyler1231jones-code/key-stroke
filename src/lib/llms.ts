@@ -5,7 +5,8 @@
 // Rules this file keeps:
 //   - Nothing still marked demo is described: the crew, the counter figures
 //     and the sample report stay out until the principals mark them real.
-//   - No prices. They are on /savers and nowhere else; these files point there.
+//   - No prices. The published ones (the retainer plans and the website
+//     builds) are on /savers; these files point there.
 //   - Contact details, location and service area appear only once they are
 //     set in site.json.
 import casesJson from '../content/cases.json';
@@ -44,7 +45,7 @@ export function llmsIndex(): string {
     '',
     '## Products',
     '',
-    `- [All products](${abs('/products')}): everything we build, with the price of each on its page.`,
+    `- [All products](${abs('/products')}): everything we build, and what each one solves. Each is quoted once scoped; the website builds have fixed prices.`,
     ...catalogue.map((p) => `- [${p.name}](${abs(productHref(p))}): ${p.headline} ${p.whatWeBuild}`),
     '',
     '## Getting started',
@@ -100,7 +101,7 @@ export function llmsFull(): string {
     ...services.flatMap(serviceFull),
     '## Products',
     '',
-    `${abs('/products')}. Each product's page gives its price.`,
+    `${abs('/products')}. Each is quoted once scoped, apart from the website builds, which have fixed prices.`,
     '',
     ...catalogue.flatMap((p) => [
       `### ${p.name}`,
@@ -141,7 +142,7 @@ export function llmsFull(): string {
     '',
     savers.scope,
     '',
-    `Prices for every plan, website care, the website builds and the audits are published at ${abs('/savers')}.`,
+    `Prices for the Keystroke Savers plans, website care and the website builds are published at ${abs('/savers')}.`,
     ...qa('savers'),
     '',
     '## Case studies',

@@ -1,9 +1,10 @@
 ---
 // A product on the products page and under "More from" on a product page.
 // The whole card links to the product. Name, headline, works-with line and
-// price come from the catalogue as written.
+// price come from the catalogue as written; only the website builds show a
+// price (PRICED in src/lib/catalogue.ts), the rest say they are quoted.
 import ProductLoop from './ProductLoop.astro';
-import { practiceOf, practiceLabel, productHref, priceKind, worksWithLine, type Product } from '../lib/catalogue';
+import { practiceOf, practiceLabel, productHref, priceKind, showsPrice, worksWithLine, type Product } from '../lib/catalogue';
 
 interface Props {
   product: Product;
@@ -21,5 +22,9 @@ const works = worksWithLine(p);
     <p class="body-s pcard-headline">{p.headline}</p>
     {works && <p class="pcard-works">{works}</p>}
   </div>
-  <p class="pcard-price"><span class="pcard-figure">{p.price}</span><span class="pcard-kind">{priceKind(p)}</span></p>
+  {showsPrice(p) ? (
+    <p class="pcard-price"><span class="pcard-figure">{p.price}</span><span class="pcard-kind">{priceKind(p)}</span></p>
+  ) : (
+    <p class="pcard-price"><span class="pcard-kind">Quoted once scoped</span></p>
+  )}
 </article>

@@ -97,7 +97,7 @@
   },
   "audits": {
     "title": "Audits",
-    "what": "Two ways to start. One is free and quick. The other is fixed price and counts a whole process.",
+    "what": "Two ways to start. One is free and quick. The other counts a whole process, at a fixed price we quote once we know the process.",
     "items": [
       {
         "name": "Initial audit",
@@ -106,7 +106,8 @@
       },
       {
         "name": "The Keystroke Audit",
-        "price": "$1,500",
+        "price": "Quoted",
+        "unit": "as a fixed price, once scoped",
         "includes": "One process counted end to end, a shift report, a scoped quote for the build, and one initial tool."
       }
     ]

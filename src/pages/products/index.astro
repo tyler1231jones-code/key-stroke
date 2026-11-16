@@ -1,6 +1,6 @@
 ---
-// /products: every live product, grouped by practice, each with its loop and
-// its price. Product copy and prices come from the catalogue
+// /products: every live product, grouped by practice, each with its loop. Only
+// the website builds show a price. Product copy and prices come from the catalogue
 // (src/lib/catalogue.ts) as written. The filter row is plain links without
 // script (src/scripts/products.ts). No reveals or scroll motion here: the
 // loops are the only movement.
@@ -22,8 +22,8 @@ const list = {
 };
 ---
 <Base
-  title="Products: what we build and what it costs"
-  description="Every product KEYSTROKE builds: reporting, automation, software and brand work, each with the problem it solves and its price."
+  title="Products: everything we build for businesses"
+  description="Every product KEYSTROKE builds: reporting, automation, software and brand work, each with the problem it solves and what you receive."
   current="products"
   page="products"
   band="none"
@@ -35,7 +35,7 @@ const list = {
       <p class="plate prod-eyebrow">KS / Products</p>
       <h1 class="display-xl">What we build.</h1>
       <div class="prod-intro">
-        <p class="lede"><Fig text={`${products.length} things we build for businesses. Each one starts with a problem you can see from the front desk and ends with fewer keystrokes. Every price is on the page.`} /></p>
+        <p class="lede"><Fig text={`${products.length} things we build for businesses. Each one starts with a problem you can see from the front desk and ends with fewer keystrokes.`} /></p>
         <p class="body prod-note">{SYSTEMS_NOTE}</p>
       </div>
     </div>
@@ -49,7 +49,7 @@ const list = {
           <a class="chip" href={`#${p.id}`} data-filter={p.id}><span class="fig">{p.number}</span>{serviceOf(p)?.name ?? p.name}</a>
         ))}
       </nav>
-      <p class="body-s prod-price-line">Launch prices, ex GST. Each job is quoted as a fixed total once we have scoped it.</p>
+      <p class="body-s prod-price-line">Each job is quoted as a fixed total once we have scoped it. The website builds have fixed prices, ex GST.</p>
       <p class="vh" id="prod-status" role="status" aria-live="polite"></p>
 
       <div id="all">

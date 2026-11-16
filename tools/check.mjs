@@ -10,7 +10,8 @@
 //   - text written for the builder, not the customer: TODO, demo labels, the
 //     old audience limit, internal terms (ledger, baseline, unit and practice
 //     numbers) anywhere but the counting page
-//   - a dollar figure on any page but /savers, the one place prices are shown
+//   - a dollar figure on any page but /savers, the one place prices are shown,
+//     apart from the website builds' prices on the products pages
 //   - a disabled control
 //   - a crew card without the tag "AI agent"
 // Text inside [data-artefact] is skipped for the figure checks: artefacts show
@@ -143,6 +144,8 @@ const strings = [];
 sources.forEach((s) => stringsIn(s, strings));
 const allowedDollars = new Set();
 for (const s of strings) for (const m of s.matchAll(/\$\d[\d,]*(?:\.\d+)?/g)) allowedDollars.add(m[0]);
+// The one product whose price is published (PRICED in src/lib/catalogue.ts).
+const buildDollars = new Set(json('catalogue.json').products.find((p) => p.slug === 'website-build')?.price.match(/\$\d[\d,]*/g) ?? []);
 
 /* ---------- Reading the built pages ---------- */
 
@@ -254,11 +257,12 @@ for (const file of walk(dist, '.html')) {
   // Figures. Prices are shown on the Savers page and nowhere else, apart from
   // the terms a client accepts on an onboarding form (onboarding.json), which
   // is never indexed or linked from the site.
-  // Since the products showcase (November 2026) each product's price is on
-  // its own page and on /products, from catalogue.json.
-  const savers = /^savers(\.html|\/|$)/.test(where) || /^onboard(\.html|\/)/.test(where) || catalogue;
+  // The products pages may show the website builds' prices and no other: since
+  // 16 November 2026 every other product is quoted once scoped.
+  const savers = /^savers(\.html|\/|$)/.test(where) || /^onboard(\.html|\/)/.test(where);
   for (const m of page.all.matchAll(/\$\s?\d[\d,]*(?:\.\d+)?/g)) {
-    if (!savers) fail(where, `dollar figure ${m[0]}: prices appear on /savers and nowhere else`);
+    if (catalogue && !buildDollars.has(m[0])) fail(where, `dollar figure ${m[0]}: the products pages show the website builds' prices and no other`);
+    else if (!savers && !catalogue) fail(where, `dollar figure ${m[0]}: prices appear on /savers and nowhere else`);
     else if (!allowedDollars.has(m[0])) fail(where, `dollar figure ${m[0]} is not in a content file`);
   }
   for (const m of page.text.matchAll(/(?<![$\d,.])(\d{1,3}(?:,\d{3})+)(?![\d,]*\.\d)/g)) {

@@ -1,9 +1,11 @@
 ---
 // Keystroke Savers, and the published price list. What Savers is in one
 // sentence, its three plans with their prices and what every plan includes;
-// then website care, the two website builds and the two audits, each with its
-// price; then an enquiry form that carries the chosen plan. This is the only
-// page on the site that shows a price.
+// then website care and the two website builds, each with its price; then the
+// two audits (free, and quoted once scoped); then an enquiry form that carries
+// the chosen plan. Since 16 November 2026 the only published prices are the
+// retainer plans (Savers and website care) and the website builds, which
+// /products/website-build shows too.
 import Base from '../layouts/Base.astro';
 import TierCard from '../components/TierCard.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
@@ -21,7 +23,7 @@ const { care, websites, audits } = priceList;
 ---
 <Base
   title="Keystroke Savers: monthly plans and pricing"
-  description="What KEYSTROKE costs: Keystroke Savers plans, website care, fixed-price website builds and audits, with the hours and the price of each."
+  description="What KEYSTROKE costs: Keystroke Savers plans, website care plans and fixed-price website builds, with the hours and the price of each."
   current="savers"
   page="savers"
   band="none"
@@ -100,7 +102,7 @@ const { care, websites, audits } = priceList;
               {audits.items.map((a, i) => (
                 <article class="card price-card" data-reveal="card" style={`--i:${i}`}>
                   <h3 class="display-m">{a.name}</h3>
-                  <p class="tier-price"><span class="counter-m">{a.price}</span>{a.price !== 'Free' && <span class="unit">fixed price, excluding GST</span>}</p>
+                  <p class="tier-price"><span class="counter-m">{a.price}</span>{'unit' in a && a.unit && <span class="unit">{a.unit}</span>}</p>
                   <p class="body"><Fig text={a.includes} /></p>
                 </article>
               ))}

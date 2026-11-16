@@ -1,7 +1,7 @@
 {
   "_note": "Questions people ask before they enquire. An answer of TODO keeps the question off the page (and out of the structured data) until a principal supplies it; `needs` says what is missing. Answers are 50 words or fewer.",
   "audit": [
-    { "q": "What does the audit cost?", "a": "The Keystroke Audit is fixed price, published with our plans. The first conversation and a quick initial audit are free, with no obligation. The initial audit is an overview of where the hand work is, not an in-depth count. Anything built afterwards is quoted on its own." },
+    { "q": "What does the audit cost?", "a": "The Keystroke Audit is a fixed price, quoted once we know which process to count. The first conversation and a quick initial audit are free, with no obligation. The initial audit is an overview of where the hand work is, not an in-depth count. Anything built afterwards is quoted on its own." },
     { "q": "What do you need from us?", "a": "One process, and someone who does it. That person does the job once, the usual way, while we record it. The counting is ours." },
     { "q": "How long does the audit take?", "a": "1–2 weeks from the recording to the report." },
     { "q": "What is a keystroke?", "a": "One thing a person has to type or click: a character, a click, a copy, a paste or a file attached. We count them from a recording, not from an estimate." },

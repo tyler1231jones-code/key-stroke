@@ -1,12 +1,13 @@
 ---
 // /products/<slug>: one live product, the use case in full. Every word and
-// price comes from the catalogue as written (src/lib/catalogue.ts). Products
-// that are not live get no page, so their addresses return the site's 404.
+// price comes from the catalogue as written (src/lib/catalogue.ts). Only the
+// website builds show a price; every other product says it is quoted.
+// Products that are not live get no page, so their addresses return the 404.
 import Base from '../../layouts/Base.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import ProductLoop from '../../components/ProductLoop.astro';
 import BookButton from '../../components/BookButton.astro';
-import { products, practiceOf, practiceLabel, productsIn, productHref, neighbours, firstSentence, SYSTEMS_NOTE, type Product } from '../../lib/catalogue';
+import { products, practiceOf, practiceLabel, productsIn, productHref, neighbours, firstSentence, showsPrice, QUOTED, SYSTEMS_NOTE, type Product } from '../../lib/catalogue';
 import { abs } from '../../lib/seo';
 import '../../styles/pages.css';
 import '../../styles/products.css';
@@ -24,7 +25,8 @@ const { prev, next } = neighbours(p);
 const fullDescription = `${p.headline} ${firstSentence(p.whatWeBuild)}`;
 const description = fullDescription.length <= 155 ? fullDescription : `${fullDescription.slice(0, 152).replace(/\s+\S*$/, '')}…`;
 
-const prices = p.price.match(/\$[\d,]+/g)?.map((v) => Number(v.replace(/[$,]/g, ''))) ?? [];
+const priced = showsPrice(p);
+const prices = priced ? (p.price.match(/\$[\d,]+/g)?.map((v) => Number(v.replace(/[$,]/g, ''))) ?? []) : [];
 const service = {
   '@context': 'https://schema.org',
   '@type': 'Service',
@@ -86,11 +88,18 @@ const service = {
         )}
       </dl>
 
-      <div class="prod-price">
-        <p class="prod-price-figure">{p.price}</p>
-        <p class="plate prod-price-kind">{p.priceType === 'fixed' ? 'Fixed' : 'Launch'} price · ex GST</p>
-        <p class="body">Quoted as a fixed total once we have scoped it. 50% before we start, 50% on completion.</p>
-      </div>
+      {priced ? (
+        <div class="prod-price">
+          <p class="prod-price-figure">{p.price}</p>
+          <p class="plate prod-price-kind">{p.priceType === 'fixed' ? 'Fixed' : 'Launch'} price · ex GST</p>
+          <p class="body">Quoted as a fixed total once we have scoped it. 50% before we start, 50% on completion.</p>
+        </div>
+      ) : (
+        <div class="prod-price">
+          <p class="plate prod-price-kind">Price</p>
+          <p class="body">{QUOTED} 50% before we start, 50% on completion.</p>
+        </div>
+      )}
 
       <div class="prod-close">
         <p class="body">Start with a free consultation and a quick initial audit.</p>
