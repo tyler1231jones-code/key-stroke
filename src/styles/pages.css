@@ -6,6 +6,9 @@
 .filter { display: flex; gap: var(--space-3); overflow-x: auto; padding: 0 2px var(--space-2) 0; margin-bottom: var(--space-8); scrollbar-width: none; }
 .filter::-webkit-scrollbar { display: none; }
 .filter .chip { flex: none; }
+@media (max-width: 899px) {
+  .filter { flex-wrap: wrap; overflow-x: visible; padding-right: 0; }
+}
 
 /* ============ A case ============ */
 .page-head h1.case-h { max-width: 16ch; font-size: 72px; line-height: 68px; }

@@ -135,7 +135,7 @@ console.log('\nproduct pages');
     const seen = await page.evaluate(() => ({
       h1: document.querySelector('h1')?.textContent?.trim(),
       lede: document.querySelector('.page-head .lede')?.textContent?.trim(),
-      price: document.querySelector('.prod-price-figure')?.textContent?.trim(),
+      price: document.querySelector('.prod-price-figure')?.textContent?.replace(/\s+/g, ' ').trim(),
       text: document.querySelector('main')?.textContent ?? '',
       og: document.querySelector('meta[property="og:image"]')?.getAttribute('content') ?? '',
     }));

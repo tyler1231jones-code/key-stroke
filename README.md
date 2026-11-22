@@ -323,6 +323,22 @@ The businesses in the demonstrations are invented. Before changing a name in
 `demos.json`, search for it and make sure no real business has it. With
 reduced motion a demonstration shows its finished state and nothing plays.
 
+## Phones
+
+Three tools walk the built site at phone size: `node tools/phone-walk.mjs`
+(every page at 360 and 390 wide, measured for sideways scroll and for clipped
+or squeezed text, and each page reached through the menu),
+`node tools/phone-screens.mjs --routes=home,savers` (each screen as a thumb
+scrolls it, side by side) and `node tools/phone-nav.mjs` (form jumps, section
+links, the back button and the menu). Route names take no leading slash: Git
+Bash rewrites one.
+
+Two rules came out of the November 2026 audit. The phone menu stays open
+until the next page has taken over, so the page underneath never flashes back
+(`Nav.astro`). And a touch screen, or anything narrower than 900px, gets a
+plain page change: the cross-fade between pages is for a desktop only
+(`motion.css`).
+
 ## Share images
 
 Each page has its own 1200 by 630 share image in `public/og/`, drawn from the

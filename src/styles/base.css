@@ -54,6 +54,14 @@ strong, b { font-weight: 600; }
   .display-l { font-size: 40px; line-height: 40px; }
   .display-m { font-size: 28px; line-height: 30px; }
 }
+/* A long single word ("dashboards") at 64px is wider than a 360px screen and pushed the page sideways. */
+@media (max-width: 400px) {
+  .display-xl { font-size: 56px; line-height: 52px; }
+}
+@media (max-width: 339px) {
+  .display-xl { font-size: 48px; line-height: 46px; }
+  .display-l { font-size: 34px; line-height: 34px; }
+}
 
 /* ---------- Structure ---------- */
 .wrap { width: 100%; max-width: var(--wide); margin-inline: auto; padding-inline: var(--margin); }

@@ -72,6 +72,13 @@ a, .faq-item > summary, .field input, .field select, .field textarea { transitio
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--dur-1); }
 .bar { view-transition-name: bar; }
 
+/* Not on a phone or a tablet. There the two pages' headlines sit in the same
+   place and at the same size, so a cross-fade shows one set through the other,
+   and a browser bar that hides between pages stretches the outgoing picture.
+   A touch screen gets a plain page change. */
+@media (max-width: 899px), (pointer: coarse) {
+  @view-transition { navigation: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   @view-transition { navigation: none; }
   [data-reveal], .key, .chip, .card, a, .demo-toggle, .demo-replay, .more::after, .scard-go::after { transition: none; }

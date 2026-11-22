@@ -26,6 +26,11 @@ const fullDescription = `${p.headline} ${firstSentence(p.whatWeBuild)}`;
 const description = fullDescription.length <= 155 ? fullDescription : `${fullDescription.slice(0, 152).replace(/\s+\S*$/, '')}…`;
 
 const priced = showsPrice(p);
+// "$1,295 Keystroke-built / $2,295 WordPress" is set as two lines, so a narrow screen never breaks one mid-word.
+const priceLines = p.price.split(' / ').map((part) => {
+  const m = part.match(/^(\$[\d,]+(?:–\$[\d,]+)?)\s*(.*)$/);
+  return m ? { amount: m[1], what: m[2] } : { amount: part, what: '' };
+});
 const prices = priced ? (p.price.match(/\$[\d,]+/g)?.map((v) => Number(v.replace(/[$,]/g, ''))) ?? []) : [];
 const service = {
   '@context': 'https://schema.org',
@@ -90,7 +95,13 @@ const service = {
 
       {priced ? (
         <div class="prod-price">
-          <p class="prod-price-figure">{p.price}</p>
+          <p class="prod-price-figure">
+            {priceLines.map((line, i) => (
+              <span class="prod-price-row">
+                <span class="prod-price-amount">{line.amount}</span>{line.what && <>{' '}<span class="prod-price-what">{line.what}</span></>}{i < priceLines.length - 1 && <span class="vh">{' / '}</span>}
+              </span>
+            ))}
+          </p>
           <p class="plate prod-price-kind">{p.priceType === 'fixed' ? 'Fixed' : 'Launch'} price · ex GST</p>
           <p class="body">Quoted as a fixed total once we have scoped it. 50% before we start, 50% on completion.</p>
         </div>

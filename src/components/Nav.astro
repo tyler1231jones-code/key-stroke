@@ -49,12 +49,19 @@ const items = [
 </header>
 
 <script>
-  // The phone menu is a <details>, so it opens without script. This closes it
-  // again when a link is followed or Escape is pressed.
+  // The phone menu is a <details>, so it opens without script. Escape closes
+  // it. A link in it does not: the menu stays up until the next page takes
+  // over, so the page underneath never flashes back while the next one is on
+  // its way. Coming back with the back button finds it closed.
   const menu = document.querySelector<HTMLDetailsElement>('details.menu');
   if (menu) {
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) menu.open = false;
+    });
+    // A link to a section of the page already open goes nowhere new, so the menu gets out of the way.
     menu.addEventListener('click', (event) => {
-      if ((event.target as HTMLElement).closest('a')) menu.open = false;
+      const link = (event.target as HTMLElement).closest('a');
+      if (link && link.pathname === location.pathname && link.hash) menu.open = false;
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && menu.open) {
