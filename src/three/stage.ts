@@ -186,6 +186,9 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
   }
 
   function paint(now: number): void {
+    // Cleared before the scene updates, not after: a scene whose keys are still
+    // moving asks for another frame from inside update(), and that request has to survive this one.
+    dirty = false;
     const live = current && current.live;
     if (live && current) {
       // Dip toward the hand-over line so the cut between scenes is never seen.
@@ -206,7 +209,6 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
       renderer!.setClearColor(0x000000, 0);
       renderer!.clear();
     }
-    dirty = false;
   }
 
   function build(entry: Entry): void {

@@ -323,6 +323,30 @@ The businesses in the demonstrations are invented. Before changing a name in
 `demos.json`, search for it and make sure no real business has it. With
 reduced motion a demonstration shows its finished state and nothing plays.
 
+## The cursor wake
+
+On a computer with a mouse, the pointer leaves a liquid trail that shows a
+keyboard under the page: the keys it passes light and press, then come back
+up, and a click sends one ring out through them. It is one canvas over the
+page (`.wake` in `base.css`, blended with `screen` so it only adds light and
+text keeps its contrast), drawn by two small shader passes in
+`src/wake/engine.ts`. `src/scripts/wake.ts`, loaded from `Base.astro`, fetches
+the engine on the first mouse move, so no page waits for it. It does not run
+on a touch screen, with reduced motion, or on the onboarding forms; it hides
+and stops a few seconds after the mouse stops; and a computer that cannot
+keep its frame rate loses it for that page.
+
+On the homepage the hero's own keys answer instead
+(`src/three/scenes/hero.ts`): a key under the mouse goes down and comes back
+up behind it, a click or a tap sends a ring through the field, and the worn
+key presses itself once when the page arrives at its top. These sit on top of
+the scroll sequence and change none of its timing. The wake leaves the hero
+alone while the 3D stage is on. Colours come from the design tokens; the
+pitch and stagger of the drawn keyboard match the hero's field.
+
+`node tools/wake-test.mjs` checks all of this in a browser and writes pictures
+to `shots/wake/`.
+
 ## Phones
 
 Three tools walk the built site at phone size: `node tools/phone-walk.mjs`

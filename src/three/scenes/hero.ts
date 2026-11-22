@@ -6,6 +6,14 @@
 // The camera is a perspective camera directly above the worn key, with its
 // lens shifted so the key sits in its slot on screen. Pulling back is a
 // change of distance along one axis and nothing else.
+//
+// The keys answer the visitor as well as the scroll. A key under the mouse
+// goes down and comes back up behind it, so the pointer leaves a wake of
+// pressed keys. A click or a tap sends a ring out through the field from
+// that key. When the page first arrives, the worn key presses itself once and
+// its neighbours follow. These sit on top of the scroll sequence and change
+// none of its timing. Away from the hero the same keyboard is drawn under the
+// rest of the page by the wake (src/wake/engine.ts).
 import * as THREE from 'three';
 import { addRig, type SceneFactory, type LiveScene } from '../stage';
 import { makeKey, makeField, WORN_K, KEY_HEIGHT, KEY_TRAVEL, type Field } from '../objects/keycap';
@@ -27,7 +35,13 @@ interface FieldKey {
   lag: number;
   beat: number | null;
   struck: number;
+  /** How far the pointer is holding this key down, 0..1. */
+  hover: number;
 }
+
+/** A ring from a click travels a key every 45ms and reaches this many keys. */
+const RING_STEP = 0.045;
+const RING_REACH = 11;
 
 export const heroScene: SceneFactory = (ctx) => {
   const { t, env, el } = ctx;
@@ -49,6 +63,46 @@ export const heroScene: SceneFactory = (ctx) => {
   let signature = '';
   let sMacro = 400;
   let sField = 76;
+
+  // The pointer, in viewport pixels. `on` is a mouse inside the hero's frame.
+  const ptr = { x: 0, y: 0, on: false };
+  const taps: { x: number; y: number }[] = [];
+  let ringUntil = 0;
+  let wornHover = 0;
+  let wornStruck = -10;
+  let lastTime = 0;
+  // The greeting: once, when the page arrives at its top, the worn key presses itself and the ring goes out.
+  let greetAt: number | null = !ctx.still && window.scrollY < 8 ? -1 : null;
+  const inFrame = (x: number, y: number) => {
+    const r = (getComputedStyle(pin).position === 'sticky' ? pin : stage).getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  };
+  const onMove = (e: PointerEvent) => {
+    if (e.pointerType !== 'mouse') return;
+    const on = inFrame(e.clientX, e.clientY);
+    if (!on && !ptr.on) return;
+    ptr.x = e.clientX;
+    ptr.y = e.clientY;
+    ptr.on = on;
+    bus.invalidate();
+  };
+  const onLeave = () => {
+    if (!ptr.on) return;
+    ptr.on = false;
+    bus.invalidate();
+  };
+  const onClick = (e: MouseEvent) => {
+    // A click on a link, a button or a field is that control's, not the keyboard's.
+    if ((e.target as Element | null)?.closest?.('a, button, input, select, textarea, summary, label')) return;
+    if (!inFrame(e.clientX, e.clientY)) return;
+    taps.push({ x: e.clientX, y: e.clientY });
+    bus.invalidate();
+  };
+  if (!ctx.still) {
+    window.addEventListener('pointermove', onMove, { passive: true });
+    document.documentElement.addEventListener('pointerleave', onLeave);
+    window.addEventListener('click', onClick);
+  }
 
   /** Decide which keys exist. Everything is measured from the worn key, so it holds while the page scrolls. */
   function layout(): void {
@@ -123,6 +177,7 @@ export const heroScene: SceneFactory = (ctx) => {
           lag: dx * 0.085 + r * 0.19 + h * 0.5,
           beat: null,
           struck: -10,
+          hover: 0,
         });
       });
     });
@@ -163,6 +218,40 @@ export const heroScene: SceneFactory = (ctx) => {
       camera.updateProjectionMatrix();
 
       let busy = false;
+      const dt = Math.min(0.05, Math.max(0, time - lastTime));
+      lastTime = time;
+
+      // The pointer and any clicks, in key units from the worn key.
+      const reach = Math.max(0.62, 58 / scale);
+      const px = (ptr.x - ax) / scale;
+      const py = -(ptr.y - ay) / scale;
+      const ring = (ux: number, uy: number) => {
+        for (const k of keys) {
+          const d = Math.hypot(k.x - ux, k.y - uy);
+          if (d <= RING_REACH) k.struck = time + Math.max(0, d - 0.5) * RING_STEP;
+        }
+        const own = Math.hypot(ux, uy);
+        if (own <= RING_REACH) wornStruck = time + Math.max(0, own - 0.5) * RING_STEP;
+        ringUntil = time + RING_REACH * RING_STEP + 0.25;
+      };
+      for (const tap of taps.splice(0)) ring((tap.x - ax) / scale, -(tap.y - ay) / scale);
+      if (greetAt !== null) {
+        if (greetAt < 0) greetAt = time + 1.15;
+        if (p > 0.02) greetAt = null; // already scrolling: the sequence has its own press
+        else if (time >= greetAt) {
+          greetAt = null;
+          ring(0, 0);
+        } else busy = true;
+      }
+      if (time < ringUntil) busy = true;
+      const overWorn = ptr.on && Math.abs(px) < 0.5 && Math.abs(py) < 0.5;
+      // Only a key that is still moving asks for another frame: one held down at rest costs nothing.
+      const wornTarget = overWorn ? 1 : 0;
+      if (Math.abs(wornTarget - wornHover) > 0.004) {
+        wornHover += (wornTarget - wornHover) * (1 - Math.exp(-dt * (overWorn ? 24 : 8)));
+        busy = true;
+      } else wornHover = wornTarget;
+
       const wave = span(p, HERO.waves[0], HERO.waves[1]);
       const typing = wave > 0 && wave < 1;
       const drop = span(p, HERO.drop[0], HERO.drop[1]);
@@ -175,18 +264,31 @@ export const heroScene: SceneFactory = (ctx) => {
             if (beat !== null && k.beat !== null && beat >= 0) k.struck = time;
             k.beat = beat;
           }
-          const press = strike(time, k.struck);
-          if (press > 0) busy = true;
+          // Held down while the pointer is over it, and let up behind it.
+          const held = ptr.on && Math.hypot(k.x - px, k.y - py) < reach;
+          const target = held ? 1 : 0;
+          if (Math.abs(target - k.hover) > 0.004) {
+            k.hover += (target - k.hover) * (1 - Math.exp(-dt * (held ? 26 : 7)));
+            busy = true;
+          } else k.hover = target;
+          const tap = strike(time, k.struck);
+          if (tap > 0 || k.struck > time) busy = true;
+          const press = Math.max(tap, k.hover * 0.9);
           const d = span(drop, k.t0, k.t0 + k.dur);
           field.set(i, k.x, k.y, press, d * d * (3 - 2 * d));
         }
         field.commit();
       }
-      worn.mesh.position.z = -bus.hero.press * KEY_TRAVEL;
+      const wornTap = strike(time, wornStruck);
+      if (wornTap > 0) busy = true;
+      worn.mesh.position.z = -Math.max(bus.hero.press, wornTap, wornHover * 0.3) * KEY_TRAVEL;
       // Keys still moving need another frame even if the page has stopped.
       if (busy) bus.invalidate();
     },
     dispose() {
+      window.removeEventListener('pointermove', onMove);
+      document.documentElement.removeEventListener('pointerleave', onLeave);
+      window.removeEventListener('click', onClick);
       worn.dispose();
       field?.dispose();
     },

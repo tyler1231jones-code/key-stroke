@@ -143,3 +143,8 @@ const jsonLd = [organization(), website(), breadcrumbs(crumbs), faq ? faqSchema(
     {!minimal && <StickyCta service={service} href={bookHref} />}
   </body>
 </html>
+
+<script>
+  // The cursor wake, on every page (src/scripts/wake.ts decides whether it runs).
+  import '../scripts/wake.ts';
+</script>
