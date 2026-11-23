@@ -112,6 +112,8 @@ const jsonLd = [organization(), website(), breadcrumbs(crumbs), faq ? faqSchema(
         // top of the page. Adding ?intro to the address plays it again. A browser driven by a program (the
         // project's own tools) is not shown it unless it asks, so they see the page itself.
         if (d.getAttribute('data-page') === 'home') {
+          // The homepage's header starts with no bar behind it. The script after the hero keeps this up to date.
+          d.classList.add('bar-bare');
           var asked = /[?&]intro\b/.test(location.search);
           var seen = false;
           try {
@@ -141,5 +143,9 @@ const jsonLd = [organization(), website(), breadcrumbs(crumbs), faq ? faqSchema(
     </main>
     <Footer minimal={minimal} />
     {!minimal && <StickyCta service={service} href={bookHref} />}
+    <script>
+      // The cursor wake (src/scripts/wake.ts decides whether it runs).
+      import '../scripts/wake.ts';
+    </script>
   </body>
 </html>

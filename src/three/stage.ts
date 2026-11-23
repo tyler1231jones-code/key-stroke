@@ -8,6 +8,8 @@
  *    element's rectangle in the frame the scene is drawn into.
  *  - Dip. The hand-over between two scenes is a cut at the viewport's
  *    midpoint; the canvas opacity dips toward that line so it is never seen.
+ *    A page with one scene has no hand-over: that scene has the canvas for
+ *    as long as any of its section is on screen, and nothing dips.
  *  - Watchdog. A device that cannot hold frame rate has its pixel ratio
  *    lowered, then the stage hands over to stills.
  *
@@ -141,7 +143,7 @@ export interface Stage {
   destroy(): void;
 }
 
-export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; phone: boolean; onSlow: () => void }): Stage | null {
+export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; phone: boolean; /** The page has one scene only. */ solo?: boolean; onSlow: () => void }): Stage | null {
   const renderer = makeRenderer(canvas);
   if (!renderer) return null;
   const env = makeEnvironment(renderer);
@@ -195,7 +197,7 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
       const r = current.el.getBoundingClientRect();
       const mid = height / 2;
       const d = Math.min(mid - r.top, r.bottom - mid);
-      const o = Math.round(Math.min(1, Math.max(0, d / (height * 0.16))) * 100) / 100;
+      const o = opts.solo ? 1 : Math.round(Math.min(1, Math.max(0, d / (height * 0.16))) * 100) / 100;
       if (o !== opacity) {
         opacity = o;
         canvas.style.opacity = String(o);
@@ -241,11 +243,11 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
           dirty = true;
         },
       }),
-      // The section under the viewport's centre owns the canvas.
+      // The section under the viewport's centre owns the canvas. A page's only scene owns it while any of its section is on screen.
       ScrollTrigger.create({
         trigger: el,
-        start: 'top center',
-        end: 'bottom center',
+        start: opts.solo ? 'top bottom' : 'top center',
+        end: opts.solo ? 'bottom top' : 'bottom center',
         onToggle: (self) => {
           if (self.isActive) {
             build(entry);

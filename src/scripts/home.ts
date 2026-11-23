@@ -9,8 +9,6 @@ import { initSite } from './site';
 import { initDemos } from './demos';
 import { loadStage } from './stage';
 import { bus, HERO } from './bus';
-// The cursor wake in the hero (src/scripts/wake.ts decides whether it runs).
-import './wake';
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel);
 
@@ -26,11 +24,14 @@ function initHero(figures: { today: number; weekAgo: number } | null): void {
     bus.hero.p = 1;
     return;
   }
-  const d = driver([{ host: section, pin }, { host: track, pin: stage }], stage);
+  // The sequence runs only where the hero is pinned: a desktop (see home.css). Anywhere else the hero is a still
+  // picture: the worn key close up, the closing line under it, and no scroll tied to anything.
+  const d = driver([{ host: section, pin }], pin);
+  let wasOn: boolean | null = null;
   const ctrEl = $('#home-counter');
   const c = ctrEl ? counter(ctrEl) : null;
   const rolls = Boolean(c && figures && figures.today !== figures.weekAgo);
-  if (c && figures && rolls) c.show(figures.weekAgo);
+  if (c && figures && rolls && d.pinned()) c.show(figures.weekAgo);
 
   // With no client figures yet, the counter shows how many of the field's keys are still up. The scene
   // counts them as it draws, so the figure is always what is on the screen, at any point of the scroll.
@@ -46,6 +47,19 @@ function initHero(figures: { today: number; weekAgo: number } | null): void {
   }
 
   d.progress((p) => {
+    const on = d.pinned();
+    if (!on) {
+      if (wasOn === false) return;
+      wasOn = false;
+      bus.hero.p = 0;
+      bus.invalidate();
+      strip.style.transform = '';
+      strip.style.visibility = 'visible';
+      if (c && figures && rolls) c.show(figures.today);
+      return;
+    }
+    if (wasOn === false && c && figures && rolls) c.show(p >= HERO.roll ? figures.today : figures.weekAgo);
+    wasOn = true;
     bus.hero.p = p;
     bus.invalidate();
     // The counter strip indexes in on its rail.
@@ -59,6 +73,7 @@ function initHero(figures: { today: number; weekAgo: number } | null): void {
   d.beat(
     HERO.press,
     () => {
+      if (!d.pinned()) return;
       gsap.timeline({ onUpdate: bus.invalidate })
         .to(bus.hero, { press: 1, duration: 0.09, ease: 'none' })
         .to(bus.hero, { press: 0, duration: 0.12, ease: 'none' });
@@ -71,11 +86,11 @@ function initHero(figures: { today: number; weekAgo: number } | null): void {
   d.beat(
     HERO.roll,
     () => {
-      if (!c || !figures || !rolls) return;
+      if (!c || !figures || !rolls || !d.pinned()) return;
       c.roll(figures.today, { dir: 1 });
     },
     () => {
-      if (!c || !figures || !rolls) return;
+      if (!c || !figures || !rolls || !d.pinned()) return;
       c.roll(figures.weekAgo, { dir: -1 });
     },
   );

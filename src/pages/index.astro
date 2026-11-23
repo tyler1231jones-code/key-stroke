@@ -73,7 +73,7 @@ const crewCount = words(crew.length);
               // Until there are client figures to show, the counter counts what is on the screen: the keys of
               // the hero's own keyboard, going down as the rows drop out. The 3D scene supplies the figure, so
               // the counter is not shown until the scene is running. Its place is kept, so nothing moves when it is.
-              <div class="hero-counter is-off">
+              <div class="hero-counter hero-count-keys is-off">
                 <div class="hero-ctr-row">
                   <Counter value={null} widest={999} size="xl" id="keys-left" />
                 </div>
@@ -86,6 +86,28 @@ const crewCount = words(crew.length);
       </div>
     </div>
   </section>
+
+  <!-- The header has no bar behind it while it sits on the hero. As soon as the hero starts to pass under it (at
+       the end of the scroll sequence on a desktop, at the first scroll anywhere else) it gets its bar back. -->
+  <script is:inline>
+    (function () {
+      var d = document.documentElement;
+      var pin = document.querySelector('.hero-pin');
+      var bar = document.querySelector('.bar');
+      if (!pin || !bar) { d.classList.remove('bar-bare'); return; }
+      var bare = null;
+      var asked = false;
+      function sync() {
+        asked = false;
+        var on = pin.getBoundingClientRect().top >= bar.offsetHeight - 2;
+        if (on !== bare) { bare = on; d.classList.toggle('bar-bare', on); }
+      }
+      function ask() { if (!asked) { asked = true; requestAnimationFrame(sync); } }
+      window.addEventListener('scroll', ask, { passive: true });
+      window.addEventListener('resize', ask);
+      sync();
+    })();
+  </script>
 
   <!-- 2. Proof -->
   {proof.length > 0 && (

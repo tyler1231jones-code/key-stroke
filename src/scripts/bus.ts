@@ -22,6 +22,8 @@ export const bus = {
  * off the ones that are really there.
  */
 export interface HeroGrid {
+  /** True where the scroll sequence runs (a desktop). False where the hero is a still picture: the field is then only the few keys around the worn one, at its own size, in the band the slot is in. */
+  sequence: boolean;
   /** Pixels to a key once the camera has pulled back, and at the start, close in. */
   pitch: number;
   macro: number;

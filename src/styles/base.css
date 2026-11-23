@@ -77,8 +77,9 @@ section { position: relative; }
 
 #stage { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .no-stage #stage { display: none; }
-/* The cursor wake (src/wake/engine.ts), in the homepage hero only: one canvas straight after the 3D stage, so it is above the hero's keys and below its copy. It draws light with no alpha, so it adds to what is behind it and hides nothing. */
+/* The cursor wake (src/wake/engine.ts). In the homepage hero it is one canvas straight after the 3D stage, so it is above the hero's keys and below its copy. Everywhere else it is a second, fainter one over the page and under the header. Both draw light with no alpha, so they add to what is behind them and hide nothing. */
 .wake { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; visibility: hidden; }
+.wake-page { z-index: 15; }
 @media print { .wake { display: none; } }
 
 .skip { position: fixed; left: var(--space-4); top: var(--space-2); z-index: 100; transform: translateY(-200%); background: var(--base-000); color: var(--ink); padding: var(--space-2) var(--space-4); border: 1px solid var(--rule); }
@@ -86,7 +87,15 @@ section { position: relative; }
 [tabindex="-1"]:focus-visible { outline: none; }
 
 /* ---------- Bar ---------- */
-.bar { position: sticky; top: 0; z-index: 20; height: var(--bar-h); background: var(--base-000); border-bottom: 1px solid var(--rule); }
+.bar { position: sticky; top: 0; z-index: 20; height: var(--bar-h); }
+/* The bar's own ground and rule are a plate behind its contents, so they can come and go without the contents moving.
+   On the homepage the header sits on the hero with no plate (html.bar-bare, set in the head and kept by the script
+   after the hero in index.astro); once the hero starts to pass under it the plate slides down into place. */
+.bar::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--base-000); border-bottom: 1px solid var(--rule); transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); }
+.bar-bare .bar::before { opacity: 0; transform: translateY(-100%); }
+/* The phone menu opens under the bar, so the bar has its plate while the menu is open. */
+.menu-open .bar::before { opacity: 1; transform: none; }
+.still .bar::before { transition: none; }
 .bar .wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
 .bar-home { display: block; flex: none; text-decoration: none; color: var(--ink); }
 .bar-home .lockup { display: block; width: 240px; height: auto; }
@@ -97,6 +106,7 @@ section { position: relative; }
 .nav-list a:hover { border-bottom-color: var(--rule); }
 .nav-list a[aria-current="page"] { border-bottom-color: var(--live); }
 .bar-book { flex: none; min-height: 40px; padding: 0 var(--space-4); font-size: 14px; line-height: 21px; white-space: nowrap; }
+.bar-book-short { display: none; }
 .menu { display: none; }
 
 @media (max-width: 1179px) {
@@ -195,15 +205,23 @@ html.menu-open { overflow: hidden; }
   .foot-logo { display: flex; align-items: center; min-height: 48px; }
   .foot h2 { margin-bottom: var(--space-2); }
 }
+/* The header's button on a phone or a tablet: a small key with room above and below it in the bar. The link keeps
+   a 48px tap area; the key drawn inside it is 36px. */
+@media (max-width: 899px) {
+  .bar .bar-book { min-height: 48px; padding: 0; background: none; box-shadow: none; border-radius: 0; }
+  .bar .bar-book > span { align-items: center; min-height: 36px; padding: 0 var(--space-3); background: var(--readout); color: var(--base-900); border-radius: var(--radius-cap); box-shadow: var(--shadow-rest); font-size: 13px; line-height: 20px; }
+  .bar .bar-book > .bar-book-full { display: inline-flex; }
+}
 /* The header holds the mark, the button and the menu inside 360px. The mark
    and the word Menu keep their place on the page margin; their 48px tap areas
-   reach 8px into it. */
+   reach 8px into it. The button says less, so it is a small key and not a slab. */
 @media (max-width: 479px) {
   .bar .wrap { gap: var(--space-3); }
-  .bar-nav { gap: var(--space-3); }
+  .bar-nav { gap: var(--space-4); }
   .bar-home { justify-content: center; margin-left: calc(var(--space-2) * -1); }
   .menu > summary { padding: 0; margin-right: calc(var(--space-2) * -1); }
-  .bar-book { padding: 0 var(--space-3); }
+  .bar .bar-book > .bar-book-full { display: none; }
+  .bar .bar-book > .bar-book-short { display: inline-flex; }
 }
 /* Narrower than any current phone: the button leaves the header. The hero and the bar at the foot still carry it. */
 @media (max-width: 349px) {

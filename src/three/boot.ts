@@ -59,6 +59,7 @@ export async function bootStage(): Promise<void> {
   const stage = createStage(canvas, {
     maxDpr: phone ? 1.5 : 2,
     phone,
+    solo: defs.length === 1,
     onSlow: () => {
       if (debug) return; // tools/qa.mjs measures the live stage, even on a software renderer
       // The device cannot hold frame rate: hand over to still frames.

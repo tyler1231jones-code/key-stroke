@@ -1,10 +1,14 @@
-/* The homepage. The hero is laid out in its resting state; html.motion adds
-   its scroll length and sticky pin, and html.still (reduced motion, or no
-   script) leaves it as a plain document. Everything below the hero is plain
-   sections built from the shared parts. */
+/* The homepage. The hero is laid out in its resting state. On a desktop
+   (a wide, tall window with a mouse) html.motion adds its scroll length and
+   sticky pin, and the keyboard sequence plays as the page is scrolled. On a
+   phone or a tablet, in a small window, and with html.still (reduced motion,
+   or no script) it is a plain document: the copy, the key, the closing line.
+   Everything below the hero is plain sections built from the shared parts. */
 
 /* ============ 1. Hero ============ */
 .hero { color: var(--ink-inverse); }
+/* The hero's ground carries on up behind the header, which has no bar of its own while the hero is under it. */
+.hero > .ground { top: calc(var(--bar-h) * -1); }
 .hero-pin { position: relative; z-index: 1; }
 .hero-copy, .hero-strip { position: relative; z-index: 1; }
 .hero-h { max-width: 13ch; }
@@ -21,8 +25,10 @@
   html:is(.motion, .still):not(.no-stage) .hero-slot .stand-in { visibility: hidden; }
 }
 .hero-strip { display: flex; flex-direction: column; gap: var(--space-6); padding-bottom: var(--space-8); }
-/* The count of keys left waits for the 3D scene. Until then it keeps its place and shows nothing; where there
-   will be no scene at all (reduced motion, no script, no WebGL) it takes no room. */
+/* The count of keys left belongs to the scroll sequence, so it is only there where the sequence is (see below).
+   There it waits for the 3D scene: until then it keeps its place and shows nothing; where there will be no scene
+   at all (no WebGL) it takes no room. */
+.hero-count-keys { display: none; }
 .hero-counter.is-off { visibility: hidden; }
 :is(.still, .no-stage) .hero-counter.is-off { display: none; }
 .hero-ctr-row { display: flex; align-items: flex-end; gap: var(--space-6); flex-wrap: wrap; }
@@ -30,11 +36,13 @@
 .hero-label .fig { margin-left: -0.2em; }
 .hero-voice { max-width: 26ch; color: var(--ink-inverse); }
 
-/* Phone and short screens: the copy flows, the scene pins on its own. */
+/* Phones, tablets and small windows: the copy, then the key in its slot, then the closing line. Nothing is pinned
+   and nothing is tied to the scroll. */
 .hero-copy { padding: var(--space-12) var(--margin) var(--space-8); }
 .hero-stage { display: grid; grid-template-rows: minmax(0, 1fr) auto; padding-inline: var(--margin); }
-.motion .hero-track { height: 320svh; }
-.motion .hero-stage { position: sticky; top: var(--bar-h); height: calc(100svh - var(--bar-h)); z-index: 1; }
+/* The 3D keys around the worn one are drawn in the band the slot is in, from one side of the screen to the other.
+   They fade into the ground at the top and the foot of the band, so no key ends on a hard line. */
+html.stage-on:not(.no-stage) .hero-slot::after { content: ""; position: absolute; inset: -1px calc(var(--margin) * -1); pointer-events: none; background: linear-gradient(var(--base-900), transparent) top / 100% var(--space-12) no-repeat, linear-gradient(transparent, var(--base-900)) bottom / 100% var(--space-12) no-repeat; }
 
 @media (min-width: 960px) and (min-height: 700px) {
   .hero-pin {
@@ -45,13 +53,25 @@
     padding-inline: max(var(--margin), calc((100vw - var(--wide)) / 2 + var(--margin)));
   }
   .hero-track, .hero-stage { display: contents; }
-  .motion .hero-track { height: auto; }
   .hero-copy { grid-column: 1; grid-row: 1; align-self: center; padding: var(--space-8) 0; }
   .hero-slot { grid-column: 2; grid-row: 1; min-height: 0; }
   .hero-strip { grid-column: 1 / -1; grid-row: 2; flex-direction: row; justify-content: space-between; align-items: flex-end; padding-bottom: var(--space-12); }
   .hero-voice { text-align: right; margin-left: auto; }
+  /* Side by side, the band of keys starts at the copy's column and fades on that side too. */
+  html.stage-on:not(.no-stage) .hero-slot::after { left: 0; background: linear-gradient(var(--base-900), transparent) top / 100% var(--space-12) no-repeat, linear-gradient(transparent, var(--base-900)) bottom / 100% var(--space-12) no-repeat, linear-gradient(90deg, var(--base-900), transparent) left / var(--space-12) 100% no-repeat; }
+}
+/* The scroll sequence: a desktop only. The hero is five screens long and its one screen is pinned while the
+   keyboard plays. A touch screen of the same size gets the layout above without it. */
+@media (min-width: 960px) and (min-height: 700px) and (hover: hover) and (pointer: fine) {
   .motion .hero { height: 520svh; }
-  .motion .hero-pin { position: sticky; top: var(--bar-h); height: calc(100svh - var(--bar-h)); }
+  .motion .hero-pin { position: sticky; top: var(--bar-h); height: calc(100svh - var(--bar-h)); overflow: clip; }
+  /* The keys are drawn up to the top of the pin, where the header begins. They fade out just short of it, so the
+     header sits on plain ground and no key is cut by a line that is not there. */
+  .motion .hero-pin::before { content: ""; position: absolute; inset: 0 0 auto 0; height: var(--space-12); background: linear-gradient(var(--base-900), transparent); pointer-events: none; }
+  /* With the sequence the keys have the whole pin, and are not drawn in a band. */
+  html.motion .hero-slot::after { content: none; }
+  .motion:not(.run) .hero-strip { visibility: hidden; }
+  .motion .hero-count-keys { display: block; }
 }
 /* A short window: the same pinned hero, set a size down so the copy and its
    two buttons clear the counter strip. */
@@ -69,10 +89,6 @@
 @media (max-width: 400px) {
   .hero .hero-h { font-size: 56px; line-height: 52px; letter-spacing: -0.005em; }
 }
-
-/* Motion states */
-.motion .hero-pin, .motion .hero-stage { overflow: clip; }
-.motion:not(.run) .hero-strip { visibility: hidden; }
 
 /* The load-in: the header, the headline line by line, the sentence, the two
    buttons, and the key settling into place. About 1.2 seconds, once per
@@ -119,8 +135,11 @@
 .pitch-word { grid-area: 1 / 1; white-space: nowrap; animation: pitch-hide 1ms linear var(--end) forwards; }
 .pitch-word.last { animation: pitch-text-out 0.2s var(--ease-inout) var(--out) forwards; }
 .pitch-l { position: relative; display: inline-block; opacity: 0; animation: pitch-show 1ms linear var(--d) forwards; }
-.pitch-l::after { content: ""; position: absolute; left: 100%; top: 13%; width: 0.07em; height: 74%; margin-left: 0.05em; background: var(--readout); opacity: 0; animation: pitch-caret var(--g) step-end var(--d) forwards; }
-@keyframes pitch-caret { from { opacity: 1; } to { opacity: 0; } }
+.pitch-l::after { content: ""; position: absolute; left: 100%; top: 13%; width: 0.07em; height: 74%; margin-left: 0.05em; background: var(--readout); opacity: 0; animation: pitch-caret var(--g) linear var(--d) forwards; }
+/* The caret is there until the next keystroke and then gone. Not a stepped timing: a finished animation can rest a
+   hair short of its end (a rounding error in the browser), where step-end still gives the first frame, and every
+   caret stayed on behind the word. Written this way, a hair short of the end is still nothing. */
+@keyframes pitch-caret { from, 96% { opacity: 1; } to { opacity: 0; } }
 
 /* The four, kept as they are typed. */
 .pitch-list { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2) var(--space-6); color: var(--readout); animation: pitch-text-out 0.2s var(--ease-inout) var(--out) forwards; }

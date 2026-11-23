@@ -1,14 +1,16 @@
 // node tools/wake-test.mjs   (after `npm run build`)
 //
-// The cursor wake, in a real browser. It belongs to the homepage hero and
-// nowhere else:
-//   - on any other page there is no wake, whatever the mouse does
-//   - in the hero a moving mouse draws it, behind the headline
+// The cursor wake, in a real browser. There are two: the hero's, at full
+// strength behind the headline, and the page's, a faint trail everywhere else.
+//   - on another page a moving mouse draws the page's wake, and it rests
+//   - in the hero a moving mouse draws the hero's, behind the headline
 //   - the hero's greeting sends a ring out through it with no mouse at all
 //   - it rests (canvas hidden, no frames) a few seconds after the mouse stops
-//   - once the hero's scroll sequence has dropped its keys there is no wake,
-//     and there is none in any section below the hero
-//   - it never starts on a touch screen or with reduced motion
+//   - once the hero's scroll sequence has dropped its keys the hero has no
+//     wake of either kind: it settles clean
+//   - below the hero the page's wake is drawn, and it is fainter than the hero's
+//   - neither starts on a touch screen, with reduced motion, on a light page
+//     or on an onboarding form
 //   - the hero's own keys still answer the pointer and a click, without a
 //     script error, and the page keeps its frame rate
 // The homepage is opened with ?debug, which keeps the 3D stage and the wake
@@ -30,11 +32,20 @@ const ok = (cond, what) => {
   if (!cond) failures.push(what);
   console.log(`${cond ? '  ok  ' : '  FAIL'} ${what}`);
 };
-const state = (page) =>
-  page.evaluate(() => {
-    const c = document.querySelector('canvas.wake');
-    return { exists: Boolean(c), visible: c ? getComputedStyle(c).visibility === 'visible' : false };
-  });
+/** The hero's wake by default; the page's with `which` = 'page'. */
+const state = (page, which = 'hero') =>
+  page.evaluate((w) => {
+    const c = document.querySelector(w === 'page' ? 'canvas.wake-page' : 'canvas.wake:not(.wake-page)');
+    return { exists: Boolean(c), visible: c ? getComputedStyle(c).visibility === 'visible' : false, any: document.querySelectorAll('canvas.wake').length };
+  }, which);
+/** The brightest any pixel of a region became between two screenshots, 0 to 255. */
+async function brightest(a, b, region) {
+  const raw = async (png) => sharp(png).extract(region).greyscale().raw().toBuffer();
+  const [x, y] = await Promise.all([raw(a), raw(b)]);
+  let most = 0;
+  for (let i = 0; i < x.length; i++) most = Math.max(most, y[i] - x[i]);
+  return most;
+}
 /** A hand-like path: a curve across the page, in small steps. */
 async function sweep(page, from, to, steps = 28, bend = 90) {
   for (let i = 0; i <= steps; i++) {
@@ -67,17 +78,25 @@ console.log('\ndesktop');
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 
-  // Another page: no wake.
-  await page.goto(`${url}/services`, { waitUntil: 'load' });
+  // Another page: the page's wake, and no hero's.
+  await page.goto(`${url}/services?debug`, { waitUntil: 'load' });
   await page.waitForTimeout(600);
+  const before = await page.screenshot();
   await sweep(page, [260, 300], [1100, 520], 30);
-  await page.waitForTimeout(400);
-  ok(!(await state(page)).exists, 'no wake on a page that is not the homepage');
+  await page.waitForTimeout(300);
+  let s = await state(page, 'page');
+  ok(s.exists && s.visible && s.any === 1, 'on another page a moving mouse draws the page\'s wake');
+  const other = await page.screenshot({ path: join(out, 'services-trail.png') });
+  const whole = { left: 0, top: 80, width: 1440, height: 800 };
+  ok((await changed(before, other, whole)) > 0.002, 'it can be seen');
+  ok((await page.evaluate(() => document.elementFromPoint(300, 300)?.tagName)) !== 'CANVAS', 'it takes no clicks from the page');
+  await page.waitForTimeout(5200);
+  ok(!(await state(page, 'page')).visible, 'it rests once the mouse stops');
 
   // The homepage. The greeting: the worn key presses itself and a ring goes out behind the headline.
   await page.goto(`${url}/?debug`, { waitUntil: 'load' });
   await page.waitForFunction(() => getComputedStyle(document.querySelector('canvas.wake') ?? document.body).visibility === 'visible' && document.querySelector('canvas.wake'), null, { timeout: 6000 }).catch(() => {});
-  let s = await state(page);
+  s = await state(page);
   ok(s.exists && s.visible, 'the greeting starts the wake with no mouse');
   await page.waitForTimeout(350);
   const greet = await page.screenshot({ path: join(out, 'home-greeting.png') });
@@ -125,14 +144,20 @@ console.log('\ndesktop');
   await page.waitForTimeout(1800);
   await sweep(page, [120, 300], [1100, 600], 26, 60);
   await page.waitForTimeout(200);
-  ok(!(await state(page)).visible, 'no wake once the scroll sequence has dropped its keys');
-  // Below the hero: no wake.
-  await page.mouse.wheel(0, 1800);
-  await page.waitForTimeout(1500);
+  ok(!(await state(page)).visible && !(await state(page, 'page')).visible, 'no wake of either kind once the scroll sequence has dropped its keys');
+  // Below the hero: the page's wake, fainter than the hero's.
+  await page.mouse.wheel(0, 2400);
+  await page.waitForTimeout(1800);
+  await page.mouse.move(60, 860);
+  await page.waitForTimeout(5200);
+  const belowClean = await page.screenshot();
   await sweep(page, [120, 300], [1100, 600], 26, 60);
   await page.waitForTimeout(200);
-  ok(!(await state(page)).visible, 'no wake in the sections below the hero');
-  await page.screenshot({ path: join(out, 'home-below.png') });
+  ok(!(await state(page)).visible && (await state(page, 'page')).visible, 'below the hero the page\'s wake is drawn, and the hero\'s is not');
+  const below = await page.screenshot({ path: join(out, 'home-below.png') });
+  const heroLit = await brightest(clean, trail, corner);
+  const pageLit = await brightest(belowClean, below, { left: 0, top: 80, width: 1440, height: 800 });
+  ok(pageLit > 4 && pageLit < heroLit * 0.75, `it is fainter than the hero's (brightest change ${pageLit} of 255, against ${heroLit} in the hero)`);
   ok(errors.length === 0, `no script errors${errors.length ? `: ${errors.slice(0, 3).join(' | ')}` : ''}`);
   await sheet([greet, trail, field, ripple], 'sheet.jpg');
   await context.close();
@@ -140,13 +165,15 @@ console.log('\ndesktop');
 
 /* ---------- Where there must be no wake ---------- */
 console.log('\nno wake');
-for (const [label, options] of [
+for (const [label, options, route = ''] of [
   ['a touch screen', { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }],
   ['reduced motion', { viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' }],
+  ['a light page', { viewport: { width: 1440, height: 900 } }, 'counting'],
+  ['an onboarding form', { viewport: { width: 1440, height: 900 } }, 'onboard'],
 ]) {
   const context = await browser.newContext(options);
   const page = await context.newPage();
-  await page.goto(`${url}/`, { waitUntil: 'load' });
+  await page.goto(`${url}/${route}`, { waitUntil: 'load' });
   await page.waitForTimeout(900);
   if (options.hasTouch) {
     await page.touchscreen.tap(200, 500);
@@ -154,7 +181,7 @@ for (const [label, options] of [
     await sweep(page, [200, 300], [900, 500], 12);
   }
   await page.waitForTimeout(1800);
-  ok(!(await state(page)).exists, `no wake with ${label}`);
+  ok((await state(page)).any === 0, `no wake with ${label}`);
   await context.close();
 }
 

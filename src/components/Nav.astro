@@ -35,7 +35,8 @@ const items = [
           <li><a href={item.href} aria-current={current === item.key ? 'page' : undefined}>{item.label}</a></li>
         ))}
       </ul>
-      <a class="key bar-book" href={BOOK_HREF}>{BOOK_LABEL}</a>
+      {/* On a narrow phone the button says less. Its name for a screen reader is the same everywhere. */}
+      <a class="key bar-book" href={BOOK_HREF} aria-label={BOOK_LABEL}><span class="bar-book-full">{BOOK_LABEL}</span><span class="bar-book-short">Free consultation</span></a>
       <details class="menu">
         <summary class="plate">Menu</summary>
         <ul class="menu-list">

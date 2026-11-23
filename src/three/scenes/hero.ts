@@ -7,6 +7,11 @@
 // lens shifted so the key sits in its slot on screen. Pulling back is a
 // change of distance along one axis and nothing else.
 //
+// That sequence is for a desktop, where the hero is pinned (src/styles/
+// home.css decides). On a phone or a tablet, and in a small window, the hero
+// is a still picture: the worn key close up with the few keys around it, in
+// the band its slot is in, and no scroll tied to anything.
+//
 // The keys answer the visitor as well as the scroll. A key under the mouse
 // goes down and comes back up behind it, so the pointer leaves a wake of
 // pressed keys. A click or a tap sends a ring out through the field from
@@ -21,7 +26,7 @@
 // other is how many of the field's keys are still up, which the page shows as
 // a figure that goes down as the rows drop out.
 import * as THREE from 'three';
-import { addRig, type SceneFactory, type LiveScene } from '../stage';
+import { addRig, type SceneFactory, type LiveScene, type Rect } from '../stage';
 import { makeKey, makeField, WORN_K, KEY_HEIGHT, KEY_TRAVEL, type Field } from '../objects/keycap';
 import { bus, HERO, type HeroGrid } from '../../scripts/bus';
 
@@ -62,14 +67,25 @@ export const heroScene: SceneFactory = (ctx) => {
   const slot = el.querySelector<HTMLElement>('.hero-slot')!;
   const copy = el.querySelector<HTMLElement>('.hero-copy')!;
   const pin = el.querySelector<HTMLElement>('.hero-pin')!;
-  const stage = el.querySelector<HTMLElement>('.hero-stage')!;
+
+  /** The scroll sequence runs where the hero is pinned. */
+  const sequenced = () => getComputedStyle(pin).position === 'sticky';
+  /** Where keys are drawn: the whole pin with the sequence. Without it, the band the slot is in, out to the edge of the screen on any side where the slot reaches the page margin. */
+  const frameRect = (seq: boolean): Rect => {
+    if (seq) return ctx.rect(pin);
+    const s = ctx.rect(slot);
+    const { w } = ctx.size();
+    const x0 = s.x < 80 ? 0 : s.x;
+    const x1 = s.x + s.w > w - 80 ? w : s.x + s.w;
+    return { x: x0, y: s.y, w: x1 - x0, h: s.h };
+  };
 
   let field: Field | null = null;
   let keys: FieldKey[] = [];
   let signature = '';
   let sMacro = 400;
   let sField = 76;
-  const grid: HeroGrid = { pitch: 76, macro: 400, scale: 400, base: 1, frame: [0, 0, 0, 0], copy: null };
+  const grid: HeroGrid = { sequence: true, pitch: 76, macro: 400, scale: 400, base: 1, frame: [0, 0, 0, 0], copy: null };
 
   // The pointer, in viewport pixels. `on` is a mouse inside the hero's frame.
   const ptr = { x: 0, y: 0, on: false };
@@ -89,8 +105,8 @@ export const heroScene: SceneFactory = (ctx) => {
   };
   let keysLeft = -1;
   const inFrame = (x: number, y: number) => {
-    const r = (getComputedStyle(pin).position === 'sticky' ? pin : stage).getBoundingClientRect();
-    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+    const r = frameRect(sequenced());
+    return x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
   };
   // Where the worn key was and how big a key was at the last frame drawn, to tell whether the pointer is near a key.
   const seen = { ax: 0, ay: 0, scale: 1, reach: 1 };
@@ -134,16 +150,17 @@ export const heroScene: SceneFactory = (ctx) => {
   /** Decide which keys exist. Everything is measured from the worn key, so it holds while the page scrolls. */
   function layout(): void {
     const s = ctx.rect(slot);
-    const pinned = getComputedStyle(pin).position === 'sticky';
-    const frame = ctx.rect(pinned ? pin : stage);
-    const sig = [s.w, s.h, frame.w, frame.h, pinned].map((v) => (typeof v === 'number' ? Math.round(v) : v)).join(':');
+    const pinned = sequenced();
+    const frame = frameRect(pinned);
+    const sig = [s.w, s.h, frame.x, frame.w, frame.h, pinned].map((v) => (typeof v === 'number' ? Math.round(v) : v)).join(':');
     if (sig === signature) return;
     signature = sig;
 
     const ax = s.x + s.w / 2;
     const ay = s.y + s.h / 2;
     sMacro = (0.8 * Math.min(s.w, s.h)) / 0.94;
-    sField = ctx.phone ? Math.min(60, Math.max(40, frame.w / 8.4)) : 76;
+    // With no sequence the camera never pulls back, so the field is laid out at the size it is seen at.
+    sField = pinned ? 76 : sMacro;
 
     field?.dispose();
     if (field) scene.remove(field.mesh);
@@ -161,6 +178,7 @@ export const heroScene: SceneFactory = (ctx) => {
     const right = frame.x + frame.w - ax;
     const top = frame.y - ay;
     const bottom = frame.y + frame.h - ay;
+    grid.sequence = pinned;
     grid.pitch = sField;
     grid.macro = sMacro;
     grid.frame = [left, top, right, bottom];
@@ -203,8 +221,9 @@ export const heroScene: SceneFactory = (ctx) => {
         keys.push({
           x: dx,
           y: -r,
-          t0: (idx + (j / Math.max(1, cols.length)) * 0.7) / (n + 0.9),
-          dur: 1.4 / (n + 0.9),
+          // Every key is all the way down by the end of the drop, the last one included.
+          t0: (idx + (j / Math.max(1, cols.length)) * 0.7) / (n + 1.1),
+          dur: 1.4 / (n + 1.1),
           lag: dx * 0.085 + r * 0.19 + h * 0.5,
           beat: null,
           struck: -10,
@@ -233,12 +252,13 @@ export const heroScene: SceneFactory = (ctx) => {
     update(time) {
       layout();
       // The scene belongs to its pin: nothing is drawn behind copy that sits outside it.
-      live.clip = ctx.still ? null : ctx.rect(getComputedStyle(pin).position === 'sticky' ? pin : stage);
+      const seq = sequenced();
+      live.clip = ctx.still ? null : frameRect(seq);
       const { w, h } = ctx.size();
       const s = ctx.rect(slot);
       const ax = s.x + s.w / 2;
       const ay = s.y + s.h / 2;
-      const p = ctx.still ? 1 : bus.hero.p;
+      const p = ctx.still ? 1 : seq ? bus.hero.p : 0;
 
       // Straight back, then straight in again. Interpolated in log space so the pull reads as constant speed.
       const out = inOut(span(p, HERO.pull[0], HERO.pull[1])) * (1 - inOut(span(p, HERO.push[0], HERO.push[1])));

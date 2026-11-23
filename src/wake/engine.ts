@@ -4,18 +4,24 @@
 // the trail thins. A click sends one ring out through them, and so does the
 // hero's own greeting when the page arrives.
 //
-// It belongs to the hero and nothing else. It is drawn only inside the hero,
-// behind the headline, on the grid the hero's own 3D field comes to rest on
-// (the same pitch, the same rows, measured from the worn key), so once the
-// camera has pulled back the ghost keys carry the real keyboard on under the
-// headline. As the hero's scroll sequence drops its
-// keys away the wake fades with them, and from there down the page there is
-// no wake at all.
+// There are two of it, and each keeps to its own ground.
 //
-// One fixed canvas above the 3D stage and below the hero's copy. It writes
-// colour with no alpha, which a premultiplied canvas adds to what is behind
-// it, so it can only add light and costs the browser no blending pass. Two
-// small shader passes:
+// The hero's. It is drawn only inside the hero, behind the headline, on the
+// grid the hero's own 3D field comes to rest on (the same pitch, the same
+// rows, measured from the worn key), so once the camera has pulled back the
+// ghost keys carry the real keyboard on under the headline. As the hero's
+// scroll sequence drops its keys away this wake fades with them, and the hero
+// settles with nothing moving in it. One fixed canvas above the 3D stage and
+// below the hero's copy.
+//
+// The page's. Everywhere below the hero, and on the other pages, the same
+// keyboard at well under half the strength: a faint trail behind the pointer
+// and nothing else (no rings). One fixed canvas over the page and under the
+// header. It is not made until the pointer first moves somewhere it draws.
+//
+// Both write colour with no alpha, which a premultiplied canvas adds to what
+// is behind it, so they can only add light and cost the browser no blending
+// pass. Two small shader passes:
 //
 //   1. The trail. A low-resolution field holding how much trail is at each
 //      point and which way it is moving. Each frame it drifts, spreads a
@@ -99,7 +105,10 @@ in vec2 vUv;
 out vec4 o;
 uniform sampler2D uTrail;
 uniform vec2 uSize, uAnchor;
-uniform float uPitch, uLive, uBase, uTime, uGain;
+// uPitch: a key of the hero's 3D field at rest. uGhost: a key of the keyboard drawn here. uSame is 1 when they
+// are one grid (the scroll sequence), so a ghost key is only drawn where the field has none. uMode is 1 for the
+// page's wake, which has no 3D keys to keep off.
+uniform float uPitch, uGhost, uSame, uMode, uLive, uBase, uTime, uGain;
 uniform vec4 uFrame, uField;
 // The copy's corner: its right edge and its foot, from the worn key. z is 1 when keys were left out for it.
 uniform vec3 uCopy;
@@ -118,6 +127,7 @@ float stagger(float row) {
 // Is there a real key at this place in the grid? The same rule the 3D scene lays its field out by:
 // inside the frame, and never crossing the copy's corner at any distance of the pull-back.
 bool real(float col, float row) {
+  if (uMode > 0.5) return false;
   float st = stagger(row);
   if (row == 0.0 && col == 0.0) return true; // the worn key
   if (uField.z <= uField.x) return false; // no 3D field at all
@@ -141,40 +151,48 @@ void main() {
   // The edge of the trail: a hard, liquid line that wobbles a little.
   float wobble = (vnoise(p * 0.016 + uTime * 0.3) - 0.5) * 0.09;
   float a = smoothstep(0.17, 0.24, m + wobble);
-  // Only inside the hero, with a soft foot so nothing of it reaches the section below.
   vec2 lo = uFrame.xy, hi = uFrame.xy + uFrame.zw;
-  a *= step(lo.x, p.x) * step(p.x, hi.x) * step(lo.y, p.y) * (1.0 - smoothstep(hi.y - 56.0, hi.y - 4.0, p.y));
+  // The page's wake starts under the header, or under the hero, with a soft head.
+  if (uMode > 0.5) a *= smoothstep(lo.y, lo.y + 48.0, p.y);
+  // The hero's is only inside the hero, with a soft foot so nothing of it reaches the section below.
+  else a *= step(lo.x, p.x) * step(p.x, hi.x) * step(lo.y, p.y) * (1.0 - smoothstep(hi.y - 56.0, hi.y - 4.0, p.y));
   a *= uGain;
   if (a <= 0.0) { o = vec4(0.0); return; }
   // A thin bright line where the trail ends, like the edge of a liquid.
   float lip = smoothstep(0.17, 0.215, m + wobble) * (1.0 - smoothstep(0.215, 0.26, m + wobble));
 
+  // The frame the 3D keys are drawn in. With no 3D scene there is only the drawn key in the slot.
+  vec2 rel = p - uAnchor;
+  bool hasField = uField.z > uField.x;
+  bool inField = !hasField || (rel.x >= uField.x && rel.x <= uField.z && rel.y >= uField.y && rel.y <= uField.w);
   // Where a real key is on screen now, the wake keeps off it: only the liquid's edge crosses it.
-  vec2 kl = (p - uAnchor) / uLive;
+  vec2 kl = rel / uLive;
   float rowL = floor(kl.y + 0.5);
   float colL = floor(kl.x - stagger(rowL) + 0.5);
   vec2 cl = vec2(colL + stagger(rowL), rowL);
   // A key as the camera sees it: its top where it is, its foot a little smaller and a little nearer the worn key.
   float shape = min(box(kl - cl, vec2(0.34), 0.08), box(kl - cl * uBase, vec2(0.475 * uBase), 0.06));
   float cover = 1.0 - smoothstep(-0.012, 0.012, shape);
-  if (cover > 0.0 && real(colL, rowL)) {
+  if (cover > 0.0 && inField && real(colL, rowL)) {
     a *= 1.0 - cover;
     if (a <= 0.0) { o = vec4(uSide * 0.1 * lip * uGain, 0.0); return; }
   }
 
-  // The rest of the keyboard: the keys the field left out, on the grid it comes to rest on.
-  vec2 k = (p - uAnchor) / uPitch;
+  // Where the hero is a still picture, the band its keys are in is theirs alone.
+  if (uSame < 0.5 && hasField && inField) { o = vec4(uSide * 0.1 * lip * a, 0.0); return; }
+  // The rest of the keyboard. With the scroll sequence these are the keys the field left out, on the grid it comes to rest on.
+  vec2 k = rel / uGhost;
   float row = floor(k.y + 0.5);
   float st = stagger(row);
   float col = floor(k.x - st + 0.5);
-  if (real(col, row)) { o = vec4(uSide * 0.1 * lip * a, 0.0); return; }
+  if (uSame > 0.5 && real(col, row)) { o = vec4(uSide * 0.1 * lip * a, 0.0); return; }
   vec2 l = k - vec2(col + st, row);
 
   // How lit this key is: the trail at its centre.
-  vec2 cv = uAnchor + vec2(col + st, row) * uPitch;
+  vec2 cv = uAnchor + vec2(col + st, row) * uGhost;
   float press = smoothstep(0.3, 1.0, texture(uTrail, vec2(cv.x / uSize.x, 1.0 - cv.y / uSize.y)).b);
 
-  float aa = 1.2 / uPitch;
+  float aa = 1.2 / uGhost;
   float body = box(l, vec2(0.455), 0.08);
   vec2 lf = (l + vec2(0.0, 0.014)) / (1.0 - press * 0.05);
   float face = box(lf, vec2(0.33), 0.075);
@@ -220,6 +238,8 @@ const RING_REACH = 330;
 const IDLE_AFTER = 3200;
 /** With no 3D scene to take the grid from, a key is this wide. */
 const PITCH = 76;
+/** How strong the page's wake is beside the hero's. */
+const PAGE_GAIN = 0.42;
 const CONTROLS = 'a, button, input, select, textarea, summary, label';
 
 const span = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
@@ -255,13 +275,38 @@ function program(gl: WebGL2RenderingContext, frag: string): WebGLProgram | null 
   return p;
 }
 
-/** Start the wake in the homepage hero. `first` is the pointer event that woke it, if one did, so the trail starts where the pointer is. */
-export function startWake(first?: PointerEvent): void {
+/** Where the page's wake begins: under the header, and under the hero while any of it is on screen. */
+function pageTop(): number {
+  const bar = document.querySelector<HTMLElement>('.bar');
   const hero = document.getElementById('hero');
-  const slot = hero?.querySelector<HTMLElement>('.hero-slot');
-  if (!hero || !slot) return;
+  return Math.max(bar ? bar.getBoundingClientRect().bottom : 0, hero ? hero.getBoundingClientRect().bottom : 0);
+}
+
+/**
+ * Start the wake. `first` is the pointer event that woke it, if one did, so the trail starts where the pointer is.
+ * The hero's is made at once where there is a hero. The page's waits for the pointer to move somewhere it draws.
+ */
+export function startWake(first?: PointerEvent): void {
+  if (document.getElementById('hero')) create('hero', first);
+  if (first && first.clientY >= pageTop()) {
+    create('page', first);
+    return;
+  }
+  const onMove = (e: PointerEvent) => {
+    if (e.pointerType !== 'mouse' || e.clientY < pageTop()) return;
+    window.removeEventListener('pointermove', onMove);
+    create('page', e);
+  };
+  window.addEventListener('pointermove', onMove, { passive: true });
+}
+
+function create(mode: 'hero' | 'page', first?: PointerEvent): void {
+  const page = mode === 'page';
+  const hero = document.getElementById('hero');
+  const slot = hero?.querySelector<HTMLElement>('.hero-slot') ?? null;
+  if (!page && (!hero || !slot)) return;
   const canvas = document.createElement('canvas');
-  canvas.className = 'wake';
+  canvas.className = page ? 'wake wake-page' : 'wake';
   canvas.setAttribute('aria-hidden', 'true');
   const gl = canvas.getContext('webgl2', { alpha: true, antialias: false, depth: false, stencil: false, premultipliedAlpha: true, powerPreference: 'low-power' });
   // The trail needs a float texture it can draw into. Without one, the page simply has no wake.
@@ -271,7 +316,7 @@ export function startWake(first?: PointerEvent): void {
   if (!trail || !picture) return;
   const U = (p: WebGLProgram, names: string[]) => Object.fromEntries(names.map((n) => [n, gl.getUniformLocation(p, n)])) as Record<string, WebGLUniformLocation | null>;
   const ut = U(trail, ['uPrev', 'uSize', 'uDt', 'uTime', 'uScrollDy', 'uStamp', 'uRadius', 'uA', 'uB', 'uVel', 'uRing']);
-  const up = U(picture, ['uTrail', 'uSize', 'uAnchor', 'uPitch', 'uLive', 'uBase', 'uTime', 'uGain', 'uFrame', 'uField', 'uCopy', 'uPath', 'uSide', 'uFace']);
+  const up = U(picture, ['uTrail', 'uSize', 'uAnchor', 'uPitch', 'uGhost', 'uSame', 'uMode', 'uLive', 'uBase', 'uTime', 'uGain', 'uFrame', 'uField', 'uCopy', 'uPath', 'uSide', 'uFace']);
 
   const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
@@ -282,9 +327,11 @@ export function startWake(first?: PointerEvent): void {
 
   const side = colour('--rule');
   const face = colour('--readout');
-  // Straight after the 3D stage in the document: above its keys, below the hero's copy.
+  // The hero's goes straight after the 3D stage in the document: above its keys, below the hero's copy.
+  // The page's goes at the end, and its z-index puts it over the page and under the header.
   const stage = document.getElementById('stage');
-  if (stage) stage.after(canvas);
+  if (page) document.body.append(canvas);
+  else if (stage) stage.after(canvas);
   else document.body.prepend(canvas);
 
   let width = 1;
@@ -325,13 +372,16 @@ export function startWake(first?: PointerEvent): void {
     read = 0;
   }
 
-  /** How strong the wake is: whole while the keyboard is there, fading out as the scroll sequence drops the keys away. */
-  const gain = () => 1 - inOut(span(bus.hero.p, HERO.drop[0], HERO.drop[1]));
-  /** The part of the hero on screen. */
+  /** How strong the wake is. The hero's is whole while the keyboard is there, fading out as the scroll sequence drops the keys away. The page's is always faint. */
+  const gain = () => (page ? PAGE_GAIN : 1 - inOut(span(bus.hero.p, HERO.drop[0], HERO.drop[1])));
+  /** This wake's own ground: the part of the hero on screen, or the page below the header and the hero. */
   const inHero = (x: number, y: number) => {
-    const r = hero.getBoundingClientRect();
+    if (page) return y >= pageTop();
+    const r = hero!.getBoundingClientRect();
     return x >= r.left && x <= r.right && y >= Math.max(0, r.top) && y <= r.bottom;
   };
+  /** What the trail is fixed to: the hero, or the document. */
+  const groundTop = () => (page ? -window.scrollY : hero!.getBoundingClientRect().top);
 
   // The pointer: where it is, where the last stroke ended, and how fast it is going.
   const ptr = { x: first?.clientX ?? -1, y: first?.clientY ?? -1, lastX: first?.clientX ?? -1, lastY: first?.clientY ?? -1, vx: 0, vy: 0, moved: false, on: false };
@@ -352,7 +402,7 @@ export function startWake(first?: PointerEvent): void {
     if (running || dead || document.hidden) return;
     running = true;
     lastFrame = 0;
-    lastTop = hero!.getBoundingClientRect().top;
+    lastTop = groundTop();
     canvas.style.visibility = 'visible';
     raf = requestAnimationFrame(frame);
   }
@@ -386,16 +436,18 @@ export function startWake(first?: PointerEvent): void {
       canvas.remove();
       return;
     }
-    const box = hero!.getBoundingClientRect();
+    const top = page ? pageTop() : 0;
+    const box = page ? new DOMRect(0, top, width, Math.max(0, height - top)) : hero!.getBoundingClientRect();
     const g = gain();
-    // The keys have dropped away, or the hero has left the screen: there is nothing here to light.
+    // The keys have dropped away, or this wake's ground has left the screen: there is nothing here to light.
     if (g <= 0.001 || box.bottom <= 0 || box.top >= height) {
       rest();
       return;
     }
-    // The trail belongs to the hero: it stays put while the hero is pinned, and moves with it when it is not.
-    const scrollDy = lastTop - box.top;
-    lastTop = box.top;
+    // The trail belongs to its ground: it stays put while the hero is pinned, and moves with the page when the page moves.
+    const ground = groundTop();
+    const scrollDy = lastTop - ground;
+    lastTop = ground;
 
     // This frame's stroke.
     const stamp = ptr.moved && ptr.on ? 1 : 0;
@@ -410,9 +462,11 @@ export function startWake(first?: PointerEvent): void {
     }
     const speed = Math.hypot(ptr.vx, ptr.vy);
     // The 3D field's grid when the scene is running, so once the camera has pulled back a ghost key and a real one line up.
-    const grid = bus.hero.grid;
+    const grid = page ? null : bus.hero.grid;
     const pitch = grid?.pitch ?? PITCH;
-    const radius = 34 + Math.min(34, speed * 0.024);
+    // Where the hero is a still picture its few keys are close up, and the keyboard drawn here keeps its usual size.
+    const ghost = grid?.sequence ? pitch : PITCH;
+    const radius = (34 + Math.min(34, speed * 0.024)) * (page ? 0.85 : 1);
 
     ringData.fill(0);
     for (let i = rings.length - 1; i >= 0; i--) if (now - rings[i].t0 > rings[i].life * 1000) rings.splice(i, 1);
@@ -421,7 +475,7 @@ export function startWake(first?: PointerEvent): void {
       // A click's ring is quick. The greeting's travels the whole hero, so it goes more evenly and holds its strength longer.
       const long = r.life > 1;
       const eased = 1 - Math.pow(1 - age, long ? 1.6 : 3);
-      ringData.set([r.x, r.y + box.top, 24 + r.reach * eased, (long ? Math.min(1, (1 - age) * 2.2) : 1 - age) * r.strength], i * 4);
+      ringData.set([r.x, r.y + ground, 24 + r.reach * eased, (long ? Math.min(1, (1 - age) * 2.2) : 1 - age) * r.strength], i * 4);
     });
 
     const write = 1 - read;
@@ -462,12 +516,16 @@ export function startWake(first?: PointerEvent): void {
     gl!.bindTexture(gl!.TEXTURE_2D, targets[read].tex);
     gl!.uniform1i(up.uTrail, 0);
     gl!.uniform2f(up.uSize, width, height);
-    // The worn key sits in the middle of its slot, and is the key at row 0, column 0.
-    const s = slot!.getBoundingClientRect();
+    // The worn key sits in the middle of its slot, and is the key at row 0, column 0. A page with no hero hangs
+    // the keyboard from the middle of the top of the document.
+    const s = slot ? slot.getBoundingClientRect() : new DOMRect(width / 2, -window.scrollY, 0, 0);
     gl!.uniform2f(up.uAnchor, s.left + s.width / 2, s.top + s.height / 2);
     gl!.uniform1f(up.uPitch, pitch);
+    gl!.uniform1f(up.uGhost, ghost);
+    gl!.uniform1f(up.uSame, !grid || grid.sequence ? 1 : 0);
+    gl!.uniform1f(up.uMode, page ? 1 : 0);
     // With no 3D scene the only real key is the drawn one in the slot, at its close-in size.
-    const macro = grid?.macro ?? (0.8 * Math.min(s.width, s.height)) / 0.94;
+    const macro = grid?.macro ?? Math.max(PITCH, (0.8 * Math.min(s.width, s.height)) / 0.94);
     gl!.uniform1f(up.uLive, grid?.scale ?? macro);
     gl!.uniform1f(up.uBase, grid?.base ?? 0.94);
     if (grid) gl!.uniform4f(up.uField, grid.frame[0], grid.frame[1], grid.frame[2], grid.frame[3]);
@@ -488,8 +546,8 @@ export function startWake(first?: PointerEvent): void {
   }
 
   function ring(x: number, y: number, reach = RING_REACH, life = RING_LIFE, strength = 0.95): void {
-    if (gain() <= 0.001) return;
-    rings.push({ x, y: y - hero!.getBoundingClientRect().top, t0: performance.now(), reach, life, strength });
+    if (page || gain() <= 0.001) return;
+    rings.push({ x, y: y - groundTop(), t0: performance.now(), reach, life, strength });
     wake();
   }
 
@@ -497,7 +555,7 @@ export function startWake(first?: PointerEvent): void {
     'pointermove',
     (e) => {
       if (e.pointerType !== 'mouse') return;
-      // Outside the hero there is no wake: the next stroke starts where the pointer comes back in.
+      // Off this wake's ground there is nothing to draw: the next stroke starts where the pointer comes back in.
       if (!inHero(e.clientX, e.clientY) || gain() <= 0.001) {
         ptr.on = false;
         return;

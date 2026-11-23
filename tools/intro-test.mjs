@@ -5,6 +5,7 @@
 //   - it is over, and out of the document, inside four and a half seconds
 //   - Skip, the Escape key and a scroll each end it at once
 //   - its key lands on the hero's key
+//   - a letter's caret is gone once the next letter is typed
 //   - with reduced motion it is one still frame and nothing moves
 //   - a phone gets it too, with nothing wider than the screen
 // A program-driven browser is not shown the intro unless the address asks
@@ -71,7 +72,14 @@ console.log('\ndesktop');
   let s = await state(page);
   ok(s.there && s.on, 'the intro is on screen from the first paint');
   ok(await page.locator('.pitch-skip').isVisible(), 'there is a Skip button');
-  await film(page, 'desktop', 5200, 240, 5, [576, 360]);
+  // Each typed letter has a caret after it until the next keystroke. One left on shows as a bar behind the word.
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('.pitch-word.last .pitch-l:last-child') ?? document.body).opacity === '1', null, { timeout: 4000 }).catch(() => {});
+  const carets = await page.evaluate(() => {
+    const letters = [...document.querySelectorAll('.pitch-word.last .pitch-l')];
+    return letters.slice(0, -1).filter((l) => Number(getComputedStyle(l, '::after').opacity) > 0.01).length;
+  });
+  ok(carets === 0, `no caret is left on behind the word being typed (${carets} still showing)`);
+  await film(page, 'desktop', 3200, 240, 5, [576, 360]);
   await page.waitForFunction(() => !document.getElementById('pitch'), null, { timeout: 4000 }).catch(() => {});
   s = await state(page);
   ok(!s.there && !s.on, 'it has handed over and left the document');
