@@ -108,19 +108,19 @@ const jsonLd = [organization(), website(), breadcrumbs(crumbs), faq ? faqSchema(
         var d = document.documentElement;
         var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         d.classList.add(reduce ? 'still' : 'motion');
-        if (reduce) return;
-        // The homepage hero assembles once per browser session.
+        // The homepage's intro (src/components/Pitch.astro) plays on the first visit in a browser session, at the
+        // top of the page. Adding ?intro to the address plays it again. A browser driven by a program (the
+        // project's own tools) is not shown it unless it asks, so they see the page itself.
         if (d.getAttribute('data-page') === 'home') {
+          var asked = /[?&]intro\b/.test(location.search);
           var seen = false;
           try {
             seen = sessionStorage.getItem('ks-intro') === '1';
             sessionStorage.setItem('ks-intro', '1');
           } catch (e) {}
-          if (!seen) {
-            d.classList.add('intro');
-            setTimeout(function () { d.classList.remove('intro'); }, 1500);
-          }
+          if (asked || (!seen && !location.hash && !navigator.webdriver)) d.classList.add('pitch-on');
         }
+        if (reduce) return;
         setTimeout(function () {
           if (!d.classList.contains('run')) { d.classList.remove('motion'); d.classList.add('still'); }
         }, 5000);
@@ -143,8 +143,3 @@ const jsonLd = [organization(), website(), breadcrumbs(crumbs), faq ? faqSchema(
     {!minimal && <StickyCta service={service} href={bookHref} />}
   </body>
 </html>
-
-<script>
-  // The cursor wake, on every page (src/scripts/wake.ts decides whether it runs).
-  import '../scripts/wake.ts';
-</script>

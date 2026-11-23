@@ -12,12 +12,18 @@
 // pressed keys. A click or a tap sends a ring out through the field from
 // that key. When the page first arrives, the worn key presses itself once and
 // its neighbours follow. These sit on top of the scroll sequence and change
-// none of its timing. Away from the hero the same keyboard is drawn under the
-// rest of the page by the wake (src/wake/engine.ts).
+// none of its timing.
+//
+// The scene also tells the page two things through the bus. One is how this
+// keyboard is laid out: how big a key is, and which keys were left out to keep
+// the copy on empty ground. The wake (src/wake/engine.ts) draws exactly those
+// missing keys, so the keyboard carries on under the headline. The
+// other is how many of the field's keys are still up, which the page shows as
+// a figure that goes down as the rows drop out.
 import * as THREE from 'three';
 import { addRig, type SceneFactory, type LiveScene } from '../stage';
 import { makeKey, makeField, WORN_K, KEY_HEIGHT, KEY_TRAVEL, type Field } from '../objects/keycap';
-import { bus, HERO } from '../../scripts/bus';
+import { bus, HERO, type HeroGrid } from '../../scripts/bus';
 
 const FOV = 30;
 const TAN = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
@@ -63,6 +69,7 @@ export const heroScene: SceneFactory = (ctx) => {
   let signature = '';
   let sMacro = 400;
   let sField = 76;
+  const grid: HeroGrid = { pitch: 76, macro: 400, scale: 400, base: 1, frame: [0, 0, 0, 0], copy: null };
 
   // The pointer, in viewport pixels. `on` is a mouse inside the hero's frame.
   const ptr = { x: 0, y: 0, on: false };
@@ -73,10 +80,21 @@ export const heroScene: SceneFactory = (ctx) => {
   let lastTime = 0;
   // The greeting: once, when the page arrives at its top, the worn key presses itself and the ring goes out.
   let greetAt: number | null = !ctx.still && window.scrollY < 8 ? -1 : null;
+  // While the intro is playing its own key is still on its way to the slot. The greeting waits for it to land.
+  let held = document.documentElement.classList.contains('pitch-on');
+  const onLanded = () => {
+    held = false;
+    if (greetAt !== null) greetAt = -2;
+    bus.invalidate();
+  };
+  let keysLeft = -1;
   const inFrame = (x: number, y: number) => {
     const r = (getComputedStyle(pin).position === 'sticky' ? pin : stage).getBoundingClientRect();
     return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
   };
+  // Where the worn key was and how big a key was at the last frame drawn, to tell whether the pointer is near a key.
+  const seen = { ax: 0, ay: 0, scale: 1, reach: 1 };
+  let touching = false;
   const onMove = (e: PointerEvent) => {
     if (e.pointerType !== 'mouse') return;
     const on = inFrame(e.clientX, e.clientY);
@@ -84,7 +102,15 @@ export const heroScene: SceneFactory = (ctx) => {
     ptr.x = e.clientX;
     ptr.y = e.clientY;
     ptr.on = on;
-    bus.invalidate();
+    // Over the copy's corner there is no key to press, so there is nothing to redraw: the frame is asked for only
+    // when the pointer reaches a key, or leaves the last one it was on.
+    const px = (ptr.x - seen.ax) / seen.scale;
+    const py = -(ptr.y - seen.ay) / seen.scale;
+    const lim = seen.reach + 0.5;
+    let near = on && Math.abs(px) < lim && Math.abs(py) < lim;
+    if (on && !near) for (const k of keys) if (Math.abs(k.x - px) < lim && Math.abs(k.y - py) < lim) { near = true; break; }
+    if (near || touching) bus.invalidate();
+    touching = near;
   };
   const onLeave = () => {
     if (!ptr.on) return;
@@ -102,6 +128,7 @@ export const heroScene: SceneFactory = (ctx) => {
     window.addEventListener('pointermove', onMove, { passive: true });
     document.documentElement.addEventListener('pointerleave', onLeave);
     window.addEventListener('click', onClick);
+    window.addEventListener('ks:intro-end', onLanded);
   }
 
   /** Decide which keys exist. Everything is measured from the worn key, so it holds while the page scrolls. */
@@ -134,6 +161,10 @@ export const heroScene: SceneFactory = (ctx) => {
     const right = frame.x + frame.w - ax;
     const top = frame.y - ay;
     const bottom = frame.y + frame.h - ay;
+    grid.pitch = sField;
+    grid.macro = sMacro;
+    grid.frame = [left, top, right, bottom];
+    grid.copy = ex ? [ex.r, ex.b] : null;
     const crosses = (dx: number, dy: number): boolean => {
       if (!ex) return false;
       for (let i = 0; i <= 14; i++) {
@@ -216,6 +247,9 @@ export const heroScene: SceneFactory = (ctx) => {
       camera.position.set(0, 0, KEY_HEIGHT + h / (2 * TAN * scale));
       camera.setViewOffset(w, h, w / 2 - ax, h / 2 - ay, w, h);
       camera.updateProjectionMatrix();
+      grid.scale = scale;
+      grid.base = (camera.position.z - KEY_HEIGHT) / camera.position.z;
+      bus.hero.grid = ctx.still || !field ? null : grid;
 
       let busy = false;
       const dt = Math.min(0.05, Math.max(0, time - lastTime));
@@ -223,6 +257,10 @@ export const heroScene: SceneFactory = (ctx) => {
 
       // The pointer and any clicks, in key units from the worn key.
       const reach = Math.max(0.62, 58 / scale);
+      seen.ax = ax;
+      seen.ay = ay;
+      seen.scale = scale;
+      seen.reach = reach;
       const px = (ptr.x - ax) / scale;
       const py = -(ptr.y - ay) / scale;
       const ring = (ux: number, uy: number) => {
@@ -235,12 +273,15 @@ export const heroScene: SceneFactory = (ctx) => {
         ringUntil = time + RING_REACH * RING_STEP + 0.25;
       };
       for (const tap of taps.splice(0)) ring((tap.x - ax) / scale, -(tap.y - ay) / scale);
-      if (greetAt !== null) {
-        if (greetAt < 0) greetAt = time + 1.15;
+      if (greetAt !== null && !held) {
+        if (greetAt === -1) greetAt = time + 1.15;
+        if (greetAt === -2) greetAt = time + 0.16; // straight after the intro's key lands
         if (p > 0.02) greetAt = null; // already scrolling: the sequence has its own press
         else if (time >= greetAt) {
           greetAt = null;
           ring(0, 0);
+          // The same ring goes out through the keys under the headline.
+          window.dispatchEvent(new CustomEvent('ks:ring', { detail: { x: ax, y: ay, reach: Math.hypot(ax, h - ay) + 160, life: 2.1, strength: 1.05 } }));
         } else busy = true;
       }
       if (time < ringUntil) busy = true;
@@ -255,6 +296,7 @@ export const heroScene: SceneFactory = (ctx) => {
       const wave = span(p, HERO.waves[0], HERO.waves[1]);
       const typing = wave > 0 && wave < 1;
       const drop = span(p, HERO.drop[0], HERO.drop[1]);
+      let left = 0;
       if (field) {
         for (let i = 0; i < keys.length; i++) {
           const k = keys[i];
@@ -275,9 +317,14 @@ export const heroScene: SceneFactory = (ctx) => {
           if (tap > 0 || k.struck > time) busy = true;
           const press = Math.max(tap, k.hover * 0.9);
           const d = span(drop, k.t0, k.t0 + k.dur);
+          if (d < 0.5) left++;
           field.set(i, k.x, k.y, press, d * d * (3 - 2 * d));
         }
         field.commit();
+      }
+      if (!ctx.still && keys.length && left !== keysLeft) {
+        keysLeft = left;
+        bus.hero.onKeys?.(left, keys.length);
       }
       const wornTap = strike(time, wornStruck);
       if (wornTap > 0) busy = true;
@@ -289,6 +336,11 @@ export const heroScene: SceneFactory = (ctx) => {
       window.removeEventListener('pointermove', onMove);
       document.documentElement.removeEventListener('pointerleave', onLeave);
       window.removeEventListener('click', onClick);
+      window.removeEventListener('ks:intro-end', onLanded);
+      bus.hero.grid = null;
+      // The field is gone (the stage handed over to still frames, or the hero left the screen): no count to show.
+      if (keysLeft >= 0) bus.hero.onKeys?.(-1, 0);
+      keysLeft = -1;
       worn.dispose();
       field?.dispose();
     },

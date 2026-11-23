@@ -9,6 +9,8 @@ import { initSite } from './site';
 import { initDemos } from './demos';
 import { loadStage } from './stage';
 import { bus, HERO } from './bus';
+// The cursor wake in the hero (src/scripts/wake.ts decides whether it runs).
+import './wake';
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel);
 
@@ -29,6 +31,19 @@ function initHero(figures: { today: number; weekAgo: number } | null): void {
   const c = ctrEl ? counter(ctrEl) : null;
   const rolls = Boolean(c && figures && figures.today !== figures.weekAgo);
   if (c && figures && rolls) c.show(figures.weekAgo);
+
+  // With no client figures yet, the counter shows how many of the field's keys are still up. The scene
+  // counts them as it draws, so the figure is always what is on the screen, at any point of the scroll.
+  const leftEl = $('#keys-left');
+  const left = leftEl ? counter(leftEl) : null;
+  const leftWrap = leftEl?.closest<HTMLElement>('.hero-counter') ?? null;
+  if (left && leftWrap) {
+    bus.hero.onKeys = (n) => {
+      // A count below nothing means there is no field to count: the counter leaves with it.
+      leftWrap.classList.toggle('is-off', n < 0);
+      if (n >= 0) left.show(Math.min(999, n));
+    };
+  }
 
   d.progress((p) => {
     bus.hero.p = p;

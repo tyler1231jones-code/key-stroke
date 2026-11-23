@@ -323,29 +323,81 @@ The businesses in the demonstrations are invented. Before changing a name in
 `demos.json`, search for it and make sure no real business has it. With
 reduced motion a demonstration shows its finished state and nothing plays.
 
-## The cursor wake
+## The homepage hero
 
-On a computer with a mouse, the pointer leaves a liquid trail that shows a
-keyboard under the page: the keys it passes light and press, then come back
-up, and a click sends one ring out through them. It is one canvas over the
-page (`.wake` in `base.css`, blended with `screen` so it only adds light and
-text keeps its contrast), drawn by two small shader passes in
-`src/wake/engine.ts`. `src/scripts/wake.ts`, loaded from `Base.astro`, fetches
-the engine on the first mouse move, so no page waits for it. It does not run
-on a touch screen, with reduced motion, or on the onboarding forms; it hides
-and stops a few seconds after the mouse stops; and a computer that cannot
-keep its frame rate loses it for that page.
+Three things happen in the hero, in this order, and they are built to read as
+one piece: the intro, the cursor wake, and the scroll sequence.
 
-On the homepage the hero's own keys answer instead
-(`src/three/scenes/hero.ts`): a key under the mouse goes down and comes back
-up behind it, a click or a tap sends a ring through the field, and the worn
-key presses itself once when the page arrives at its top. These sit on top of
-the scroll sequence and change none of its timing. The wake leaves the hero
-alone while the 3D stage is on. Colours come from the design tokens; the
-pitch and stagger of the drawn keyboard match the hero's field.
+### The intro
+
+On the first visit to the homepage in a browser session, a pitch of about
+three and a half seconds plays over the page before the hero
+(`src/components/Pitch.astro`, styles in `home.css`). A keyboard types the
+four things we do, by itself, while a counter keeps the tally of keystrokes
+the visitor did not type. Then every key drops away but the K, and the K
+travels to its place in the hero, where the page's own key takes over and the
+headline rises in.
+
+- The words are the first word of each service's name in `services.json`, and
+  the counter's total is the number of letters in them. `npm run check` fails
+  if the two disagree. Nothing in it is a client figure.
+- It is plain HTML and CSS animations of transform and opacity, with every
+  delay worked out at build time, so it starts with the first paint, waits for
+  no script and keeps its timing while the page loads underneath. A small
+  inline script does skip, the K's journey and the hand-over.
+- "Skip intro", the Escape key, a click, or starting to scroll ends it at
+  once. If its script never runs it removes itself after a few seconds.
+- With reduced motion it is one still frame, held under two seconds.
+- The head script in `Base.astro` decides whether it plays: the first visit
+  in a session (`sessionStorage`), at the top of the page. Add `?intro` to
+  the address to see it again. A browser driven by a program is not shown it
+  unless the address asks, so the project's tools see the page itself.
+
+`node tools/intro-test.mjs` checks all of this at desktop and phone sizes and
+writes film strips to `shots/intro/`.
+
+### The cursor wake
+
+The hero is a keyboard seen from overhead, and it carries on under the
+headline, in the dark. On a computer with a mouse, the pointer leaves a liquid
+trail that shows it: the keys the trail passes light up, then go dark again. A
+click sends one ring out, and so does the hero's greeting when the page
+arrives (the worn key presses itself and the ring goes out behind the
+headline, then fades and leaves the hero clean).
+
+It belongs to the hero and runs nowhere else: not on other pages, and not in
+any section below the hero. It is one canvas straight after the 3D stage
+(`.wake` in `base.css`), so it is above the hero's keys and below its copy,
+drawn by two small shader passes in `src/wake/engine.ts`. It draws exactly the
+keys the 3D field left out to keep the copy on empty ground (the scene
+publishes its layout on the bus as `bus.hero.grid`), on the same grid, and
+keeps off every key that is really there. As the scroll sequence drops the
+field's keys away the wake fades out with them.
+
+`src/scripts/wake.ts`, loaded by the homepage script, fetches the engine once
+the page has loaded and gone quiet. It does not run on a touch screen or with
+reduced motion; it hides and stops a few seconds after the mouse stops; and a
+computer that cannot keep its frame rate loses it for that page. The hero's
+own keys still answer the pointer (`src/three/scenes/hero.ts`): a key under
+the mouse goes down, and a click or a tap sends a ring through the field.
 
 `node tools/wake-test.mjs` checks all of this in a browser and writes pictures
 to `shots/wake/`.
+
+### The scroll sequence
+
+Scrolling pulls the camera straight back from the worn key to the whole field,
+the field is typed by nobody, its rows drop out, and the camera comes back in
+to the one key left. The beats are in `HERO` in `src/scripts/bus.ts`.
+
+The strip at the foot of the hero is how the sequence ends. Until there are
+client figures in the ledger, its counter shows how many of the field's keys
+are still up. The scene counts them as it draws (`bus.hero.onKeys`), so the
+figure is always what is on the screen, wherever the scroll is stopped, and it
+runs down to nothing as the rows go. Beside it is the line the sequence has
+been making: "We don't sell transformation. We sell a smaller number than the
+one you've got." When the ledger has real rows the client counter takes the
+strip back, as before.
 
 ## Phones
 

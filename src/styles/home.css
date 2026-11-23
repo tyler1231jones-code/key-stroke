@@ -21,10 +21,14 @@
   html:is(.motion, .still):not(.no-stage) .hero-slot .stand-in { visibility: hidden; }
 }
 .hero-strip { display: flex; flex-direction: column; gap: var(--space-6); padding-bottom: var(--space-8); }
+/* The count of keys left waits for the 3D scene. Until then it keeps its place and shows nothing; where there
+   will be no scene at all (reduced motion, no script, no WebGL) it takes no room. */
+.hero-counter.is-off { visibility: hidden; }
+:is(.still, .no-stage) .hero-counter.is-off { display: none; }
 .hero-ctr-row { display: flex; align-items: flex-end; gap: var(--space-6); flex-wrap: wrap; }
 .hero-label { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); color: var(--readout); font-size: 14px; line-height: 21px; }
 .hero-label .fig { margin-left: -0.2em; }
-.hero-voice { max-width: 34ch; color: var(--ink-inverse); }
+.hero-voice { max-width: 26ch; color: var(--ink-inverse); }
 
 /* Phone and short screens: the copy flows, the scene pins on its own. */
 .hero-copy { padding: var(--space-12) var(--margin) var(--space-8); }
@@ -45,7 +49,7 @@
   .hero-copy { grid-column: 1; grid-row: 1; align-self: center; padding: var(--space-8) 0; }
   .hero-slot { grid-column: 2; grid-row: 1; min-height: 0; }
   .hero-strip { grid-column: 1 / -1; grid-row: 2; flex-direction: row; justify-content: space-between; align-items: flex-end; padding-bottom: var(--space-12); }
-  .hero-voice { text-align: right; }
+  .hero-voice { text-align: right; margin-left: auto; }
   .motion .hero { height: 520svh; }
   .motion .hero-pin { position: sticky; top: var(--bar-h); height: calc(100svh - var(--bar-h)); }
 }
@@ -72,7 +76,9 @@
 
 /* The load-in: the header, the headline line by line, the sentence, the two
    buttons, and the key settling into place. About 1.2 seconds, once per
-   browser session. html.intro is set before first paint and removed after. */
+   browser session, as the intro below hands over (its script sets html.intro
+   and removes it after). When the intro's own key has just landed in the slot
+   (html.pitch-land), the hero's key is already there and does not arrive again. */
 @keyframes ks-drop { from { opacity: 0; transform: translateY(-12px); } }
 @keyframes ks-line { from { transform: translateY(112%); } }
 @keyframes ks-key { from { opacity: 0; transform: translateY(-22px); } }
@@ -83,6 +89,87 @@
 .intro .hero-lede { animation: ks-rise var(--dur-2) var(--ease-out) 0.5s both; }
 .intro .hero-keys > span { animation: ks-rise var(--dur-2) var(--ease-out) both; animation-delay: calc(0.65s + var(--i) * 0.08s); }
 .intro .hero-slot .stand-in, .intro #stage { animation: ks-key var(--dur-3) var(--ease-out) 0.2s backwards; }
+.pitch-land .hero-slot .stand-in, .pitch-land #stage { animation: none; }
+
+/* ============ The intro (src/components/Pitch.astro) ============ */
+/* One screen over the page, in the hero's own ground. Everything in it moves
+   by transform and opacity only, on a timeline written into the markup as
+   delays, so it plays on the compositor while the page loads underneath. */
+.pitch { display: none; }
+.pitch-on .pitch { position: fixed; inset: 0; z-index: 60; display: block; color: var(--ink-inverse); animation: pitch-clock var(--out) linear both, pitch-bail 0.3s linear calc(var(--out) + 2.5s) forwards; }
+/* The clock the hand-over is taken from. It changes nothing. */
+@keyframes pitch-clock { from { outline-offset: 0; } to { outline-offset: 0; } }
+/* If the script never hands over, the intro still gets out of the way. */
+@keyframes pitch-bail { to { opacity: 0; visibility: hidden; } }
+.pitch.is-leaving { opacity: 0; pointer-events: none; transition: opacity 0.18s linear; }
+.pitch.is-landing { pointer-events: none; }
+.pitch-ground { position: absolute; inset: 0; background: var(--base-900); }
+.pitch.is-landing .pitch-ground { opacity: 0; transition: opacity 0.34s var(--ease-out); }
+.pitch-body { position: absolute; inset: 0; display: grid; justify-items: center; align-content: center; gap: clamp(14px, 3svh, 36px); padding: var(--space-12) var(--margin); text-align: center; }
+.pitch-skip { position: absolute; right: var(--margin); bottom: max(var(--space-8), env(safe-area-inset-bottom, 0px)); z-index: 2; font-size: 14px; line-height: 21px; padding: 0 var(--space-4); animation: pitch-hide 0.15s linear var(--out) forwards; }
+
+@keyframes pitch-show { to { opacity: 1; } }
+@keyframes pitch-hide { to { opacity: 0; } }
+@keyframes pitch-text-out { to { opacity: 0; transform: translateY(-12px); } }
+.pitch-eyebrow, .pitch-count { animation: ks-rise 0.28s var(--ease-out) backwards, pitch-text-out 0.2s var(--ease-inout) var(--out) forwards; }
+.pitch-count { animation-delay: 0.08s, var(--out); }
+
+/* The word being typed: each letter appears at its keystroke, with the caret after it until the next. */
+.pitch .pitch-words { display: grid; font-size: min(17vw, 21svh, 208px); line-height: 0.95; letter-spacing: -0.01em; }
+.pitch-word { grid-area: 1 / 1; white-space: nowrap; animation: pitch-hide 1ms linear var(--end) forwards; }
+.pitch-word.last { animation: pitch-text-out 0.2s var(--ease-inout) var(--out) forwards; }
+.pitch-l { position: relative; display: inline-block; opacity: 0; animation: pitch-show 1ms linear var(--d) forwards; }
+.pitch-l::after { content: ""; position: absolute; left: 100%; top: 13%; width: 0.07em; height: 74%; margin-left: 0.05em; background: var(--readout); opacity: 0; animation: pitch-caret var(--g) step-end var(--d) forwards; }
+@keyframes pitch-caret { from { opacity: 1; } to { opacity: 0; } }
+
+/* The four, kept as they are typed. */
+.pitch-list { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2) var(--space-6); color: var(--readout); animation: pitch-text-out 0.2s var(--ease-inout) var(--out) forwards; }
+.pitch-list li { opacity: 0.3; animation: pitch-show 0.15s linear var(--d) forwards; }
+
+/* The tally: a step a keystroke. */
+.pitch-count { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-3) var(--space-4); }
+.pitch-count-label { color: var(--readout); font-size: 19px; line-height: 28px; }
+@media (max-width: 719px) {
+  .pitch-count-label { font-size: 16px; line-height: 25px; }
+  .pitch-list { gap: var(--space-2) var(--space-3); letter-spacing: 0.1em; }
+}
+.pitch-units { animation: pitch-units var(--out) linear both; }
+.pitch-tens { animation: pitch-tens var(--out) linear both; }
+
+/* The keyboard. Its font size is one key, so everything in it is in keys. A key at rest is dim, as if under
+   dark glass; struck, it lights and goes down, then dims again. */
+.pitch-board { font-size: min(64px, calc((100vw - 2 * var(--margin)) / 10.8), 8svh); display: grid; gap: 0.08em; width: 10.72em; margin-top: clamp(4px, 1.5svh, 20px); }
+.pitch-row { display: flex; gap: 0.08em; }
+.pitch-row:nth-child(2) { padding-left: 0.28em; }
+.pitch-row:nth-child(3) { padding-left: 0.82em; }
+@keyframes pitch-key-in { from { opacity: 0; transform: translateY(0.4em); } }
+@keyframes pitch-key-out { to { opacity: 0; transform: translateY(0.5em) scale(0.8); } }
+@keyframes pitch-press {
+  0% { opacity: 0.28; transform: none; }
+  13% { opacity: 1; transform: translateY(0.05em); }
+  33% { opacity: 1; transform: none; }
+  100% { opacity: 0.28; transform: none; }
+}
+@keyframes pitch-k-on {
+  0% { opacity: 0.28; transform: none; }
+  35% { opacity: 1; transform: translateY(0.05em); }
+  100% { opacity: 1; transform: none; }
+}
+/* In by rows from the top; out by rows from the bottom, as the hero's own field drops out. The K stays. */
+.pk { flex: none; width: 1em; height: 1em; animation: pitch-key-in 0.28s var(--ease-out) backwards, pitch-key-out 0.24s cubic-bezier(0.5, 0, 0.9, 0.4) forwards; animation-delay: calc(var(--r) * 40ms + var(--c) * 8ms), calc(var(--out) + (2 - var(--r)) * 45ms + var(--c) * 6ms); }
+.pk-k { animation: pitch-key-in 0.28s var(--ease-out) calc(var(--r) * 40ms + var(--c) * 8ms) backwards; }
+.pk-cap { display: block; width: 100%; height: 100%; opacity: 0.28; }
+.pk-cap svg { width: 100%; height: 100%; max-width: none; }
+.pitch-k { animation: pitch-k-on 0.2s linear var(--out) forwards; }
+
+/* Reduced motion: one still frame. The four words, the tally at its total, and nothing moving. */
+.still .pitch, .still .pitch *, .still .pitch *::after { animation: none !important; }
+.still.pitch-on .pitch { animation: pitch-bail 0.2s linear 4s forwards !important; }
+.still .pitch .pitch-words { font-size: min(12vw, 10svh, 96px); line-height: 1; }
+.still .pitch-word { grid-area: auto; }
+.still .pitch-l { opacity: 1; }
+.still .pitch-list, .still .pitch-board { display: none; }
+.still .pitch .roll { transform: translateY(var(--to)); }
 
 /* ============ Below the hero ============ */
 .home-alt { background: var(--base-900); }

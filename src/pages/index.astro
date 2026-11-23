@@ -12,6 +12,7 @@ import Avatar from '../components/Avatar.astro';
 import BookButton from '../components/BookButton.astro';
 import QuizButton from '../components/QuizButton.astro';
 import Fig from '../components/Fig.astro';
+import Pitch from '../components/Pitch.astro';
 import { site, crew, ledger, services, products, featuredCases, homepageTotal, proofFigures, experienceLine } from '../lib/data';
 import { professionalService } from '../lib/seo';
 import { dateInZone } from '../lib/ledger';
@@ -36,6 +37,9 @@ const crewCount = words(crew.length);
   band="none"
   schema={[professionalService('/')]}
 >
+  <!-- The intro, on the first visit in a session. It hands over to the hero. -->
+  <Pitch />
+
   <!-- 1. Hero -->
   <section id="hero" class="hero on-900" data-scene="hero">
     <div class="ground ground-900"></div>
@@ -56,7 +60,7 @@ const crewCount = words(crew.length);
             <KeySvg class="stand-in" />
           </div>
           <div class="hero-strip">
-            {ledger.length > 0 && (
+            {ledger.length > 0 ? (
               <div class="hero-counter">
                 <div class="hero-ctr-row">
                   <Counter value={home.today} size="xl" id="home-counter" data-week-ago={home.weekAgo} />
@@ -65,8 +69,18 @@ const crewCount = words(crew.length);
                   <span class="crew-live" data-any-unit></span>keystrokes our clients have not had to type in <span class="fig" data-year>{year}</span>
                 </p>
               </div>
+            ) : (
+              // Until there are client figures to show, the counter counts what is on the screen: the keys of
+              // the hero's own keyboard, going down as the rows drop out. The 3D scene supplies the figure, so
+              // the counter is not shown until the scene is running. Its place is kept, so nothing moves when it is.
+              <div class="hero-counter is-off">
+                <div class="hero-ctr-row">
+                  <Counter value={null} widest={999} size="xl" id="keys-left" />
+                </div>
+                <p class="hero-label">keys left for you to press</p>
+              </div>
             )}
-            <p class="lede hero-voice">We don't sell transformation. We sell a smaller number than the one you've got.</p>
+            <p class="display-m hero-voice">We don't sell transformation. We sell a smaller number than the one you've got.</p>
           </div>
         </div>
       </div>

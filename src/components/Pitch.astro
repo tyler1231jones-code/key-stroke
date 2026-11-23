@@ -1,0 +1,200 @@
+---
+// The intro: a pitch of about three and a half seconds, on the first visit to
+// the homepage in a browser session. A keyboard types the four things we do,
+// by itself, while a counter keeps the tally of keystrokes the visitor did
+// not type. Then every key drops away but the K, and the K travels to its
+// place in the hero, where the page takes over.
+//
+// It is all here in the HTML and plays as CSS animations of transform and
+// opacity, so it starts with the first paint, waits for no script, and keeps
+// its timing while the page loads underneath. The whole timeline is worked
+// out below, at build time, and written into the markup as delays. The small
+// script at the foot does the three things CSS cannot: skip, the K's journey
+// to wherever the hero's key is on this screen, and handing over.
+//
+// The head script in Base.astro decides whether it plays (html.pitch-on).
+// Without it the markup is never shown. With reduced motion it is one still
+// frame, held briefly, then gone.
+import KeySvg from './KeySvg.astro';
+import { services } from '../lib/data';
+
+/** Seconds. The keyboard arrives, each key takes STEP, a finished word holds for HOLD. */
+const IN = 0.3;
+const STEP = 0.042;
+const HOLD = 0.2;
+const round = (n: number) => Math.round(n * 1000) / 1000;
+
+// What we do: the first word of each service's name, in the order the site lists them.
+const names = services.map((s) => s.name.split(' ')[0].toUpperCase());
+let t = IN;
+const strokes: number[] = [];
+const words = names.map((text) => {
+  const letters = text.split('').map((ch) => {
+    const at = round(t);
+    strokes.push(at);
+    t += STEP;
+    return { ch, at };
+  });
+  t += HOLD;
+  return { text, letters, end: round(t) };
+});
+/** The typing is over and the hand-over begins. */
+const OUT = round(t);
+const total = strokes.length;
+
+// The keyboard, and when each of its keys goes down.
+const ROWS = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+const presses = new Map<string, number[]>();
+for (const w of words) for (const l of w.letters) presses.set(l.ch, [...(presses.get(l.ch) ?? []), l.at]);
+const PRESS = 0.46;
+const pressStyle = (ch: string) => {
+  const at = presses.get(ch) ?? [];
+  return at.length ? `animation: ${at.map((s) => `pitch-press ${PRESS}s linear ${s}s`).join(', ')}` : undefined;
+};
+
+// The counter: one step a keystroke, each a quick roll. Keyframes are written out here because every step has its own moment.
+const pct = (s: number) => `${round((s / OUT) * 100)}%`;
+const strip = (every: number) => {
+  let css = '0% { transform: translateY(0); }';
+  strokes.forEach((at, i) => {
+    const n = i + 1;
+    if (n % every !== 0) return;
+    css += ` ${pct(at)} { transform: translateY(-${(n / every - 1) * 100}%); } ${pct(at + 0.036)} { transform: translateY(-${(n / every) * 100}%); }`;
+  });
+  return `${css} 100% { transform: translateY(-${Math.floor(total / every) * 100}%); }`;
+};
+const tens = Array.from({ length: Math.floor(total / 10) + 1 }, (_, i) => (i === 0 ? '' : String(i)));
+const units = Array.from({ length: total + 1 }, (_, i) => String(i % 10));
+const css = `@keyframes pitch-units { ${strip(1)} } @keyframes pitch-tens { ${strip(10)} }`;
+---
+<div class="pitch" id="pitch" style={`--out:${OUT}s`} data-out={OUT}>
+  <div class="pitch-ground"></div>
+  <button class="pitch-skip key key-2" type="button">Skip intro</button>
+  <div class="pitch-body" aria-hidden="true">
+    <p class="eyebrow pitch-eyebrow">What we build</p>
+    <p class="display-xl pitch-words">
+      {words.map((w, wi) => (
+        <span class:list={['pitch-word', { last: wi === words.length - 1 }]} style={`--end:${w.end}s`}>
+          {w.letters.map((l, i) => (
+            <span class="pitch-l" style={`--d:${l.at}s;--g:${round((w.letters[i + 1]?.at ?? w.end) - l.at)}s`}>{l.ch}</span>
+          ))}
+        </span>
+      ))}
+    </p>
+    <ul class="plate pitch-list">
+      {words.map((w) => <li style={`--d:${round(w.end - HOLD)}s`}>{w.text}</li>)}
+    </ul>
+    <div class="pitch-count">
+      <div class="ctr" data-size="m" data-figure="tally" data-value={total}>
+        <span class="d"><span class="roll pitch-tens" style={`--to:${Math.floor(total / 10) * -100}%`}>{tens.map((g) => <span>{g}</span>)}</span><span class="seam"></span></span>
+        <span class="d"><span class="roll pitch-units" style={`--to:${total * -100}%`}>{units.map((g) => <span>{g}</span>)}</span><span class="seam"></span></span>
+      </div>
+      <p class="pitch-count-label">keystrokes. You typed none of them.</p>
+    </div>
+    <div class="pitch-board">
+      {ROWS.map((row, r) => (
+        <div class="pitch-row" style={`--r:${r}`}>
+          {row.split('').map((ch, c) => (
+            <span class:list={['pk', { 'pk-k': ch === 'K' }]} style={`--c:${c}`}>
+              {ch === 'K'
+                ? <span class="pk-cap pitch-k"><KeySvg legend="K" /></span>
+                : <span class="pk-cap" style={pressStyle(ch)}><KeySvg legend={ch} worn={false} /></span>}
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+<style set:html={css}></style>
+<script is:inline>
+  (function () {
+    var d = document.documentElement;
+    var el = document.getElementById('pitch');
+    if (!el) return;
+    if (!d.classList.contains('pitch-on')) { el.remove(); return; }
+    var still = d.classList.contains('still');
+    var done = false;
+    var leaving = false;
+    var timers = [];
+    var later = function (fn, ms) { timers.push(setTimeout(fn, ms)); };
+
+    // The hero's own arrival: the header, the headline line by line, the sentence, the buttons.
+    function loadIn(landed) {
+      if (still) return;
+      if (landed) d.classList.add('pitch-land');
+      d.classList.add('intro');
+      setTimeout(function () { d.classList.remove('intro', 'pitch-land'); }, 1500);
+    }
+    function finish() {
+      if (done) return;
+      done = true;
+      timers.forEach(clearTimeout);
+      ['wheel', 'touchmove', 'keydown'].forEach(function (n) { window.removeEventListener(n, onUse); });
+      d.classList.remove('pitch-on');
+      el.remove();
+      try { performance.mark('ks-intro-end'); } catch (e) {}
+      // The hero's key answers: it presses itself once and a ring goes out.
+      window.dispatchEvent(new Event('ks:intro-end'));
+    }
+    // Skipped, or the visitor has started to scroll: out of the way at once.
+    function skip() {
+      if (done || leaving) return;
+      leaving = true;
+      el.classList.add('is-leaving');
+      loadIn(false);
+      later(finish, 200);
+    }
+    function onUse(e) {
+      if (e.type === 'keydown' && !/^(Escape| |PageDown|ArrowDown|End)$/.test(e.key)) return;
+      skip();
+    }
+    el.addEventListener('click', skip);
+    ['wheel', 'touchmove', 'keydown'].forEach(function (n) { window.addEventListener(n, onUse, { passive: true }); });
+
+    // The K leaves the keyboard for its place in the hero. It is laid out at the size it ends at and
+    // scaled down to where it started, so it is sharp when it lands.
+    function land() {
+      var cap = el.querySelector('.pitch-k');
+      var slot = document.querySelector('.hero-slot');
+      if (!cap || !slot || !cap.animate) return;
+      var a = cap.getBoundingClientRect();
+      var s = slot.getBoundingClientRect();
+      var size = 0.8 * Math.min(s.width, s.height);
+      if (!(size > 0) || !(a.width > 0)) return;
+      var x = s.left + s.width / 2 - size / 2;
+      var y = s.top + s.height / 2 - size / 2;
+      cap.style.cssText = 'position:absolute;left:' + x + 'px;top:' + y + 'px;width:' + size + 'px;height:' + size + 'px;transform-origin:0 0;opacity:1;animation:none';
+      el.appendChild(cap);
+      cap.animate(
+        [{ transform: 'translate(' + (a.left - x) + 'px,' + (a.top - y) + 'px) scale(' + a.width / size + ')' }, { transform: 'none' }],
+        { duration: 620, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'both' }
+      );
+      // Landed on the hero's own key, it gives way to it.
+      cap.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 170, delay: 630, easing: 'linear', fill: 'forwards' });
+    }
+
+    if (still) {
+      // Reduced motion: one still frame, then a plain fade.
+      later(skip, 1700);
+      return;
+    }
+    var out = false;
+    function handOver() {
+      if (out || done || leaving) return;
+      out = true;
+      later(land, 80);
+      later(function () {
+        el.classList.add('is-landing');
+        loadIn(true);
+      }, 360);
+      later(finish, 900);
+    }
+    // The clock is the CSS timeline itself, so the hand-over cannot drift from the typing.
+    el.addEventListener('animationend', function (e) {
+      if (e.target === el && e.animationName === 'pitch-clock') handOver();
+    });
+    // If that event never comes, the same moment by the wall clock.
+    later(handOver, Number(el.getAttribute('data-out')) * 1000 + 400);
+  })();
+</script>

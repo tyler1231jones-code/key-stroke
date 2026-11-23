@@ -77,8 +77,8 @@ section { position: relative; }
 
 #stage { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .no-stage #stage { display: none; }
-/* The cursor wake (src/wake/engine.ts): one canvas over the page and under the header. `screen` lets it add light and nothing else, so text above it keeps its contrast. */
-.wake { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none; mix-blend-mode: screen; visibility: hidden; }
+/* The cursor wake (src/wake/engine.ts), in the homepage hero only: one canvas straight after the 3D stage, so it is above the hero's keys and below its copy. It draws light with no alpha, so it adds to what is behind it and hides nothing. */
+.wake { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; visibility: hidden; }
 @media print { .wake { display: none; } }
 
 .skip { position: fixed; left: var(--space-4); top: var(--space-2); z-index: 100; transform: translateY(-200%); background: var(--base-000); color: var(--ink); padding: var(--space-2) var(--space-4); border: 1px solid var(--rule); }

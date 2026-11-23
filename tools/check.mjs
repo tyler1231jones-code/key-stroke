@@ -147,6 +147,8 @@ for (const s of strings) for (const m of s.matchAll(/\$\d[\d,]*(?:\.\d+)?/g)) al
 // The one product whose price is published (PRICED in src/lib/catalogue.ts).
 const buildDollars = new Set(json('catalogue.json').products.find((p) => p.slug === 'website-build')?.price.match(/\$\d[\d,]*/g) ?? []);
 
+const introTally = json('services.json').reduce((n, s) => n + s.name.split(' ')[0].length, 0);
+
 /* ---------- Reading the built pages ---------- */
 
 function walk(dir, ext, out = []) {
@@ -165,7 +167,7 @@ const hasClass = (node, cls) => (attr(node, 'class') ?? '').split(/\s+/).include
 
 function readPage(html) {
   const doc = parse(html, { scriptingEnabled: false });
-  const page = { text: '', all: '', counters: [], h1: 0, robots: null, buildDate: null, redirect: false, disabled: 0, crewCards: 0, crewCardsMarked: 0, styles: [], inline: [] };
+  const page = { text: '', all: '', counters: [], tallies: [], h1: 0, robots: null, buildDate: null, redirect: false, disabled: 0, crewCards: 0, crewCardsMarked: 0, styles: [], inline: [] };
   const textOf = (node) => {
     if (node.nodeName === '#text') return node.value;
     return (node.childNodes ?? []).map(textOf).join('');
@@ -198,7 +200,9 @@ function readPage(html) {
       const tagged = (n) => (n.tagName && hasClass(n, 'tag') && textOf(n).trim() === 'AI agent') || (n.childNodes ?? []).some(tagged);
       if (tagged(node)) page.crewCardsMarked++;
     }
-    if (tag && hasClass(node, 'ctr') && attr(node, 'data-figure') !== 'other') {
+    // The intro's counter holds every digit it rolls through, so it is checked by the figure it ends on.
+    if (tag && hasClass(node, 'ctr') && attr(node, 'data-figure') === 'tally') page.tallies.push(Number(attr(node, 'data-value')));
+    else if (tag && hasClass(node, 'ctr') && attr(node, 'data-figure') !== 'other') {
       page.counters.push(textOf(node).replace(/\s+/g, ''));
     }
     if (node.nodeName === '#text') {
@@ -272,6 +276,10 @@ for (const file of walk(dist, '.html')) {
   // Not in capitals: "2026 KEYSTROKE" in the copyright line is the firm's name.
   for (const m of page.text.matchAll(/(?<![$\d,.])(\d[\d,]*) +[kK]eystrokes?\b/g)) {
     if (!allowed.has(toNumber(m[1]))) fail(where, `keystroke figure ${m[1]} is not in a content file and is not computed from the ledger`);
+  }
+  // The homepage intro counts the keystrokes it types: the letters in the first word of each service's name.
+  for (const n of page.tallies) {
+    if (n !== introTally) fail(where, `the intro's counter ends on ${n}, but the words it types (the first word of each service in services.json) have ${introTally} letters`);
   }
   for (const c of page.counters) {
     if (c !== '' && !allowed.has(toNumber(c))) fail(where, `counter shows ${c}, which is not in a content file and is not computed from the ledger`);
