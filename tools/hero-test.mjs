@@ -79,6 +79,11 @@ console.log('\ndesktop 1440x900');
   s = await read(page);
   ok(s.bare && s.plate === 0, 'half way through the sequence the header is still bare');
   await page.screenshot({ path: join(out, 'desktop-mid.png') });
+  // The fades that edge the band of keys on a small screen are not for the sequence: here the keys have the
+  // whole pin, and a fade would lie across them as a dark box the size of the slot.
+  await page.waitForFunction(() => document.documentElement.classList.contains('stage-on'), null, { timeout: 8000 }).catch(() => {});
+  const band = await page.evaluate(() => ({ on: document.documentElement.classList.contains('stage-on'), content: getComputedStyle(document.querySelector('.hero-slot'), '::after').content }));
+  ok(band.on && band.content === 'none', `nothing is laid over the keys during the sequence (3D stage ${band.on ? 'running' : 'not running'}, slot overlay: ${band.content})`);
   await scroll(page, travel + 40);
   s = await read(page);
   ok(!s.bare && s.plate === 1, 'as the hero leaves, the header has its bar');

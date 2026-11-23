@@ -239,7 +239,7 @@ const IDLE_AFTER = 3200;
 /** With no 3D scene to take the grid from, a key is this wide. */
 const PITCH = 76;
 /** How strong the page's wake is beside the hero's. */
-const PAGE_GAIN = 0.42;
+const PAGE_GAIN = 0.3;
 const CONTROLS = 'a, button, input, select, textarea, summary, label';
 
 const span = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));

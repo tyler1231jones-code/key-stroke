@@ -326,7 +326,28 @@ reduced motion a demonstration shows its finished state and nothing plays.
 ## The homepage hero
 
 Three things happen in the hero, in this order, and they are built to read as
-one piece: the intro, the cursor wake, and the scroll sequence.
+one piece: the intro, the cursor wake, and the scroll sequence. The header
+sits on the hero with no bar behind it.
+
+### The header on the hero
+
+At the top of the homepage the header has no ground and no rule: the hero's
+ground carries on up behind it. The bar's ground and rule are a plate behind
+its contents (`.bar::before` in `base.css`), and `html.bar-bare` slides the
+plate away. The head script in `Base.astro` sets the class for the homepage
+before first paint, and a small inline script after the hero in `index.astro`
+keeps it up to date: bare while the hero's pin is still below the header,
+plated as soon as the hero starts to pass under it. That is the end of the
+scroll sequence on a desktop and the first scroll anywhere else. Without
+script every page has its bar.
+
+On a phone or a tablet the header's button is a small key (36px, inside a
+48px tap area) so it has room above and below it in the bar. Narrower than
+480px it reads "Free consultation"; its name for a screen reader is the full
+label everywhere.
+
+`node tools/hero-test.mjs` checks the header and the hero at a desktop, two
+phones and a tablet both ways up, and writes pictures to `shots/hero/`.
 
 ### The intro
 
@@ -365,18 +386,28 @@ click sends one ring out, and so does the hero's greeting when the page
 arrives (the worn key presses itself and the ring goes out behind the
 headline, then fades and leaves the hero clean).
 
-It belongs to the hero and runs nowhere else: not on other pages, and not in
-any section below the hero. It is one canvas straight after the 3D stage
-(`.wake` in `base.css`), so it is above the hero's keys and below its copy,
-drawn by two small shader passes in `src/wake/engine.ts`. It draws exactly the
-keys the 3D field left out to keep the copy on empty ground (the scene
-publishes its layout on the bus as `bus.hero.grid`), on the same grid, and
-keeps off every key that is really there. As the scroll sequence drops the
-field's keys away the wake fades out with them.
+There are two of it, each on its own ground, both drawn by the same two small
+shader passes in `src/wake/engine.ts`.
 
-`src/scripts/wake.ts`, loaded by the homepage script, fetches the engine once
-the page has loaded and gone quiet. It does not run on a touch screen or with
-reduced motion; it hides and stops a few seconds after the mouse stops; and a
+The hero's is one canvas straight after the 3D stage (`.wake` in
+`base.css`), so it is above the hero's keys and below its copy. It draws
+exactly the keys the 3D field left out to keep the copy on empty ground (the
+scene publishes its layout on the bus as `bus.hero.grid`), on the same grid,
+and keeps off every key that is really there. As the scroll sequence drops
+the field's keys away this wake fades out with them, and the hero settles
+with nothing moving in it.
+
+The page's is a second canvas over the page and under the header
+(`.wake-page`), for everything below the hero and for the other pages. It is
+the same keyboard at under a third of the strength (`PAGE_GAIN` in the
+engine: turn that one number to make it fainter or stronger), a trail and no
+rings. It is not made until the pointer first moves somewhere it draws.
+
+`src/scripts/wake.ts`, loaded on every page from `Base.astro`, fetches the
+engine: on the homepage once the page has loaded and gone quiet, elsewhere at
+the first mouse movement. Neither wake runs on a touch screen, with reduced
+motion, on a light page (added light would not show) or on an onboarding
+form; each hides and stops a few seconds after the mouse stops; and a
 computer that cannot keep its frame rate loses it for that page. The hero's
 own keys still answer the pointer (`src/three/scenes/hero.ts`): a key under
 the mouse goes down, and a click or a tap sends a ring through the field.
@@ -389,6 +420,14 @@ to `shots/wake/`.
 Scrolling pulls the camera straight back from the worn key to the whole field,
 the field is typed by nobody, its rows drop out, and the camera comes back in
 to the one key left. The beats are in `HERO` in `src/scripts/bus.ts`.
+
+It is for a desktop only: a window at least 960px wide and 700px tall, with a
+mouse (the media query in `home.css` that makes the hero five screens long
+and pins it). On a phone, a tablet and in a small window there is no sequence
+and no extra scrolling. The hero is the copy, the worn key close up with the
+keys around it fading into the ground at the edges of its band, and the
+closing line. `home.ts` and `src/three/scenes/hero.ts` both ask the same
+question (is the pin sticky?) so they cannot disagree.
 
 The strip at the foot of the hero is how the sequence ends. Until there are
 client figures in the ledger, its counter shows how many of the field's keys

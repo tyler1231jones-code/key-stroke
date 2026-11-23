@@ -69,7 +69,7 @@ html.stage-on:not(.no-stage) .hero-slot::after { content: ""; position: absolute
      header sits on plain ground and no key is cut by a line that is not there. */
   .motion .hero-pin::before { content: ""; position: absolute; inset: 0 0 auto 0; height: var(--space-12); background: linear-gradient(var(--base-900), transparent); pointer-events: none; }
   /* With the sequence the keys have the whole pin, and are not drawn in a band. */
-  html.motion .hero-slot::after { content: none; }
+  html.motion.stage-on:not(.no-stage) .hero-slot::after { content: none; }
   .motion:not(.run) .hero-strip { visibility: hidden; }
   .motion .hero-count-keys { display: block; }
 }
