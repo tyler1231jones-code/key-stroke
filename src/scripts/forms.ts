@@ -188,7 +188,7 @@ function plans(): void {
       const plan = button.dataset.plan ?? '';
       document.querySelectorAll<HTMLInputElement>('form[data-form] input[name="plan"]').forEach((field) => (field.value = plan));
       const note = document.querySelector<HTMLElement>('[data-plan-note]');
-      if (note) note.textContent = `You are asking about the ${plan} plan. Tell us what we built for you, or what you want built.`;
+      if (note) note.textContent = `You are asking about ${plan}. Tell us what you want the hours for, or what you want built.`;
     });
   });
 }

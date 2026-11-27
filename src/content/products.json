@@ -144,34 +144,55 @@
   "savers": {
     "label": "Foundation pricing",
     "foundationNote": "Foundation pricing is our launch rate for early clients.",
-    "what": "We keep what we built running, fix it when something changes, and improve it every month.",
+    "what": "A monthly plan of our hours. Use them on anything we do for you: automation, reports, your website, a tool, or design work.",
     "response": "1 business day",
     "includes": [
-      "Monitoring and repair of everything we built",
-      "The monthly reporting pack, produced and checked",
-      "A block of change hours",
-      "A scheduled review"
+      "Hours for any of our services: automation and AI agents, reporting and dashboards, websites and software, branding and graphic design",
+      "Any mix of work, month to month: changes, fixes, updates and new work",
+      "No minimum term. Cancel any time on 30 days' notice, with no fee"
     ],
     "tiers": [
       {
-        "name": "Watch",
-        "hours": 10,
-        "monthly": "$1,500",
-        "suits": "One or two automations that need to keep running."
+        "name": "2 hours",
+        "hours": 2,
+        "monthly": "$300",
+        "suits": "Small updates: a page edit, a new post, a fix to a form or a report."
       },
       {
-        "name": "Run",
+        "name": "5 hours",
+        "hours": 5,
+        "monthly": "$750",
+        "suits": "Regular updates to a website, or small changes to one tool or report."
+      },
+      {
+        "name": "10 hours",
+        "hours": 10,
+        "monthly": "$1,500",
+        "suits": "One or two systems kept current, with a few changes each month."
+      },
+      {
+        "name": "20 hours",
         "hours": 20,
         "monthly": "$3,000",
         "suits": "Several systems, with regular changes each month."
       },
       {
-        "name": "Own",
+        "name": "35 hours",
         "hours": 35,
         "monthly": "$5,250",
         "suits": "We run and improve your admin systems as an ongoing job."
+      },
+      {
+        "name": "50 hours",
+        "hours": 50,
+        "monthly": "$7,500",
+        "suits": "Continuous work across your website, tools, reports and brand."
       }
     ],
-    "scope": "Savers covers what we built for you. General IT support is not included, but it can be added to a plan as scheduled work."
+    "rules": [
+      "Hours you do not use expire at the end of each month. They do not roll over.",
+      "Work beyond your hours is quoted first, at $165 an hour."
+    ],
+    "scope": "Hosting is separate, and only applies where we manage a website or tool for you. General IT support is not included."
   }
 }

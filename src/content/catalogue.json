@@ -1,7 +1,7 @@
 {
   "version": "2026-11-05",
   "source": "Keystroke Product Catalogue (claude.ai artifact). Regenerate this file from the catalogue when products change.",
-  "currency": "AUD, ex GST",
+  "currency": "AUD",
   "practices": [
     {
       "id": "count",
@@ -398,7 +398,7 @@
         "WordPress",
         "Elementor"
       ],
-      "deliverable": "The site, hosting set up, and either a care retainer or one hour of training.",
+      "deliverable": "The site, hosting set up, and either managed hosting and maintenance or one hour of training.",
       "worksWith": "Domain, hosting and email setup",
       "price": "$1,295 Keystroke-built / $2,295 WordPress",
       "priceType": "fixed",

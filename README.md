@@ -196,8 +196,21 @@ committed.
 
 ## Prices
 
-Since 16 November 2026 the only published prices are the retainer plans
-(Keystroke Savers and website care) and the two website builds. They are on
+Since 27 November 2026 there is one set of retainer plans. Keystroke Savers
+is six monthly plans of hours (2, 5, 10, 20, 35 and 50), all at $150 an hour,
+and the hours can be used on any service. The three website care plans are
+gone. Hosting and maintenance is its own cost, $89 a month, which applies
+only where we host and manage a website or tool; a client who hosts it
+themselves does not pay it. The plans are in `products.json` (`savers`) and
+hosting is in `prices.json` (`hosting`).
+
+No price names GST. It does not apply, so nothing on the site says
+"excluding GST" or "ex GST"; the price shown is the price paid. The website
+terms say so once (`legal.json`, "Prices on the site"), in the words of the
+policy pack.
+
+The only published prices are these retainer plans, hosting and maintenance,
+and the two website builds. They are on
 `/savers`; the website builds' prices also show on `/products` and their
 product cards. Every other product, and the Keystroke Audit, is quoted once
 scoped, with no figure on the site. The published price list is
@@ -428,6 +441,16 @@ and no extra scrolling. The hero is the copy, the worn key close up with the
 keys around it fading into the ground at the edges of its band, and the
 closing line. `home.ts` and `src/three/scenes/hero.ts` both ask the same
 question (is the pin sticky?) so they cannot disagree.
+
+There the key is part of the page. The 3D canvas is normally fixed over the
+screen and redrawn as the page moves, which is always a frame behind a
+phone's scrolling and shows as a shake. So where there is no sequence the
+scene docks the canvas (`LiveScene.dock` in `src/three/stage.ts`): it is laid
+in the document over the key's band, the browser scrolls it with the page,
+and nothing is redrawn while it does. `home.css` gives the canvas
+`position: absolute` from the first paint and the stage moves it into place
+with `translate`, so docking it is not a layout shift (`npm run qa` measures
+that; it must stay at 0).
 
 The strip at the foot of the hero is how the sequence ends. Until there are
 client figures in the ledger, its counter shows how many of the field's keys

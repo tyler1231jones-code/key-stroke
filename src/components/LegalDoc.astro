@@ -2,7 +2,7 @@
 // A legal document: the privacy policy or the website terms. The text is in
 // src/content/legal.json, as the principals supplied it, numbered section by
 // section. The business's own details (entity, ABN, address, emails, phone,
-// effective date, GST) come from "legal" in site.json. One that is still TODO
+// effective date) come from "legal" in site.json. One that is still TODO
 // is left out, and the sentence that needed it falls back to the contact form.
 import legal from '../content/legal.json';
 import { site, has, BOOK_HREF } from '../lib/data';
@@ -37,7 +37,6 @@ const TOKENS: Record<string, string> = {
   privacyAsk: set('privacyEmail') ? `Email ${mail(set('privacyEmail')!)}` : `Use ${form}`,
   privacyLink: '<a href="/privacy">Privacy Policy</a>',
   analytics: has('analyticsToken') ? ' We use cookieless analytics that count visits without identifying you.' : '',
-  gst: set('gst') ?? 'GST is confirmed in your quote.',
 };
 const fill = (s: string) => esc(s).replace(/\{(\w+)\}/g, (all, key) => TOKENS[key] ?? all);
 

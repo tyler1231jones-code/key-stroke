@@ -121,7 +121,7 @@ export function serviceSchema(s: Service) {
   };
 }
 
-/** The three Savers plans as offers. Only while their prices are on show. */
+/** The Savers plans as offers. Only while their prices are on show. */
 export function saversSchema() {
   if (!products.display.savers) return null;
   return {
@@ -136,14 +136,13 @@ export function saversSchema() {
       const price = Number(t.monthly.replace(/[^\d.]/g, ''));
       return {
         '@type': 'Offer',
-        name: t.name,
-        description: `${t.hours} hours a month. ${t.suits}`,
+        name: `Keystroke Savers: ${t.hours} hours a month`,
+        description: `${t.hours} hours of our time a month, for any of our services. ${t.suits}`,
         url: abs('/savers'),
         priceSpecification: {
           '@type': 'UnitPriceSpecification',
           price,
           priceCurrency: 'AUD',
-          valueAddedTaxIncluded: false,
           unitCode: 'MON',
           unitText: 'month',
         },

@@ -16,8 +16,12 @@
 //
 // The page's. Everywhere below the hero, and on the other pages, the same
 // keyboard at well under half the strength: a faint trail behind the pointer
-// and nothing else (no rings). One fixed canvas over the page and under the
-// header. It is not made until the pointer first moves somewhere it draws.
+// and nothing else (no rings). It is in the background and nowhere else. Its
+// canvas lies on the page's ground, under every card, panel and line of text
+// (base.css), and the trail is only laid while the pointer is over bare
+// ground: on a card, a control, a picture or anything with words in it there
+// is no trail, so nothing moves near what a visitor is reading. It is not
+// made until the pointer first moves somewhere it draws.
 //
 // Both write colour with no alpha, which a premultiplied canvas adds to what
 // is behind it, so they can only add light and cost the browser no blending
@@ -275,6 +279,36 @@ function program(gl: WebGL2RenderingContext, frag: string): WebGLProgram | null 
   return p;
 }
 
+/** Things that are never ground, whatever they look like. */
+const NOT_GROUND = 'a, button, input, select, textarea, label, summary, details, form, table, figure, picture, img, svg, video, canvas, iframe, [data-artefact], [data-theme="light"]';
+/** Where a walk up from an element stops: these carry a section's own ground. */
+const GROUND_ROOT = 'section, main, body, html, header.bar, footer';
+const grounds = new WeakMap<Element, boolean>();
+const clear = (colour: string) => colour === 'transparent' || /,\s*0\)$/.test(colour) || /\/\s*0\)$/.test(colour);
+
+/**
+ * Is this element bare ground: the page behind everything, with nothing on it to read or use? Not a control or
+ * a picture, not text, and not inside anything that is drawn as a box (a card, a panel, a table): something
+ * with a fill of its own, or a border all the way round.
+ */
+function onGround(el: Element | null): boolean {
+  if (!el) return false;
+  const known = grounds.get(el);
+  if (known !== undefined) return known;
+  let ground = !el.closest(NOT_GROUND);
+  // Words are something to read: an element with text of its own is not ground.
+  if (ground) for (const n of el.childNodes) if (n.nodeType === 3 && n.textContent && n.textContent.trim()) { ground = false; break; }
+  for (let at: Element | null = el; ground && at && !at.matches(GROUND_ROOT); at = at.parentElement) {
+    const s = getComputedStyle(at);
+    const boxed = parseFloat(s.borderTopWidth) > 0 && parseFloat(s.borderLeftWidth) > 0 && !clear(s.borderTopColor);
+    if (!clear(s.backgroundColor) || s.backgroundImage !== 'none' || boxed) ground = false;
+  }
+  // The header's bar, the closing band and the footer are surfaces of their own.
+  if (ground && el.closest('.bar, .band, .foot, .cta-bar')) ground = false;
+  grounds.set(el, ground);
+  return ground;
+}
+
 /** Where the page's wake begins: under the header, and under the hero while any of it is on screen. */
 function pageTop(): number {
   const bar = document.querySelector<HTMLElement>('.bar');
@@ -288,12 +322,12 @@ function pageTop(): number {
  */
 export function startWake(first?: PointerEvent): void {
   if (document.getElementById('hero')) create('hero', first);
-  if (first && first.clientY >= pageTop()) {
+  if (first && first.clientY >= pageTop() && onGround(first.target as Element | null)) {
     create('page', first);
     return;
   }
   const onMove = (e: PointerEvent) => {
-    if (e.pointerType !== 'mouse' || e.clientY < pageTop()) return;
+    if (e.pointerType !== 'mouse' || e.clientY < pageTop() || !onGround(e.target as Element | null)) return;
     window.removeEventListener('pointermove', onMove);
     create('page', e);
   };
@@ -328,7 +362,8 @@ function create(mode: 'hero' | 'page', first?: PointerEvent): void {
   const side = colour('--rule');
   const face = colour('--readout');
   // The hero's goes straight after the 3D stage in the document: above its keys, below the hero's copy.
-  // The page's goes at the end, and its z-index puts it over the page and under the header.
+  // The page's goes at the end of the document at the same level: over every section's own ground, and under
+  // everything laid on it (all of a page's content is in a .wrap, which is a level up).
   const stage = document.getElementById('stage');
   if (page) document.body.append(canvas);
   else if (stage) stage.after(canvas);
@@ -556,7 +591,8 @@ function create(mode: 'hero' | 'page', first?: PointerEvent): void {
     (e) => {
       if (e.pointerType !== 'mouse') return;
       // Off this wake's ground there is nothing to draw: the next stroke starts where the pointer comes back in.
-      if (!inHero(e.clientX, e.clientY) || gain() <= 0.001) {
+      // For the page's wake that includes anywhere the pointer is on a card, a control or text.
+      if (!inHero(e.clientX, e.clientY) || gain() <= 0.001 || (page && !onGround(e.target as Element | null))) {
         ptr.on = false;
         return;
       }
@@ -600,7 +636,7 @@ function create(mode: 'hero' | 'page', first?: PointerEvent): void {
   });
 
   measure();
-  if (first && inHero(first.clientX, first.clientY)) {
+  if (first && inHero(first.clientX, first.clientY) && (!page || onGround(first.target as Element | null))) {
     ptr.on = true;
     ptr.moved = true;
     wake();

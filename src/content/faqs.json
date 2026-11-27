@@ -11,15 +11,15 @@
     { "q": "Who sees the recording, and how long do you keep it?", "a": "TODO", "needs": "The principals' policy on storing and deleting audit recordings." }
   ],
   "savers": [
-    { "q": "What is Keystroke Savers?", "a": "A monthly plan that keeps what we built for you running, fixes it when something changes, and improves it every month." },
-    { "q": "What are the hours for?", "a": "Changes and improvements. Monitoring, repair, the monthly reporting pack and a scheduled review are part of every plan, on top of the hours." },
-    { "q": "What does it not cover?", "a": "Things we did not build. Savers looks after the systems KEYSTROKE built for you. It is not a general IT helpdesk." },
+    { "q": "What is Keystroke Savers?", "a": "A monthly plan of our hours. You choose how many, and use them on anything we do for you: automation, reports, your website, a tool, or design work." },
+    { "q": "What are the hours for?", "a": "Any of our services: automation and AI agents, reporting and dashboards, websites and software, branding and graphic design. Changes, fixes, updates and new work all count, and the mix can change from month to month." },
+    { "q": "What does it not cover?", "a": "Hosting, which is a separate monthly cost where we manage a website or tool for you. General IT support is not included either: Savers is not an IT helpdesk." },
     { "q": "How quickly do you reply?", "a": "Within 1 business day, on every plan." },
     { "q": "What is Foundation pricing?", "a": "Our launch rate for early clients." },
-    { "q": "When does a plan start?", "a": "After we have built something for you. Savers is the monthly layer that keeps it running and improving." },
-    { "q": "Is there a minimum term?", "a": "TODO", "needs": "The minimum term and notice period for a Savers plan." },
-    { "q": "Can we change plans?", "a": "TODO", "needs": "Whether and how a client moves between Watch, Run and Own." },
-    { "q": "What happens to hours we do not use?", "a": "TODO", "needs": "Whether unused hours roll over." }
+    { "q": "When does a plan start?", "a": "When you want it to. A plan can follow something we built for you, or stand on its own. Plans are invoiced monthly, in advance." },
+    { "q": "Is there a minimum term?", "a": "No. You can cancel any plan at any time on 30 days' notice, with no fee." },
+    { "q": "Can we change plans?", "a": "TODO", "needs": "Whether and how a client moves between plans (the pricing policy proposes: from the next billing month)." },
+    { "q": "What happens to hours we do not use?", "a": "They expire at the end of each month. They do not roll over." }
   ],
   "automation": [
     { "q": "What kind of work can be automated?", "a": "Work someone does by hand on a schedule: retyping details between systems, chasing approvals, building the same document, copying figures into a report. If it follows the same steps each time, it is a candidate." },

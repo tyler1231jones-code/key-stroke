@@ -103,7 +103,7 @@ position and the date. The submission records the time it was sent and the
 address it came from (`/api/stamp`, a small route on the site's Worker).
 
 The terms as confirmed by the principals on 9 October 2026: all prices
-exclude GST, which is added at 10%; 50% deposit before work starts, 50% on
+are in Australian dollars with no GST shown (changed 27 November 2026: GST does not apply, and the price on the quote is the amount paid); 50% deposit before work starts, 50% on
 completion; additional work is $165 an hour, always proposed to the client
 and approved by them before any of it is done; cancel any time with 30
 days' notice. The Client Terms of Engagement are not final yet.

@@ -2,7 +2,9 @@
 //
 // The cursor wake, in a real browser. There are two: the hero's, at full
 // strength behind the headline, and the page's, a faint trail everywhere else.
-//   - on another page a moving mouse draws the page's wake, and it rests
+//   - on another page a mouse moving over bare ground draws the page's wake,
+//     behind the page's content, and it rests; a mouse moving over a card or
+//     over text draws nothing
 //   - in the hero a moving mouse draws the hero's, behind the headline
 //   - the hero's greeting sends a ring out through it with no mouse at all
 //   - it rests (canvas hidden, no frames) a few seconds after the mouse stops
@@ -82,13 +84,36 @@ console.log('\ndesktop');
   await page.goto(`${url}/services?debug`, { waitUntil: 'load' });
   await page.waitForTimeout(600);
   const before = await page.screenshot();
-  await sweep(page, [260, 300], [1100, 520], 30);
+  // On a card, and on the words in it: nothing. The wake is for the background only.
+  const card = await page.evaluate(() => {
+    const r = document.querySelector('main .card').getBoundingClientRect();
+    return [r.left + 30, r.top + 30, r.right - 30, Math.min(r.bottom - 30, window.innerHeight - 40)];
+  });
+  await sweep(page, [card[0], card[1]], [card[2], card[3]], 30, 0);
   await page.waitForTimeout(300);
   let s = await state(page, 'page');
-  ok(s.exists && s.visible && s.any === 1, 'on another page a moving mouse draws the page\'s wake');
+  ok(!s.visible, 'a mouse moving over a card draws nothing');
+  const head = await page.evaluate(() => {
+    const r = document.querySelector('main h1').getBoundingClientRect();
+    return [r.left + 10, r.top + r.height / 2, r.left + Math.min(r.width, 300), r.top + r.height / 2];
+  });
+  await sweep(page, [head[0], head[1]], [head[2], head[3]], 20, 0);
+  await page.waitForTimeout(300);
+  ok(!(await state(page, 'page')).visible, 'nor does one moving over a heading');
+  // Down the page margin, where there is only ground.
+  await sweep(page, [30, 200], [44, 820], 30, 0);
+  await page.waitForTimeout(300);
+  s = await state(page, 'page');
+  ok(s.exists && s.visible && s.any === 1, 'on another page a mouse moving over bare ground draws the page\'s wake');
   const other = await page.screenshot({ path: join(out, 'services-trail.png') });
-  const whole = { left: 0, top: 80, width: 1440, height: 800 };
-  ok((await changed(before, other, whole)) > 0.002, 'it can be seen');
+  const whole = { left: 0, top: 80, width: 200, height: 800 };
+  ok((await changed(before, other, whole)) > 0.01, 'it can be seen');
+  const under = await page.evaluate(() => {
+    const c = document.querySelector('canvas.wake-page');
+    const wrap = document.querySelector('main .wrap');
+    return Number(getComputedStyle(c).zIndex) < Number(getComputedStyle(wrap).zIndex);
+  });
+  ok(under, 'its canvas is under the page\'s content');
   ok((await page.evaluate(() => document.elementFromPoint(300, 300)?.tagName)) !== 'CANVAS', 'it takes no clicks from the page');
   await page.waitForTimeout(5200);
   ok(!(await state(page, 'page')).visible, 'it rests once the mouse stops');
@@ -155,12 +180,12 @@ console.log('\ndesktop');
   await page.mouse.move(60, 860);
   await page.waitForTimeout(5200);
   const belowClean = await page.screenshot();
-  await sweep(page, [120, 300], [1100, 600], 26, 60);
+  await sweep(page, [30, 250], [44, 820], 26, 0);
   await page.waitForTimeout(200);
   ok(!(await state(page)).visible && (await state(page, 'page')).visible, 'below the hero the page\'s wake is drawn, and the hero\'s is not');
   const below = await page.screenshot({ path: join(out, 'home-below.png') });
   const heroLit = await brightest(clean, trail, corner);
-  const pageLit = await brightest(belowClean, below, { left: 0, top: 80, width: 1440, height: 800 });
+  const pageLit = await brightest(belowClean, below, { left: 0, top: 80, width: 200, height: 800 });
   ok(pageLit > 4 && pageLit < heroLit * 0.75, `it is fainter than the hero's (brightest change ${pageLit} of 255, against ${heroLit} in the hero)`);
   ok(errors.length === 0, `no script errors${errors.length ? `: ${errors.slice(0, 3).join(' | ')}` : ''}`);
   await sheet([greet, trail, field, ripple], 'sheet.jpg');

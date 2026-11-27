@@ -1,10 +1,16 @@
 ---
 // Keystroke Savers, and the published price list. What Savers is in one
-// sentence, its three plans with their prices and what every plan includes;
-// then website care and the two website builds, each with its price; then the
-// two audits (free, and quoted once scoped); then an enquiry form that carries
-// the chosen plan. Since 16 November 2026 the only published prices are the
-// retainer plans (Savers and website care) and the website builds, which
+// sentence, its six plans with their prices and what every plan includes;
+// then hosting and maintenance, the two website builds, each with its price;
+// then the two audits (free, and quoted once scoped); then an enquiry form
+// that carries the chosen plan.
+//
+// Since 27 November 2026 there is one set of plans. Keystroke Savers is a
+// monthly block of hours for any service, at one hourly rate, and the three
+// website care plans are gone. Hosting and maintenance is its own monthly
+// cost, which applies only where we manage a website or tool. No price on
+// the site names GST: it does not apply, and the price shown is the price
+// paid. The only published prices are these and the website builds, which
 // /products/website-build shows too.
 import Base from '../layouts/Base.astro';
 import TierCard from '../components/TierCard.astro';
@@ -19,11 +25,11 @@ import '../styles/pages.css';
 
 const savers = products.savers;
 const prices = products.display.savers;
-const { care, websites, audits } = priceList;
+const { hosting, websites, audits } = priceList;
 ---
 <Base
   title="Keystroke Savers: monthly plans and pricing"
-  description="What KEYSTROKE costs: Keystroke Savers plans, website care plans and fixed-price website builds, with the hours and the price of each."
+  description="What KEYSTROKE costs: six Keystroke Savers plans of hours for any service, hosting and maintenance, and two fixed-price website builds."
   current="savers"
   page="savers"
   band="none"
@@ -42,7 +48,7 @@ const { care, websites, audits } = priceList;
     <div class="wrap">
       {prices && <p class="savers-label" data-reveal><span class="tag">{savers.label}</span><span class="body-s">{savers.foundationNote}</span></p>}
       <div class="cards cards-3">
-        {savers.tiers.map((t, i) => <TierCard tier={t} prices={prices} level="h2" index={i} />)}
+        {savers.tiers.map((t, i) => <TierCard tier={t} prices={prices} level="h2" index={i} plan={`Keystroke Savers, ${t.name} a month`} />)}
       </div>
       {!prices && <p class="body after-list" data-reveal>{products.quoteLine}</p>}
       <div class="savers-incl">
@@ -51,18 +57,33 @@ const { care, websites, audits } = priceList;
           {savers.includes.map((line, i) => <li data-reveal style={`--i:${i}`}>{line}</li>)}
           <li data-reveal style={`--i:${savers.includes.length}`}>A reply within <Fig text={savers.response} /></li>
         </ul>
+        <ul class="ticks">
+          {savers.rules.map((line, i) => <li data-reveal style={`--i:${i}`}><Fig text={line} /></li>)}
+        </ul>
         <p class="body" data-reveal>{savers.scope}</p>
       </div>
 
       {prices && (
         <>
-          <div class="price-block" id="website-care">
+          <div class="price-block" id="hosting">
             <header class="section-head" data-reveal>
-              <h2 class="display-l">{care.title}.</h2>
-              <p class="body">{care.what}</p>
+              <h2 class="display-l">{hosting.title}.</h2>
+              <p class="body">{hosting.what}</p>
             </header>
-            <div class="cards cards-3">
-              {care.tiers.map((t, i) => <TierCard tier={t} prices level="h3" index={i} plan={`${care.title}: ${t.name}`} />)}
+            <div class="cards cards-2">
+              <article class="card price-card" data-reveal="card">
+                <h3 class="display-m">{hosting.name}</h3>
+                <p class="tier-price"><span class="counter-m">{hosting.monthly}</span><span class="unit">a month</span></p>
+                <dl class="price-facts">
+                  {hosting.facts.map((f) => (
+                    <div>
+                      <dt>{f.label}</dt>
+                      <dd><Fig text={f.text} /></dd>
+                    </div>
+                  ))}
+                </dl>
+                <a class="key key-2 tier-ask" href="#enquire" data-plan={hosting.title}>Ask about hosting</a>
+              </article>
             </div>
           </div>
 
@@ -75,7 +96,7 @@ const { care, websites, audits } = priceList;
               {websites.builds.map((b, i) => (
                 <article class="card price-card" data-reveal="card" style={`--i:${i}`}>
                   <h3 class="display-m">{b.name}</h3>
-                  <p class="tier-price"><span class="counter-m">{b.price}</span><span class="unit">fixed price, excluding GST</span></p>
+                  <p class="tier-price"><span class="counter-m">{b.price}</span><span class="unit">fixed price</span></p>
                   <dl class="price-facts">
                     {b.facts.map((f) => (
                       <div>
@@ -123,7 +144,7 @@ const { care, websites, audits } = priceList;
     <div class="wrap band-form">
       <header class="section-head" data-reveal>
         <h2 class="display-l" id="enquire-h">Ask about a plan.</h2>
-        <p class="lede" data-plan-note>Tell us what we built for you, or what you want built, and which plan you are considering.</p>
+        <p class="lede" data-plan-note>Tell us what you want the hours for, or what you want built, and which plan you are considering.</p>
       </header>
       <EnquiryForm kind="savers" id="savers-form" submit="Send the enquiry" />
     </div>

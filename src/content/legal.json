@@ -241,7 +241,7 @@
       {
         "h": "Prices on the site",
         "blocks": [
-          { "p": "Prices are in Australian dollars. {gst} Published ranges for builds are indicative. The price you pay is the one in your accepted quote. We may change published prices at any time, but a change does not affect a quote you have already accepted." }
+          { "p": "Prices are in Australian dollars. GST does not apply: no GST is included in or added to any price, and the price shown is the amount you pay. Published ranges for builds are indicative. The price you pay is the one in your accepted quote. We may change published prices at any time, but a change does not affect a quote you have already accepted." }
         ]
       },
       {

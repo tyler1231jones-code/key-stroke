@@ -46,8 +46,8 @@ export const showsPrice = (p: Product): boolean => PRICED.has(p.slug);
 /** Said in place of a price on every other product. */
 export const QUOTED = 'Quoted as a fixed total once we have scoped it, after a free consultation.';
 
-/** "launch · ex GST" or "fixed · ex GST". */
-export const priceKind = (p: Product): string => `${p.priceType === 'fixed' ? 'fixed' : 'launch'} · ex GST`;
+/** "fixed price" or "launch price". No tax is named: GST does not apply, and the price shown is the price paid. */
+export const priceKind = (p: Product): string => `${p.priceType === 'fixed' ? 'fixed' : 'launch'} price`;
 
 // Words that start a proper noun keep their capital when a works-with line is
 // lowered into a sentence ("Works with your Microsoft 365 ...").

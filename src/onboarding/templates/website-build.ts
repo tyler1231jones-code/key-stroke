@@ -24,7 +24,7 @@ export default defineTemplate({
       intro: 'What the site is for and who it is for.',
       fields: [
         { id: 'build_type', type: 'choice', label: 'Which website build did you choose?', required: true, options: ['Built in code by Keystroke', 'WordPress with Elementor', 'Not decided yet'], help: 'A site built in code is run by us after launch, or handed to you as code. A WordPress site is yours to edit, on hosting in your name.' },
-        { id: 'after_launch', type: 'choice', label: 'After launch, who runs the site?', options: ['Keystroke, on a website care plan', 'We take the code and host it ourselves', 'Not sure yet'], showIf: { field: 'build_type', is: 'Built in code by Keystroke' } },
+        { id: 'after_launch', type: 'choice', label: 'After launch, who runs the site?', options: ['Keystroke hosts and manages it', 'We take the code and host it ourselves', 'Not sure yet'], showIf: { field: 'build_type', is: 'Built in code by Keystroke' } },
         { id: 'wp_hosting', type: 'choice', label: 'Where will the WordPress site be hosted?', options: ['We have hosting we want to keep', 'Please set up hosting in our name', 'Not sure yet'], showIf: { field: 'build_type', is: 'WordPress with Elementor' } },
         { id: 'wp_accounts', type: 'note', text: 'On a WordPress build, every account and licence is held in your name. We set them up on request, and never pay for them on your behalf.', showIf: { field: 'build_type', is: 'WordPress with Elementor' } },
         { id: 'main_job', type: 'choice', label: 'What is the main job of the new site?', required: true, other: true, options: ['Phone calls', 'Enquiry or quote forms', 'Bookings', 'Online sales', 'Information for existing customers', 'Recruiting staff'] },

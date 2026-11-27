@@ -77,7 +77,7 @@ console.log('\n/products');
   const mismatch = live.filter((p, i) => {
     const c = cards[i];
     const price = PRICED.has(p.slug)
-      ? c?.price === p.price && c?.kind === `${p.priceType} · ex GST`
+      ? c?.price === p.price && c?.kind === `${p.priceType} price`
       : c?.price === undefined && c?.kind === 'Quoted once scoped';
     return !c || c.name !== p.name || c.headline !== p.headline || !price;
   });

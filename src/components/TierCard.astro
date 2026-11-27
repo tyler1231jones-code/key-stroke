@@ -1,11 +1,11 @@
 ---
-// A monthly plan: a Keystroke Savers plan or a website care plan. On /savers
-// it carries its monthly price, its hours and a button that starts an enquiry
-// about that plan. Anywhere else it shows the name and who the plan suits,
-// and no figures.
+// A Keystroke Savers plan. A plan is named by its hours ("10 hours"). On
+// /savers it carries its monthly price and a button that starts an enquiry
+// about that plan. Anywhere else it shows the hours and who the plan suits,
+// and no price. No tax is named beside a price: GST does not apply.
 interface Props {
   tier: { name: string; hours: number; monthly: string; suits: string };
-  /** Show the price and the hours. Only the Savers page does. */
+  /** Show the price. Only the Savers page does. */
   prices?: boolean;
   level?: 'h2' | 'h3';
   index?: number;
@@ -17,10 +17,10 @@ const H = level;
 ---
 <article class="card tier" data-reveal="card" style={`--i:${index}`}>
   <H class="display-m">{tier.name}</H>
+  <p class="plate tier-kicker">of our time, each month</p>
   {prices && (
     <>
-      <p class="tier-price"><span class="counter-m">{tier.monthly}</span><span class="unit">a month, excluding GST</span></p>
-      {tier.hours > 0 && <p class="tier-facts tier-price"><span class="counter-s">{tier.hours}</span> <span class="unit">hours of our time each month</span></p>}
+      <p class="tier-price"><span class="counter-m">{tier.monthly}</span><span class="unit">a month</span></p>
     </>
   )}
   <p class="body">{tier.suits}</p>

@@ -44,6 +44,8 @@
 /* ============ Savers ============ */
 .savers-label { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-3) var(--space-4); margin-bottom: var(--space-8); }
 .savers-incl { display: grid; gap: var(--space-8); margin-top: var(--section); }
+/* The plan lines are full sentences, so they keep the measure of running copy. */
+.savers-incl .ticks { max-width: var(--measure); }
 /* The rest of the price list, under the Savers plans. */
 .price-block { display: grid; gap: var(--space-8); margin-top: var(--section); padding-top: var(--space-12); border-top: 1px solid var(--rule); }
 .price-block .section-head { margin-bottom: 0; }

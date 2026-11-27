@@ -12,6 +12,7 @@
 //     numbers) anywhere but the counting page
 //   - a dollar figure on any page but /savers, the one place prices are shown,
 //     apart from the website builds' prices on the products pages
+//   - the word GST on any page but /terms: no price or plan names it
 //   - a disabled control
 //   - a crew card without the tag "AI agent"
 // Text inside [data-artefact] is skipped for the figure checks: artefacts show
@@ -257,6 +258,12 @@ for (const file of walk(dist, '.html')) {
   // The copyright, registered and trade mark signs are text, not emoji.
   const emoji = text.replace(/[©®™]/g, '').match(/\p{Extended_Pictographic}/u);
   if (emoji) fail(where, `emoji in text: ${emoji[0]}`);
+
+  // GST is named nowhere beside a price or a plan: it does not apply, and the price shown is the price paid
+  // (27 November 2026). The website terms say so once. Sample documents in an artefact are not read here.
+  if (/\bGST\b/i.test(page.text) && !/^terms(\.html|\/|$)/.test(where)) {
+    fail(where, `GST is named in text: "${page.text.split('\n').find((l) => /\bGST\b/i.test(l))?.trim().slice(0, 80)}". No price or plan names GST; only /terms does`);
+  }
 
   // Figures. Prices are shown on the Savers page and nowhere else, apart from
   // the terms a client accepts on an onboarding form (onboarding.json), which

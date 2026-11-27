@@ -50,7 +50,6 @@ const service = {
             priceCurrency: 'AUD',
             minPrice: Math.min(...prices),
             maxPrice: Math.max(...prices),
-            valueAddedTaxIncluded: false,
           },
         },
       }
@@ -102,7 +101,7 @@ const service = {
               </span>
             ))}
           </p>
-          <p class="plate prod-price-kind">{p.priceType === 'fixed' ? 'Fixed' : 'Launch'} price · ex GST</p>
+          <p class="plate prod-price-kind">{p.priceType === 'fixed' ? 'Fixed' : 'Launch'} price</p>
           <p class="body">Quoted as a fixed total once we have scoped it. 50% before we start, 50% on completion.</p>
         </div>
       ) : (
