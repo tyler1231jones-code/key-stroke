@@ -8,6 +8,9 @@
 //   - on a phone and a tablet there is no scroll sequence: the hero is a
 //     plain stretch of page, the key is in it, the closing line is under it,
 //     and the header gets its bar at the first scroll
+//   - there the key is part of the page: its canvas lies in the document over
+//     the key's band and scrolls with it, and is not redrawn to keep up (a
+//     canvas fixed to the screen and redrawn each frame shakes on a phone)
 //   - the header's button on a phone is a small key with room around it in
 //     the bar, and still has a 48px tap area
 //   - another page's header always has its bar
@@ -83,6 +86,8 @@ console.log('\ndesktop 1440x900');
   // whole pin, and a fade would lie across them as a dark box the size of the slot.
   await page.waitForFunction(() => document.documentElement.classList.contains('stage-on'), null, { timeout: 8000 }).catch(() => {});
   const band = await page.evaluate(() => ({ on: document.documentElement.classList.contains('stage-on'), content: getComputedStyle(document.querySelector('.hero-slot'), '::after').content }));
+  const fixed = await page.evaluate(() => getComputedStyle(document.getElementById('stage')).position);
+  ok(fixed === 'fixed', `with the sequence the canvas is fixed over the screen (${fixed})`);
   ok(band.on && band.content === 'none', `nothing is laid over the keys during the sequence (3D stage ${band.on ? 'running' : 'not running'}, slot overlay: ${band.content})`);
   await scroll(page, travel + 40);
   s = await read(page);
@@ -119,6 +124,24 @@ for (const [name, w, h] of [['phone 390x844', 390, 844], ['phone 360x640', 360, 
     ok(s.book.h >= 48, `its tap area is ${Math.round(s.book.h)}px tall`);
     ok(s.menu.left - s.book.right >= 8 && s.vw - s.menu.right >= 8, `the menu has room: ${Math.round(s.menu.left - s.book.right)}px from the button, ${Math.round(s.vw - s.menu.right)}px from the edge of the screen`);
   }
+  // The key's canvas is in the page, over the band the slot is in, and a scroll draws nothing.
+  await page.waitForFunction(() => document.documentElement.classList.contains('stage-on'), null, { timeout: 8000 }).catch(() => {});
+  await page.waitForTimeout(2600);
+  const dock = () => page.evaluate(() => {
+    const c = document.getElementById('stage');
+    const slot = document.querySelector('.hero-slot').getBoundingClientRect();
+    const r = c.getBoundingClientRect();
+    return { position: getComputedStyle(c).position, top: r.top - slot.top, height: r.height - slot.height, left: r.left, right: document.documentElement.clientWidth - r.right, frames: window.__stage?.renderer.info.render.frame ?? -1 };
+  });
+  let k = await dock();
+  ok(k.position === 'absolute' && Math.abs(k.top) < 1 && Math.abs(k.height) < 1, `the key's canvas lies in the page over its band (${k.position}, ${k.top.toFixed(1)}px off the slot's top, ${k.height.toFixed(1)}px off its height)`);
+  const drawn = k.frames;
+  for (const y of [40, 120, 220, 300]) {
+    await page.evaluate((to) => window.scrollTo({ top: to, behavior: 'instant' }), y);
+    await page.waitForTimeout(120);
+  }
+  k = await dock();
+  ok(Math.abs(k.top) < 1 && k.frames >= 0 && k.frames - drawn <= 1, `it scrolls with the page and is not redrawn to keep up (still ${k.top.toFixed(1)}px off the slot after 300px, ${k.frames - drawn} frames drawn)`);
   await scroll(page, 60);
   s = await read(page);
   ok(!s.bare && s.plate === 1, 'at the first scroll the header has its bar');

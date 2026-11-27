@@ -41,6 +41,10 @@ export function bootStill(defs: StillDef[], phone: boolean): boolean {
         const o = slot.getBoundingClientRect();
         return { x: r.left - o.left, y: r.top - o.top, w: r.width, h: r.height };
       },
+      origin: () => {
+        const o = slot.getBoundingClientRect();
+        return { x: o.left, y: o.top };
+      },
       phone,
       still: true,
     };

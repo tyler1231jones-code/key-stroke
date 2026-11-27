@@ -10,7 +10,9 @@
 // That sequence is for a desktop, where the hero is pinned (src/styles/
 // home.css decides). On a phone or a tablet, and in a small window, the hero
 // is a still picture: the worn key close up with the few keys around it, in
-// the band its slot is in, and no scroll tied to anything.
+// the band its slot is in, and no scroll tied to anything. There the scene
+// docks the canvas over that band (LiveScene.dock), so the picture is part of
+// the page and scrolls with it, and is not redrawn to keep up.
 //
 // The keys answer the visitor as well as the scroll. A key under the mouse
 // goes down and comes back up behind it, so the pointer leaves a wake of
@@ -70,14 +72,19 @@ export const heroScene: SceneFactory = (ctx) => {
 
   /** The scroll sequence runs where the hero is pinned. */
   const sequenced = () => getComputedStyle(pin).position === 'sticky';
-  /** Where keys are drawn: the whole pin with the sequence. Without it, the band the slot is in, out to the edge of the screen on any side where the slot reaches the page margin. */
+  /** The band the slot is in, in the viewport: the slot's own height, out to the edge of the screen on any side where the slot reaches the page margin. */
+  const band = (): Rect => {
+    const r = slot.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    const x0 = r.left < 80 ? 0 : r.left;
+    const x1 = r.right > vw - 80 ? vw : r.right;
+    return { x: x0, y: r.top, w: x1 - x0, h: r.height };
+  };
+  /** Where keys are drawn, in the frame: the whole pin with the sequence. Without it the canvas is docked over the band, so that is all of the frame. */
   const frameRect = (seq: boolean): Rect => {
     if (seq) return ctx.rect(pin);
-    const s = ctx.rect(slot);
-    const { w } = ctx.size();
-    const x0 = s.x < 80 ? 0 : s.x;
-    const x1 = s.x + s.w > w - 80 ? w : s.x + s.w;
-    return { x: x0, y: s.y, w: x1 - x0, h: s.h };
+    const { w, h } = ctx.size();
+    return { x: 0, y: 0, w, h };
   };
 
   let field: Field | null = null;
@@ -104,19 +111,26 @@ export const heroScene: SceneFactory = (ctx) => {
     bus.invalidate();
   };
   let keysLeft = -1;
+  /** Is this point of the frame inside where keys are drawn? */
   const inFrame = (x: number, y: number) => {
     const r = frameRect(sequenced());
     return x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
+  };
+  /** A pointer event's position, in the frame. */
+  const at = (e: { clientX: number; clientY: number }) => {
+    const o = ctx.origin();
+    return { x: e.clientX - o.x, y: e.clientY - o.y };
   };
   // Where the worn key was and how big a key was at the last frame drawn, to tell whether the pointer is near a key.
   const seen = { ax: 0, ay: 0, scale: 1, reach: 1 };
   let touching = false;
   const onMove = (e: PointerEvent) => {
     if (e.pointerType !== 'mouse') return;
-    const on = inFrame(e.clientX, e.clientY);
+    const pt = at(e);
+    const on = inFrame(pt.x, pt.y);
     if (!on && !ptr.on) return;
-    ptr.x = e.clientX;
-    ptr.y = e.clientY;
+    ptr.x = pt.x;
+    ptr.y = pt.y;
     ptr.on = on;
     // Over the copy's corner there is no key to press, so there is nothing to redraw: the frame is asked for only
     // when the pointer reaches a key, or leaves the last one it was on.
@@ -136,8 +150,9 @@ export const heroScene: SceneFactory = (ctx) => {
   const onClick = (e: MouseEvent) => {
     // A click on a link, a button or a field is that control's, not the keyboard's.
     if ((e.target as Element | null)?.closest?.('a, button, input, select, textarea, summary, label')) return;
-    if (!inFrame(e.clientX, e.clientY)) return;
-    taps.push({ x: e.clientX, y: e.clientY });
+    const pt = at(e);
+    if (!inFrame(pt.x, pt.y)) return;
+    taps.push(pt);
     bus.invalidate();
   };
   if (!ctx.still) {
@@ -249,6 +264,7 @@ export const heroScene: SceneFactory = (ctx) => {
     scene,
     camera,
     clip: null,
+    dock: () => (ctx.still || sequenced() ? null : band()),
     update(time) {
       layout();
       // The scene belongs to its pin: nothing is drawn behind copy that sits outside it.
@@ -301,7 +317,10 @@ export const heroScene: SceneFactory = (ctx) => {
           greetAt = null;
           ring(0, 0);
           // The same ring goes out through the keys under the headline.
-          window.dispatchEvent(new CustomEvent('ks:ring', { detail: { x: ax, y: ay, reach: Math.hypot(ax, h - ay) + 160, life: 2.1, strength: 1.05 } }));
+          const o = ctx.origin();
+          const vx = ax + o.x;
+          const vy = ay + o.y;
+          window.dispatchEvent(new CustomEvent('ks:ring', { detail: { x: vx, y: vy, reach: Math.hypot(vx, window.innerHeight - vy) + 160, life: 2.1, strength: 1.05 } }));
         } else busy = true;
       }
       if (time < ringUntil) busy = true;

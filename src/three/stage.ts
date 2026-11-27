@@ -10,6 +10,16 @@
  *    midpoint; the canvas opacity dips toward that line so it is never seen.
  *    A page with one scene has no hand-over: that scene has the canvas for
  *    as long as any of its section is on screen, and nothing dips.
+ *  - Docking. A scene whose picture does not change with the scroll can ask
+ *    for the canvas to be laid in the document over its own rectangle
+ *    (LiveScene.dock). The browser then scrolls it with the page, exactly in
+ *    step, and nothing is redrawn while it does. A fixed canvas that is
+ *    redrawn to follow a moving slot is always a frame behind a phone's
+ *    scrolling, which shows as a shake. A docked canvas stays at the top
+ *    left of the document and is moved to its rectangle with `translate`,
+ *    which the browser does not count as a layout shift; a page that will
+ *    dock it should give it `position: absolute` in CSS from the first paint
+ *    (home.css does), so nothing shifts when the stage starts either.
  *  - Watchdog. A device that cannot hold frame rate has its pixel ratio
  *    lowered, then the stage hands over to stills.
  *
@@ -42,6 +52,8 @@ export interface SceneContext {
   size(): { w: number; h: number };
   /** An element's rectangle within that frame. */
   rect(el: Element): Rect;
+  /** Where that frame's top left corner is in the viewport, to bring a pointer's position into it. */
+  origin(): { x: number; y: number };
   phone: boolean;
   /** True when one settled frame is being drawn (reduced motion, stills). */
   still: boolean;
@@ -55,6 +67,8 @@ export interface LiveScene {
   resize?(w: number, h: number): void;
   /** Crop the scene to a rectangle of the frame: a macro band, say. Set in update(). */
   clip?: Rect | null;
+  /** The rectangle of the viewport to lay the canvas over, in the document, so it scrolls with the page. Null for the usual canvas fixed over the viewport. */
+  dock?(): Rect | null;
   dispose(): void;
 }
 
@@ -156,6 +170,9 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
   let dpr = Math.min(window.devicePixelRatio || 1, opts.maxDpr);
   let opacity = -1;
   let dead = false;
+  // Where the canvas is laid in the document while a scene has it docked, in document pixels.
+  let docked: Rect | null = null;
+  let moved = false;
 
   const ctxFor = (entry: Entry): SceneContext => ({
     renderer,
@@ -165,7 +182,14 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
     size: () => ({ w: width, h: height }),
     rect: (el) => {
       const r = el.getBoundingClientRect();
-      return { x: r.left, y: r.top, w: r.width, h: r.height };
+      if (!docked) return { x: r.left, y: r.top, w: r.width, h: r.height };
+      const o = canvas.getBoundingClientRect();
+      return { x: r.left - o.left, y: r.top - o.top, w: r.width, h: r.height };
+    },
+    origin: () => {
+      if (!docked) return { x: 0, y: 0 };
+      const o = canvas.getBoundingClientRect();
+      return { x: o.left, y: o.top };
     },
     phone: opts.phone,
     still: false,
@@ -177,14 +201,43 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
     entry.live!.resize?.(width, height);
   }
 
-  function measure(): void {
+  function resize(): void {
     width = canvas.clientWidth || window.innerWidth;
     height = canvas.clientHeight || window.innerHeight;
     renderer!.setPixelRatio(dpr);
     renderer!.setSize(width, height, false);
     for (const entry of entries) if (entry.live) fit(entry);
+  }
+
+  function measure(): void {
+    resize();
     // setSize clears the drawing buffer, so repaint in the same task.
     paint(performance.now());
+  }
+
+  const DOCK_STYLES = ['position', 'inset', 'translate', 'width', 'height'];
+  /** Put the canvas where the scene wants it. True when it moved or changed size, and so needs drawing again. */
+  function place(live: LiveScene): boolean {
+    const r = live.dock?.() ?? null;
+    const style = canvas.style;
+    if (!r || r.w < 1 || r.h < 1) {
+      if (!docked) return false;
+      docked = null;
+      for (const p of DOCK_STYLES) style.removeProperty(p);
+    } else {
+      // On whole device pixels, so the picture stays sharp.
+      const snap = (v: number) => Math.round(v * dpr) / dpr;
+      const d = { x: snap(r.x + window.scrollX), y: snap(r.y + window.scrollY), w: r.w, h: r.h };
+      if (docked && Math.abs(d.x - docked.x) < 0.5 && Math.abs(d.y - docked.y) < 0.5 && Math.abs(d.w - docked.w) < 0.5 && Math.abs(d.h - docked.h) < 0.5) return false;
+      docked = d;
+      style.position = 'absolute';
+      style.inset = '0 auto auto 0';
+      style.translate = `${d.x}px ${d.y}px`;
+      style.width = `${d.w}px`;
+      style.height = `${d.h}px`;
+    }
+    resize();
+    return true;
   }
 
   function paint(now: number): void {
@@ -193,6 +246,7 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
     dirty = false;
     const live = current && current.live;
     if (live && current) {
+      place(live);
       // Dip toward the hand-over line so the cut between scenes is never seen.
       const r = current.el.getBoundingClientRect();
       const mid = height / 2;
@@ -260,11 +314,19 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
       }),
     );
     entries.push(entry);
+    // A docked canvas has a size of its own, so it is the section changing shape that says to look again.
+    observer.observe(el);
   }
 
-  // Any scroll moves the slots, so any scroll asks for a frame.
-  const onScroll = () => { dirty = true; };
+  // Any scroll moves the slots, so any scroll asks for a frame. A docked canvas moves with the page by itself:
+  // a scroll only has it checked, in case the page under it has changed shape.
+  const onScroll = () => {
+    if (docked) moved = true;
+    else dirty = true;
+  };
   window.addEventListener('scroll', onScroll, { passive: true });
+  const onResize = () => { moved = true; };
+  window.addEventListener('resize', onResize);
 
   // Watchdog: judge only frames that were actually painted in a run.
   let slowRun = 0;
@@ -290,6 +352,11 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
 
   function frame(): void {
     if (dead || document.hidden) return;
+    if (moved) {
+      moved = false;
+      const live = current && current.live;
+      if (live && place(live)) dirty = true;
+    }
     if (dirty) {
       const now = performance.now();
       paint(now);
@@ -312,6 +379,8 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
       gsap.ticker.remove(frame);
       observer.disconnect();
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      for (const p of DOCK_STYLES) canvas.style.removeProperty(p);
       for (const entry of entries) {
         entry.triggers.forEach((tr) => tr.kill());
         release(entry);

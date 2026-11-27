@@ -40,6 +40,10 @@
    and nothing is tied to the scroll. */
 .hero-copy { padding: var(--space-12) var(--margin) var(--space-8); }
 .hero-stage { display: grid; grid-template-rows: minmax(0, 1fr) auto; padding-inline: var(--margin); }
+/* Here the 3D canvas is part of the page: the stage lays it over the key's band and it scrolls with the page
+   (docking, in src/three/stage.ts). A canvas fixed to the screen and redrawn to follow the page shakes on a phone.
+   It is in the document from the first paint, so nothing on the page shifts when the stage starts. */
+[data-page="home"] #stage { position: absolute; }
 /* The 3D keys around the worn one are drawn in the band the slot is in, from one side of the screen to the other.
    They fade into the ground at the top and the foot of the band, so no key ends on a hard line. */
 html.stage-on:not(.no-stage) .hero-slot::after { content: ""; position: absolute; inset: -1px calc(var(--margin) * -1); pointer-events: none; background: linear-gradient(var(--base-900), transparent) top / 100% var(--space-12) no-repeat, linear-gradient(transparent, var(--base-900)) bottom / 100% var(--space-12) no-repeat; }
@@ -65,6 +69,8 @@ html.stage-on:not(.no-stage) .hero-slot::after { content: ""; position: absolute
 @media (min-width: 960px) and (min-height: 700px) and (hover: hover) and (pointer: fine) {
   .motion .hero { height: 520svh; }
   .motion .hero-pin { position: sticky; top: var(--bar-h); height: calc(100svh - var(--bar-h)); overflow: clip; }
+  /* With the sequence the canvas is fixed over the screen, behind the pin. */
+  .motion[data-page="home"] #stage { position: fixed; }
   /* The keys are drawn up to the top of the pin, where the header begins. They fade out just short of it, so the
      header sits on plain ground and no key is cut by a line that is not there. */
   .motion .hero-pin::before { content: ""; position: absolute; inset: 0 0 auto 0; height: var(--space-12); background: linear-gradient(var(--base-900), transparent); pointer-events: none; }
