@@ -6,9 +6,10 @@
 // that carries the chosen plan.
 //
 // Since 27 November 2026 there is one set of plans. Keystroke Savers is a
-// monthly block of hours for any service, at one hourly rate, and the three
-// website care plans are gone. Hosting and maintenance is its own monthly
-// cost, which applies only where we manage a website or tool. No price on
+// monthly block of hours for any service, in six plans named after keys,
+// with an hourly rate that falls as the hours rise, and the three website care plans are gone. Hosting and
+// maintenance is its own monthly cost, charged for each website or tool we
+// manage and not at all where the client manages it. No price on
 // the site names GST: it does not apply, and the price shown is the price
 // paid. The only published prices are these and the website builds, which
 // /products/website-build shows too.
@@ -46,9 +47,9 @@ const { hosting, websites, audits } = priceList;
 
   <section class="page-body">
     <div class="wrap">
-      {prices && <p class="savers-label" data-reveal><span class="tag">{savers.label}</span><span class="body-s">{savers.foundationNote}</span></p>}
+      {prices && <p class="savers-label" data-reveal><span class="tag">{savers.label}</span><span class="body-s">{savers.foundationNote} {savers.rateNote}</span></p>}
       <div class="cards cards-3">
-        {savers.tiers.map((t, i) => <TierCard tier={t} prices={prices} level="h2" index={i} plan={`Keystroke Savers, ${t.name} a month`} />)}
+        {savers.tiers.map((t, i) => <TierCard tier={t} prices={prices} level="h2" index={i} plan={`Keystroke Savers ${t.name} (${t.hours} hours a month)`} />)}
       </div>
       {!prices && <p class="body after-list" data-reveal>{products.quoteLine}</p>}
       <div class="savers-incl">
@@ -73,7 +74,7 @@ const { hosting, websites, audits } = priceList;
             <div class="cards cards-2">
               <article class="card price-card" data-reveal="card">
                 <h3 class="display-m">{hosting.name}</h3>
-                <p class="tier-price"><span class="counter-m">{hosting.monthly}</span><span class="unit">a month</span></p>
+                <p class="tier-price"><span class="counter-m">{hosting.monthly}</span><span class="unit">{hosting.unit}</span></p>
                 <dl class="price-facts">
                   {hosting.facts.map((f) => (
                     <div>

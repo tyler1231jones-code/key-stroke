@@ -136,7 +136,7 @@ export function saversSchema() {
       const price = Number(t.monthly.replace(/[^\d.]/g, ''));
       return {
         '@type': 'Offer',
-        name: `Keystroke Savers: ${t.hours} hours a month`,
+        name: `Keystroke Savers ${t.name}: ${t.hours} hours a month`,
         description: `${t.hours} hours of our time a month, for any of our services. ${t.suits}`,
         url: abs('/savers'),
         priceSpecification: {

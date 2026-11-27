@@ -153,46 +153,53 @@
     ],
     "tiers": [
       {
-        "name": "2 hours",
+        "name": "Tab",
         "hours": 2,
         "monthly": "$300",
-        "suits": "Small updates: a page edit, a new post, a fix to a form or a report."
+        "rate": "$150",
+        "suits": "The next small job, done. A page edit, a new post, a fix to a form or a report."
       },
       {
-        "name": "5 hours",
+        "name": "Shift",
         "hours": 5,
-        "monthly": "$750",
-        "suits": "Regular updates to a website, or small changes to one tool or report."
+        "monthly": "$725",
+        "rate": "$145",
+        "suits": "Things change, and we change them. Regular updates to your website, or to one tool or report."
       },
       {
-        "name": "10 hours",
+        "name": "Enter",
         "hours": 10,
-        "monthly": "$1,500",
-        "suits": "One or two systems kept current, with a few changes each month."
+        "monthly": "$1,400",
+        "rate": "$140",
+        "suits": "Send it once and it is done. One or two systems kept current, with changes every month."
       },
       {
-        "name": "20 hours",
+        "name": "Control",
         "hours": 20,
-        "monthly": "$3,000",
-        "suits": "Several systems, with regular changes each month."
+        "monthly": "$2,700",
+        "rate": "$135",
+        "suits": "Several systems, in hand. Regular changes each month, across everything we built for you."
       },
       {
-        "name": "35 hours",
+        "name": "Command",
         "hours": 35,
-        "monthly": "$5,250",
-        "suits": "We run and improve your admin systems as an ongoing job."
+        "monthly": "$4,550",
+        "rate": "$130",
+        "suits": "You say what, we do it. We run and improve your admin systems as an ongoing job."
       },
       {
-        "name": "50 hours",
+        "name": "Escape",
         "hours": 50,
-        "monthly": "$7,500",
-        "suits": "Continuous work across your website, tools, reports and brand."
+        "monthly": "$6,250",
+        "rate": "$125",
+        "suits": "Out of the admin altogether. Continuous work across your website, tools, reports and brand."
       }
     ],
     "rules": [
       "Hours you do not use expire at the end of each month. They do not roll over.",
       "Work beyond your hours is quoted first, at $165 an hour."
     ],
-    "scope": "Hosting is separate, and only applies where we manage a website or tool for you. General IT support is not included."
+    "scope": "Hosting is separate, and only applies where we manage a website or tool for you. General IT support is not included.",
+    "rateNote": "The more hours in a plan, the less each hour costs."
   }
 }

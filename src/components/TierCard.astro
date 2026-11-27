@@ -1,10 +1,12 @@
 ---
-// A Keystroke Savers plan. A plan is named by its hours ("10 hours"). On
+// A Keystroke Savers plan. Each plan is named after a key (Tab, Shift, Enter,
+// Control, Command, Escape), with its hours on the line under the name. On
 // /savers it carries its monthly price and a button that starts an enquiry
-// about that plan. Anywhere else it shows the hours and who the plan suits,
-// and no price. No tax is named beside a price: GST does not apply.
+// about that plan, and what its hours work out at each: the rate falls as
+// the hours rise. Anywhere else it shows the name, the hours and what the
+// plan is for, and no price. No tax is named beside a price: GST does not apply.
 interface Props {
-  tier: { name: string; hours: number; monthly: string; suits: string };
+  tier: { name: string; hours: number; monthly: string; rate?: string; suits: string };
   /** Show the price. Only the Savers page does. */
   prices?: boolean;
   level?: 'h2' | 'h3';
@@ -17,10 +19,11 @@ const H = level;
 ---
 <article class="card tier" data-reveal="card" style={`--i:${index}`}>
   <H class="display-m">{tier.name}</H>
-  <p class="plate tier-kicker">of our time, each month</p>
+  <p class="plate tier-kicker">{tier.hours} hours of our time, each month</p>
   {prices && (
     <>
       <p class="tier-price"><span class="counter-m">{tier.monthly}</span><span class="unit">a month</span></p>
+      {tier.rate && <p class="tier-facts tier-price"><span class="counter-s">{tier.rate}</span> <span class="unit">an hour</span></p>}
     </>
   )}
   <p class="body">{tier.suits}</p>

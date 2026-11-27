@@ -197,10 +197,14 @@ committed.
 ## Prices
 
 Since 27 November 2026 there is one set of retainer plans. Keystroke Savers
-is six monthly plans of hours (2, 5, 10, 20, 35 and 50), all at $150 an hour,
-and the hours can be used on any service. The three website care plans are
-gone. Hosting and maintenance is its own cost, $89 a month, which applies
-only where we host and manage a website or tool; a client who hosts it
+is six monthly plans of hours, and the hours can be used on any service. Each
+plan is named after a key: Tab (2 hours), Shift (5), Enter (10), Control
+(20), Command (35) and Escape (50). The hourly rate falls as the hours rise:
+$150 on Tab, then $5 less at each plan up, to $125 on Escape. Each plan
+carries its monthly price and its rate (`monthly` and `rate` in
+`products.json`; change both together). The three website
+care plans are gone. Hosting and maintenance is its own cost, $89 a month
+for each website or tool we host and manage; a client who hosts it
 themselves does not pay it. The plans are in `products.json` (`savers`) and
 hosting is in `prices.json` (`hosting`).
 
