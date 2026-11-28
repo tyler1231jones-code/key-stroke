@@ -11,6 +11,8 @@
 //   - there the key is part of the page: its canvas lies in the document over
 //     the key's band and scrolls with it, and is not redrawn to keep up (a
 //     canvas fixed to the screen and redrawn each frame shakes on a phone)
+//   - there the drawn key fills its slot until the 3D key is drawn, so the
+//     band is never empty and the key never pops in at the first scroll
 //   - the header's button on a phone is a small key with room around it in
 //     the bar, and still has a 48px tap area
 //   - another page's header always has its bar
@@ -124,6 +126,14 @@ for (const [name, w, h] of [['phone 390x844', 390, 844], ['phone 360x640', 360, 
     ok(s.book.h >= 48, `its tap area is ${Math.round(s.book.h)}px tall`);
     ok(s.menu.left - s.book.right >= 8 && s.vw - s.menu.right >= 8, `the menu has room: ${Math.round(s.menu.left - s.book.right)}px from the button, ${Math.round(s.vw - s.menu.right)}px from the edge of the screen`);
   }
+  // The drawn key holds the slot until the 3D one is drawn (a phone starts the stage at the first scroll), so it has
+  // a size of its own. Its size is in container units, which once came out as 0 here and left the band empty.
+  const drawnKey = await page.evaluate(() => {
+    const r = document.querySelector('.hero-slot .stand-in').getBoundingClientRect();
+    const slot = document.querySelector('.hero-slot').getBoundingClientRect();
+    return { w: r.width, share: r.width / Math.min(slot.width, slot.height) };
+  });
+  ok(drawnKey.share > 0.7 && drawnKey.share < 0.9, `the drawn key fills its slot as the 3D key will (${Math.round(drawnKey.w)}px, ${Math.round(drawnKey.share * 100)}% of the slot)`);
   // The key's canvas is in the page, over the band the slot is in, and a scroll draws nothing.
   await page.waitForFunction(() => document.documentElement.classList.contains('stage-on'), null, { timeout: 8000 }).catch(() => {});
   await page.waitForTimeout(2600);

@@ -16,8 +16,19 @@
 .hero-lede { margin-top: var(--space-6); color: var(--ink-inverse); }
 .hero-keys { margin-top: var(--space-8); }
 .hero-keys > span { display: flex; }
-.hero-slot { position: relative; min-height: 46svh; container-type: size; }
+/* The slot's height is set, not only a minimum: a size container whose height comes from min-height alone gives
+   cqh (and so cqmin) as 0, and the drawn key had no size at all on a phone. */
+.hero-slot { position: relative; height: 46svh; min-height: 46svh; container-type: size; }
 .hero-slot .stand-in { position: absolute; inset: 0; margin: auto; width: 80cqmin; height: 80cqmin; }
+/* Where the stage starts late (a phone starts it at the first scroll), the 3D key takes over from the drawn one in a
+   short crossfade, so nothing pops in while the page is moving. The stage marks the slot live only once it has drawn
+   the key, and sets the canvas's opacity then. With the sequence, the canvas is there from the start (below). */
+[data-page="home"] #stage { opacity: 0; transition: opacity var(--dur-2) linear; }
+.hero-slot .stand-in { transition: opacity var(--dur-2) linear, visibility 0s linear var(--dur-2); }
+.hero-slot.slot-live .stand-in { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  [data-page="home"] #stage, .hero-slot .stand-in { transition: none; }
+}
 /* The drawn key is for when there is no 3D key. On a desktop the stage starts at once, so the slot stays empty
    until it arrives and a flat key never flashes before the real one. A phone starts the stage late on purpose
    (src/scripts/stage.ts) and keeps the drawn key until then. */
@@ -58,7 +69,7 @@ html.stage-on:not(.no-stage) .hero-slot::after { content: ""; position: absolute
   }
   .hero-track, .hero-stage { display: contents; }
   .hero-copy { grid-column: 1; grid-row: 1; align-self: center; padding: var(--space-8) 0; }
-  .hero-slot { grid-column: 2; grid-row: 1; min-height: 0; }
+  .hero-slot { grid-column: 2; grid-row: 1; height: auto; min-height: 0; }
   .hero-strip { grid-column: 1 / -1; grid-row: 2; flex-direction: row; justify-content: space-between; align-items: flex-end; padding-bottom: var(--space-12); }
   .hero-voice { text-align: right; margin-left: auto; }
   /* Side by side, the band of keys starts at the copy's column and fades on that side too. */
@@ -70,7 +81,7 @@ html.stage-on:not(.no-stage) .hero-slot::after { content: ""; position: absolute
   .motion .hero { height: 520svh; }
   .motion .hero-pin { position: sticky; top: var(--bar-h); height: calc(100svh - var(--bar-h)); overflow: clip; }
   /* With the sequence the canvas is fixed over the screen, behind the pin. */
-  .motion[data-page="home"] #stage { position: fixed; }
+  .motion[data-page="home"] #stage { position: fixed; transition: none; }
   /* The keys are drawn up to the top of the pin, where the header begins. They fade out just short of it, so the
      header sits on plain ground and no key is cut by a line that is not there. */
   .motion .hero-pin::before { content: ""; position: absolute; inset: 0 0 auto 0; height: var(--space-12); background: linear-gradient(var(--base-900), transparent); pointer-events: none; }

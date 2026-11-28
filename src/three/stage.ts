@@ -260,6 +260,9 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
       applyClip(renderer!, live.clip ?? null, height);
       renderer!.render(live.scene, live.camera);
       renderer!.setScissorTest(false);
+      // The drawn stand-in gives way only once the 3D object is on screen. Marked at build, the slot was empty for
+      // as long as the first frame took (shaders compiling, on a phone at the first scroll).
+      current.slot?.classList.add('slot-live');
     } else {
       renderer!.setScissorTest(false);
       renderer!.setClearColor(0x000000, 0);
@@ -271,7 +274,6 @@ export function createStage(canvas: HTMLCanvasElement, opts: { maxDpr: number; p
     if (entry.live || dead) return;
     entry.live = entry.factory(ctxFor(entry));
     fit(entry);
-    entry.slot?.classList.add('slot-live');
     // Compile shaders now, off the critical frame, instead of at hand-over.
     renderer!.compileAsync(entry.live.scene, entry.live.camera).catch(() => {});
   }
