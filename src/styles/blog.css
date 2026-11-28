@@ -69,6 +69,11 @@
 /* Figures made up to show a method. Each block says so in its own first line. */
 .prose [data-sample] { display: grid; gap: var(--space-4); max-width: 960px; border: 1px solid var(--rule); background: var(--base-100); padding: var(--space-6); }
 .prose [data-sample] > * { margin: 0; }
+/* On a phone, tighter cells so a four-column table fits without scrolling sideways. */
+@media (max-width: 600px) {
+  .prose [data-sample] { padding: var(--space-4); }
+  .prose .table th, .prose .table td { padding-inline: var(--space-2); }
+}
 .prose .footnotes { margin-top: var(--space-12); padding-top: var(--space-6); border-top: 1px solid var(--hairline); }
 .prose .footnotes h2 { margin-top: 0; }
 .prose .footnotes li, .prose .footnotes p { font-size: 14px; line-height: 21px; }
