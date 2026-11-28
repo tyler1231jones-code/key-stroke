@@ -1,15 +1,19 @@
 ---
 // One service. It opens with the service's demonstration at full size, then
-// lists what the service offers, shows two cases, answers the questions
-// people ask, and ends on the free consultation. No prices.
+// lists what the service offers, shows two cases and the three newest posts
+// about it, answers the questions people ask, and ends on the free
+// consultation. No prices.
 import Base from '../../layouts/Base.astro';
 import Demo from '../../components/demos/Demo.astro';
 import CaseCard from '../../components/CaseCard.astro';
 import BookButton from '../../components/BookButton.astro';
 import Faq from '../../components/Faq.astro';
+import PostRow from '../../components/PostRow.astro';
 import { services, casesOf, products, serviceHref } from '../../lib/data';
 import { serviceSchema } from '../../lib/seo';
+import { postsFor } from '../../lib/blog';
 import '../../styles/pages.css';
+import '../../styles/blog.css';
 
 export function getStaticPaths() {
   return services.map((s) => ({ params: { slug: s.slug }, props: { s } }));
@@ -18,6 +22,7 @@ export function getStaticPaths() {
 const { s } = Astro.props;
 const own = casesOf(s.id).slice(0, 2);
 const keystrokes = own.some((c) => /keystroke/.test(c.before.unit));
+const written = await postsFor(s.id, 3);
 const lower = s.name.toLowerCase().replace('ai agents', 'AI agents');
 ---
 <Base
@@ -83,6 +88,20 @@ const lower = s.name.toLowerCase().replace('ai agents', 'AI agents');
           {own.map((c) => <CaseCard item={c} />)}
         </div>
         <a class="more" href={`/cases?service=${s.id}`}>See all {lower} cases</a>
+      </div>
+    </section>
+  )}
+
+  {written.length > 0 && (
+    <section class:list={['section-pad', own.length === 0 && 'home-alt']} id="blog">
+      <div class="wrap">
+        <header class="section-head" data-reveal>
+          <h2 class="display-l">From the blog.</h2>
+        </header>
+        <div class="post-list">
+          {written.map((p) => <PostRow post={p} />)}
+        </div>
+        <a class="more" href="/blog">Read the blog</a>
       </div>
     </section>
   )}

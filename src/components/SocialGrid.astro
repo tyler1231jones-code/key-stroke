@@ -1,0 +1,39 @@
+---
+// The latest posts on Instagram and TikTok (and any other network saved into
+// social.json): six still tiles, each a picture saved into the site, which
+// network and the day it went out, linking to the post. Shown only while the
+// newest is less than 30 days old (src/lib/social.ts); otherwise nothing.
+import { socialGrid, profiles, NETWORKS, type Network } from '../lib/social';
+import { dateInZone } from '../lib/ledger';
+import { dateLong } from '../lib/format';
+import site from '../content/site.json';
+
+interface Props {
+  /** h2 when the grid stands on its own, h3 under a section heading. */
+  level?: 'h2' | 'h3';
+}
+const { level = 'h2' } = Astro.props;
+const H = level;
+const items = socialGrid(dateInZone(site.timezone));
+const nets = [...new Set(items.map((i) => i.network))];
+const names = (list: string[]) => (list.length < 2 ? list.join('') : `${list.slice(0, -1).join(', ')} and ${list.at(-1)}`);
+const follow = (Object.entries(profiles) as [Network, string][]).filter(([n, href]) => href && nets.includes(n));
+---
+{items.length > 0 && (
+  <section class="social" aria-labelledby="social-h">
+    <H class={level === 'h2' ? 'display-l' : 'display-m'} id="social-h">Latest on {names(nets.map((n) => NETWORKS[n]))}.</H>
+    <ul class="social-grid" role="list">
+      {items.map((i) => (
+        <li>
+          <a class="social-tile" href={i.url}>
+            <img src={i.src} alt={i.alt} width="640" height="640" loading="lazy" decoding="async" />
+            <span class="social-tile-meta body-s muted"><span class="tag">{NETWORKS[i.network]}</span> <time class="figure" datetime={i.date}>{dateLong(i.date)}</time></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    {follow.length > 0 && (
+      <p class="body-s">{follow.map(([n, href], k) => <>{k > 0 && ' '}<a href={href}>Follow {site.name} on {NETWORKS[n]}</a>.</>)}</p>
+    )}
+  </section>
+)}

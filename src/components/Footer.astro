@@ -3,6 +3,7 @@
 // A contact detail that is not set yet in site.json is left out.
 import Logotype from './Logotype.astro';
 import { site, services, crew, has, serviceHref, BOOK_HREF, BOOK_LABEL } from '../lib/data';
+import { posts } from '../lib/blog';
 
 interface Props {
   /** The last line only, with privacy and terms: for a client's working page. */
@@ -10,6 +11,7 @@ interface Props {
 }
 const { minimal = false } = Astro.props;
 const year = new Date().getFullYear();
+const blog = (await posts()).length > 0;
 const company = [
   { label: 'Products', href: '/products' },
   { label: 'Cases', href: '/cases' },
@@ -17,10 +19,14 @@ const company = [
   { label: 'Crew', href: '/crew' },
   { label: 'Savers', href: '/savers' },
   { label: 'Quiz', href: '/quiz' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'About', href: '/about' },
   { label: 'Counting method', href: '/counting' },
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
-].filter((link) => link.href !== '/crew' || crew.length > 0); // Crew once an agent runs for clients
+]
+  .filter((link) => link.href !== '/crew' || crew.length > 0) // Crew once an agent runs for clients
+  .filter((link) => link.href !== '/blog' || blog); // the blog once a post is published
 ---
 <footer class:list={['foot', { 'foot-min': minimal }]}>
   <div class="wrap">
@@ -46,12 +52,12 @@ const company = [
         <ul>
           {has('email') && <li><a href={`mailto:${site.email}`}>{site.email}</a></li>}
           <li><a href={BOOK_HREF}>{BOOK_LABEL}</a></li>
-          {has('serviceArea') && <li>{site.serviceArea}</li>}
+          {has('serviceArea') && <li>Serving {site.serviceArea}</li>}
         </ul>
       </div>
     </div>}
     <div class="foot-line">
-      <p>{site.origin}{has('location') && <> {site.location}.</>}</p>
+      <p>{site.origin}{has('location') && <> Based in {site.location}.</>}</p>
       {minimal && <p><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>}
       <p>&copy; <span class="fig" data-copy-year>{year}</span> {site.name}</p>
     </div>

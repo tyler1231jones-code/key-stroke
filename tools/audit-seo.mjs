@@ -120,10 +120,13 @@ for (const [route, p] of real) {
   else if (p.title.length > 60) bad(route, `title is ${p.title.length} characters: "${p.title}"`);
   if (!p.description) bad(route, 'no meta description');
   else if (p.description.length > 155) bad(route, `description is ${p.description.length} characters`);
-  if (titles.has(p.title)) bad(route, `title is the same as ${titles.get(p.title)}`);
-  if (descriptions.has(p.description)) bad(route, `description is the same as ${descriptions.get(p.description)}`);
-  titles.set(p.title, route);
-  descriptions.set(p.description, route);
+  // Two pages may share a title only if neither is meant to be found.
+  if (!/noindex/.test(p.robots ?? '')) {
+    if (titles.has(p.title)) bad(route, `title is the same as ${titles.get(p.title)}`);
+    if (descriptions.has(p.description)) bad(route, `description is the same as ${descriptions.get(p.description)}`);
+    titles.set(p.title, route);
+    descriptions.set(p.description, route);
+  }
   if (p.h1.length !== 1) bad(route, `${p.h1.length} h1 elements`);
   if (p.lang !== 'en-AU') bad(route, `lang is "${p.lang}"`);
   // Headings in order: a heading may go one level deeper than the one before it, never more.
@@ -133,20 +136,29 @@ for (const [route, p] of real) {
     if (last === 0 && h.level !== 1) bad(route, `the first heading is an h${h.level}, not the h1`);
     last = h.level;
   }
+  // A page that is never indexed on purpose (the onboarding forms, the crew note while the crew is hidden) is not
+  // shared, linked or listed, so the share tags, breadcrumb, links in and sitemap are not asked of it.
+  const indexable = !/noindex/.test(p.robots ?? '');
+  if (indexable && route.startsWith('/blog/')) {
+    const post = p.jsonld.find((j) => j['@type'] === 'BlogPosting');
+    if (!post) bad(route, 'a blog post with no BlogPosting JSON-LD');
+    else for (const key of ['headline', 'datePublished', 'dateModified', 'author', 'publisher', 'image']) if (!post[key]) bad(route, `BlogPosting has no ${key}`);
+    if (p.og.type !== 'article') bad(route, `og:type is "${p.og.type}", not "article"`);
+  }
+  if (p.imgNoAlt) bad(route, `${p.imgNoAlt} img without an alt attribute`);
+  const types = p.jsonld.map((j) => j['@type']);
+  for (const need of ['Organization', 'WebSite']) if (!types.includes(need)) bad(route, `no ${need} JSON-LD`);
+  if (types.some((t) => /Review|Rating/.test(String(t))) || JSON.stringify(p.jsonld).match(/aggregateRating|"review"/)) bad(route, 'review or rating markup is present');
+  if (!indexable) continue;
   for (const key of ['type', 'title', 'description', 'image']) if (!p.og[key]) bad(route, `no og:${key}`);
   if (p.twitter.card !== 'summary_large_image') bad(route, 'no twitter:card');
   if (p.og.image) {
     const path = p.og.image.replace(/^https?:\/\/[^/]+/, '');
     if (!existsSync(join(dist, path))) bad(route, `share image ${path} is not in the build`);
   }
-  if (p.imgNoAlt) bad(route, `${p.imgNoAlt} img without an alt attribute`);
-  const types = p.jsonld.map((j) => j['@type']);
-  for (const need of ['Organization', 'WebSite']) if (!types.includes(need)) bad(route, `no ${need} JSON-LD`);
   if (route !== '/' && !types.includes('BreadcrumbList')) bad(route, 'no BreadcrumbList JSON-LD');
-  if (types.some((t) => /Review|Rating/.test(String(t))) || JSON.stringify(p.jsonld).match(/aggregateRating|"review"/)) bad(route, 'review or rating markup is present');
   if (!linkedFrom.has(route) && route !== '/') bad(route, 'no page links to this one');
-  const indexable = !/noindex/.test(p.robots ?? '');
-  if (indexable && !p.canonical) bad(route, 'indexable but has no canonical address');
+  if (!p.canonical) bad(route, 'indexable but has no canonical address');
 }
 
 // Sitemap and robots.
@@ -155,7 +167,21 @@ const robots = existsSync(join(dist, 'robots.txt')) ? readFileSync(join(dist, 'r
 if (!sitemap) bad('sitemap.xml', 'missing');
 if (!robots) bad('robots.txt', 'missing');
 const inSitemap = sitemap ? [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].replace(/^https?:\/\/[^/]+/, '') || '/') : [];
-for (const [route] of real) if (sitemap && !inSitemap.includes(route)) bad('sitemap.xml', `${route} is not listed`);
+const listable = real.filter(([, p]) => !/noindex/.test(p.robots ?? ''));
+for (const [route] of listable) if (sitemap && !inSitemap.includes(route)) bad('sitemap.xml', `${route} is not listed`);
+for (const [route, p] of real) if (/noindex/.test(p.robots ?? '') && inSitemap.includes(route)) bad('sitemap.xml', `${route} is listed but carries noindex`);
+
+// The blog: every post is in the feed and in llms.txt, and the feed is linked from the pages.
+const postRoutes = listable.map(([r]) => r).filter((r) => r.startsWith('/blog/'));
+if (postRoutes.length) {
+  const feed = existsSync(join(dist, 'rss.xml')) ? readFileSync(join(dist, 'rss.xml'), 'utf8') : null;
+  const llms = existsSync(join(dist, 'llms.txt')) ? readFileSync(join(dist, 'llms.txt'), 'utf8') : '';
+  if (!feed) bad('rss.xml', 'missing, though there are posts');
+  for (const r of postRoutes) {
+    if (feed && !feed.includes(`${r}</link>`)) bad('rss.xml', `${r} is not in the feed`);
+    if (!llms.includes(`${r})`)) bad('llms.txt', `${r} is not listed`);
+  }
+}
 for (const loc of inSitemap) if (!built.has(loc)) bad('sitemap.xml', `${loc} is listed but not built`);
 if (!existsSync(join(dist, '404.html'))) bad('404', 'no 404 page');
 

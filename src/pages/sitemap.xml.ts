@@ -1,14 +1,16 @@
 // sitemap.xml, written at build. Every page a visitor can land on, by its
 // canonical address. The 404 and the redirects are not in it. Addresses are
 // absolute once the domain is set in site.json, which `npm run deploy`
-// requires.
+// requires. Blog posts carry the day they last changed.
 import type { APIRoute } from 'astro';
 import { services, cases, crew, serviceHref } from '../lib/data';
 import { products, productHref } from '../lib/catalogue';
 import { abs } from '../lib/seo';
+import { posts, postHref } from '../lib/blog';
 
-export const GET: APIRoute = () => {
-  const paths = [
+export const GET: APIRoute = async () => {
+  const blog = await posts();
+  const pages: { path: string; lastmod?: string }[] = [
     '/',
     '/services',
     ...services.map(serviceHref),
@@ -23,10 +25,18 @@ export const GET: APIRoute = () => {
     '/savers',
     '/quiz',
     '/contact',
+    '/about',
     '/counting',
     '/privacy',
     '/terms',
-  ];
-  const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${abs(p)}</loc></url>`).join('\n')}\n</urlset>\n`;
+  ].map((path) => ({ path }));
+  // The blog once a post is published. Drafts never reach an ordinary build.
+  if (blog.length) {
+    pages.push({ path: '/blog', lastmod: blog.map((p) => p.data.updated ?? p.data.date).sort().at(-1) });
+    for (const p of blog.filter((p) => !p.data.draft)) pages.push({ path: postHref(p), lastmod: p.data.updated ?? p.data.date });
+  }
+  const url = ({ path, lastmod }: { path: string; lastmod?: string }) =>
+    `  <url><loc>${abs(path)}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
+  const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(url).join('\n')}\n</urlset>\n`;
   return new Response(body, { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });
 };

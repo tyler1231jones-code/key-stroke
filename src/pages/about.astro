@@ -1,0 +1,68 @@
+---
+// /about: the two people who are the whole firm, by name and role, with a
+// line on what each builds, and the posts each has written. Every blog post's
+// byline links here. Nothing on this page is about a client.
+import Base from '../layouts/Base.astro';
+import PostRow from '../components/PostRow.astro';
+import { site, has } from '../lib/data';
+import { posts, people, peopleSchema } from '../lib/blog';
+import '../styles/pages.css';
+import '../styles/blog.css';
+
+const all = await posts();
+const byWho = (id: string) => all.filter((p) => p.data.author === id).slice(0, 3);
+const names = people.map((p) => p.name).join(' and ');
+const where = has('location') ? ` We are based in ${site.location}${has('serviceArea') ? ` and work with businesses across ${site.serviceArea}` : ''}.` : '';
+---
+<Base
+  title="About KEYSTROKE: two people, based in Brisbane"
+  description={`KEYSTROKE is ${names}. We find the admin a business does by hand and make it run itself. Based in Brisbane, working across Australia.`}
+  page="about"
+  crumbs={[{ name: 'About', href: '/about' }]}
+  schema={peopleSchema()}
+>
+  <section class="page-head">
+    <div class="wrap">
+      <h1 class="display-xl load-in">About.</h1>
+      <p class="lede load-in" style="--i:1">KEYSTROKE is two people, {names}.{where}</p>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="wrap">
+      <div class="people">
+        {people.map((p) => {
+          const theirs = byWho(p.id);
+          return (
+            <section class="person" id={p.id} aria-labelledby={`${p.id}-h`} data-reveal>
+              <div class="person-head">
+                <h2 class="display-m" id={`${p.id}-h`}>{p.name}</h2>
+                <p class="plate muted">{p.role}</p>
+              </div>
+              <div class="person-copy">
+                <p class="body">{p.line}</p>
+                {theirs.length > 0 && (
+                  <div class="post-list">
+                    {theirs.map((post) => <PostRow post={post} />)}
+                  </div>
+                )}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
+      <section class="about-work" aria-labelledby="about-work-h" data-reveal>
+        <h2 class="display-s" id="about-work-h">What we do</h2>
+        <div class="person-copy">
+          <p class="body">{site.description}</p>
+          <p class="body">We count the keystrokes before we start and again after, and we publish <a href="/counting">how we count them</a>. Our plans and fixed prices are on <a href="/savers">the Savers page</a>.</p>
+        </div>
+      </section>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/page.ts';
+</script>

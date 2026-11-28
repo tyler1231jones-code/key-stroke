@@ -6,9 +6,11 @@
 //   - No markup that presents a case as real work: the cases are mock until
 //     demo mode is off, so they are never described in structured data.
 //   - Location and service area are stated only once the principals have set
-//     them in site.json. Until then the area served is Australia, which the
-//     site already says. No town is guessed.
+//     them in site.json. The firm is based in Brisbane and serves all of
+//     Australia (owner, 28 November 2026), so the area served is the country
+//     and the address names the city only: no street is published.
 import faqsJson from '../content/faqs.json';
+import socialJson from '../content/social.json';
 import { site, services, products, origin, has, serviceHref, type Service } from './data';
 
 export interface Crumb {
@@ -22,7 +24,7 @@ export interface Faq {
 
 const base = origin ?? '';
 export const abs = (path: string): string => `${base}${path}`;
-const ORG = abs('/#organization');
+export const ORG = abs('/#organization');
 const SITE = abs('/#website');
 
 /** "/services/x" -> "services-x"; "/" -> "home". Names the share image for a page. */
@@ -38,11 +40,15 @@ export function faqsFor(page: string): Faq[] {
   return (list as Faq[]).filter((f) => f.a && f.a !== 'TODO');
 }
 
-// Until a service area is set, the country is stated: the site says the firm is
-// Australian owned and works with Australian businesses. No town is guessed.
+// The area served is the whole country: the firm works with businesses across
+// Australia from Brisbane. serviceArea in site.json is the words the footer
+// shows; for search engines it is the country, so the city never narrows it.
+const AREA = { '@type': 'Country', name: 'Australia' };
 const place = () => ({
-  areaServed: has('serviceArea') ? site.serviceArea : { '@type': 'Country', name: 'Australia' },
-  ...(has('location') ? { address: { '@type': 'PostalAddress', addressLocality: site.location, addressCountry: 'AU' } } : {}),
+  areaServed: AREA,
+  ...(has('location')
+    ? { address: { '@type': 'PostalAddress', addressLocality: site.location, ...(site.region ? { addressRegion: site.region } : {}), addressCountry: 'AU' } }
+    : {}),
 });
 
 export function organization() {
@@ -58,6 +64,8 @@ export function organization() {
     // What the firm does, in the words a search engine or an AI tool can match a question to.
     knowsAbout: [...services.map((s) => s.name), ...services.flatMap((s) => s.products.map((p) => p.name))],
     ...(has('email') ? { email: site.email } : {}),
+    // The profiles that point back to the site, so search engines know they are the same business.
+    ...(Object.values(socialJson.profiles).length ? { sameAs: Object.values(socialJson.profiles) } : {}),
     ...place(),
   };
 }
@@ -109,7 +117,7 @@ export function serviceSchema(s: Service) {
     description: s.what,
     url: abs(serviceHref(s)),
     provider: { '@id': ORG },
-    ...(has('serviceArea') ? { areaServed: site.serviceArea } : {}),
+    areaServed: AREA,
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
       name: s.name,

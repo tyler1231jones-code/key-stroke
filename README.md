@@ -43,6 +43,9 @@ npm run preview    # serve dist/ locally
 - a disabled control
 - a crew card without the tag `AI agent`
 - a page without `noindex` while demo mode is on
+- in a blog post, a figure with no source beside it, or a sample block that
+  does not say it is one; on any page, US spelling, or the name of a client
+  kept in `clients/` (see "Blog")
 
 It warns on any `TODO` left in `site.json`. Text inside `[data-artefact]` and
 inside a demonstration's frame is skipped: both show invented sample data.
@@ -65,6 +68,10 @@ Other scripts:
 | `npm run check:types` | `astro check` |
 | `node tools/browsers.mjs` | Every main page in Chrome, Edge, Firefox and Safari's engine (WebKit), at desktop and phone size: errors, failed requests, fonts, sideways scroll, 3D. `--live` for the live site, `--browser=edge` for one. See `AUDIT-browsers.md` |
 | `node tools/onboard-test.mjs` | Fills in every onboarding form in a browser, with Formspree and reCAPTCHA intercepted |
+| `npm run blog:build -- --drafts` | Builds with the blog's drafts included, to read them before they are published (see "Blog") |
+| `npm run blog:build -- --fixtures` | Builds with the test posts in `tools/fixtures/blog/` instead of the real ones |
+| `node tools/blog-shots.mjs` | Pictures of `/blog`, two posts, `/about` and the blog's sections on the homepage and a service page, at desktop and phone size, in `shots/blog/`, with sideways scroll, line length, script errors and anything loaded from another site |
+| `npm run social:save -- <posts.json>` | Saves social posts and their pictures into the site for the social grid (see "Social grid") |
 
 The audit scripts write their measurements to `shots/audit/`, which git
 ignores. All of them need `npm run build` first.
@@ -88,6 +95,9 @@ ignores. All of them need `npm run build` first.
 | `/privacy` | The privacy policy, from `legal.json` |
 | `/terms` | The website terms of use, from `legal.json` |
 | `/counting` | The counting method and the ledger. Linked from the footer |
+| `/about` | The two principals, by name and role, with a line on each and their latest posts. Every post's byline links here |
+| `/blog`, `/blog/[post]` | The blog (see "Blog"). Built only once a post is published |
+| `/rss.xml` | The blog's feed, each post in full. Written only once a post is published |
 | `/onboard`, `/onboard/[service]` | The client onboarding forms (see "Onboarding forms"). Not linked, not indexed, and not built until their Formspree id is set |
 
 Old addresses redirect: the four `/practice/*` pages from the first build, and
@@ -532,6 +542,146 @@ until the next page has taken over, so the page underneath never flashes back
 plain page change: the cross-fade between pages is for a desktop only
 (`motion.css`).
 
+## Blog
+
+Decided by the owner on 28 November 2026 (the build brief had left a blog
+out): one section at `/blog` for guides, news and notes from the work, written
+by Tyler and Kieran. The plan is the Claude Doc "Blog, news and social plan".
+Posts are Markdown files in this repository: no CMS, no third-party embeds, no
+tracking, no cookie banner.
+
+**What is built.** `/blog` lists every post, newest first, with a row of
+filters by kind (Guides, News, Work notes) that runs in the page. Each post
+has its kind, title and description, then its author (linked to `/about`),
+the day it was published, the day it last changed and the reading time, the
+post, a line to book a consultation or the audit, the service it is about,
+and two posts to read next. Each post has `BlogPosting` structured data, a
+share image from `npm run og`, an entry with its last change in the sitemap,
+and its place in `llms.txt`, `llms-full.txt` (in full) and `/rss.xml`. The
+helpers are in `src/lib/blog.ts`; the pages are `src/pages/blog/` and
+`src/pages/[feed].xml.ts`; the styles are `src/styles/blog.css`.
+
+Until a post is published there is no `/blog`, no feed and no link to either.
+The footer links the blog from the first post; the main menu adds it at six
+posts (`MENU_AT` in `src/lib/blog.ts`). The homepage shows the three newest
+posts above the quiz band, and each service page the three newest about that
+service, after its cases; both say nothing until there is a post to show.
+
+**Writing a post.**
+
+1. Copy `src/content/blog/_template.md` to a new file in the same folder. The
+   file name is the address: `month-end-pack.md` is `/blog/month-end-pack`.
+   Never rename a published post.
+2. Fill in the front matter. The author is drawn at random between Tyler and
+   Kieran when the topic is picked (the owner's rule, 28 November 2026), and
+   the one drawn gives the input, so the byline stays true. The build stops,
+   and says which field, if one is
+   wrong: the title is 60 characters or fewer, the description 70 to 155,
+   dates are written `2026-12-01`, the author is an id in `people.json`, the
+   kind is `guides`, `news` or `work-notes`, the service an id in
+   `services.json`, and `adds` is one sentence on what the post adds that the
+   current top results lack.
+3. Leave `draft: true` while it is being written. A draft shows in
+   `npm run dev`, and in `npm run blog:build -- --drafts` followed by
+   `npm run preview`, with "Draft. Not published." at the top and `noindex`.
+   It never appears in an ordinary build.
+4. To publish: set `draft: false`, then
+   `npm run build && npm run og && npm run build && npm run check`, commit
+   and push.
+5. When the substance changes later, set `updated` to that day.
+
+**A post's cover.** Optional, and every post should have one. Put the image in
+`src/content/blog/covers/`, named after the post, and add two lines to the
+front matter:
+
+```yaml
+cover: ./covers/month-end-pack.jpg
+coverAlt: A worn numpad seen from directly above, the 0 key polished smooth.
+```
+
+The cover is shown full width under the title, small beside the post in every
+list, and cut to 1200 by 630 as the post's share image (in place of the one
+`npm run og` would draw). Astro makes the sizes each screen needs. The build
+stops if a cover is smaller than 1200 by 630 or not that shape, or has no
+`coverAlt`. The art itself:
+
+- 2400 by 1260 (1200 by 630 is the least), JPG at about quality 85, under 1 MB.
+- No words, logos or figures in the image: the title is set by the page, the
+  cover is cropped square in lists, and words in a picture are not read out.
+  Keep the subject in the middle square so the crop keeps it.
+- The design system's photography brief: rendered objects, monochrome, matte,
+  one flat even light, the camera square-on or straight overhead, deep focus,
+  a ground of `base-000` or `base-900`. Neutral greys only; never `signal` or
+  `live` on an object. No people, faces or hands, and nothing that passes for
+  a photograph of a real office or client. The fun is in the object and what
+  has happened to it (a worn key, a numpad mid-tally, a receipt roll run out),
+  not in colour or effects.
+- Covers are made in the Keystroke Social Media project (Canva, Higgsfield)
+  and saved here; nothing on a page loads them from anywhere else.
+
+**What `npm run check` holds a post to.** Everything it holds a page to
+(the banned words, no exclamation marks or emoji, no GST, no internal terms,
+no prices off `/savers`), and also:
+
+- Every figure (a percentage, a figure of 1,000 or more, or a number with a
+  unit such as hours, days, staff or keystrokes) has its source in the same
+  paragraph, list item or table: a link to where it comes from, or a
+  footnote (`[^1]`, written out at the foot of the post). A figure already on
+  the site, such as a case's, links to that page.
+- Figures made up to show a method go inside `<div data-sample>` ... `</div>`,
+  and the block says "Sample figures" in its first line. The template shows
+  how.
+- Australian spelling. This rule runs on every page, not only posts.
+- No client's name, people or domain. The check reads them from `clients/`
+  when that folder is on the computer (it is kept out of git, so the rule
+  does not run in Cloudflare's build), and never prints them.
+- Keep prices out of posts: the site's rule is that prices appear on
+  `/savers` alone. A post links there.
+
+The same rules for words, prices and clients run on `/rss.xml` and the
+`llms` files. `npm run audit:seo -- --dir=dist` also checks that each post
+has its `BlogPosting` data and `og:type` of `article`, and that each post is
+in the sitemap, the feed and `llms.txt`.
+
+**Trying the layout.** `npm run blog:build -- --fixtures` builds with the
+three test posts in `tools/fixtures/blog/` (two with test covers) and the six
+test social posts in `tools/fixtures/social.json` in place of the real ones,
+then `node tools/blog-shots.mjs` takes pictures and
+`npm run lighthouse -- --routes=home,blog,about` measures. Never push from that
+build, and if `npm run og` was run on it, run an ordinary build and
+`npm run og` again so the test posts' share images are replaced.
+
+### Social grid
+
+The latest posts on Instagram and TikTok (and Facebook or LinkedIn once they
+are connected to Metricool) show as six still tiles under the list on `/blog`
+and under the newest posts on the homepage: one row on a wide screen, three
+or two across on smaller ones. Each tile is a picture saved into the site,
+which network and the day it went out, and links to the post. Nothing loads
+from Instagram or TikTok, and nothing moves. The grid shows only while its
+newest post is less than 30 days old on the day the site is built, since an
+old feed makes the business look quiet; the profiles in `social.json` are
+linked under it and named as `sameAs` in the Organization data.
+
+The posts are in `src/content/social.json`, their pictures in
+`public/social/`. To add posts, list them in a file and save them:
+
+```bash
+npm run social:save -- new-posts.json
+```
+
+```json
+[{ "network": "instagram", "url": "https://www.instagram.com/p/...",
+   "date": "2026-12-02", "image": "<picture address or file>",
+   "alt": "What the picture shows" }]
+```
+
+Each picture is cut square to 640 by 640 and saved as WebP, the newest six
+posts are kept, and pictures no longer used are deleted. Claude does this
+from Metricool after each blog post goes out and in the monthly routine, then
+builds, checks and asks before pushing. The helper is `src/lib/social.ts`,
+the tiles `src/components/SocialGrid.astro`.
+
 ## Share images
 
 Each page has its own 1200 by 630 share image in `public/og/`, drawn from the
@@ -554,8 +704,12 @@ npm run build && npm run og && npm run build
   service per service page, the Savers plans as offers, the questions on each
   page that has them, and the trail of pages on every inner page. There is no
   review or rating data, and the mock cases are not marked up as real work.
-- `location` and `serviceArea` in `site.json` go into the footer and the
-  structured data once set. While `TODO` they are left out.
+- KEYSTROKE is based in Brisbane and serves all of Australia (decided 28
+  November 2026). `location`, `region` and `serviceArea` in `site.json` go
+  into the footer, `llms.txt` and the structured data: the business's address
+  names the city and state only (no street), and the area served is always
+  the country, so the city never narrows it. The homepage title and the four
+  service descriptions name Brisbane for local searches.
 - The questions and answers are in `src/content/faqs.json`. An answer of
   `"TODO"` keeps its question off the page and out of the structured data.
 - `analyticsToken` in `site.json` is the Cloudflare Web Analytics token. No
@@ -659,6 +813,9 @@ agent, price, question or product is written into a template.
 | `shiftReport.json` | The sample report on the audit page |
 | `quiz.json` | The nine questions, the rules, the read templates and the five closing lines |
 | `artefacts.json` | Invented sample rows for the illustration on each case page |
+| `people.json` | The two principals: name, role, a line each, and the services each knows (their `knowsAbout` in the search data). The blog's authors and the About page |
+| `blog/*.md` | The blog's posts, one Markdown file each (see "Blog"); their covers in `blog/covers/` |
+| `social.json` | The latest social posts for the social grid, and the profiles it links to (see "Social grid") |
 
 ### Replace mock rows
 

@@ -14,6 +14,8 @@ import { site, services, products, has, serviceHref, type Service } from './data
 import { abs, faqsFor } from './seo';
 import { num, sentenceCase } from './format';
 import { products as catalogue, productHref, practiceOf, practiceLabel } from './catalogue';
+import { people, person, postHref, categoryLabel, type Post } from './blog';
+import { dateLong } from './format';
 
 const realCases = casesJson.filter((c) => !c.demo);
 const serviceName = (id: string) => services.find((s) => s.id === id)?.name ?? '';
@@ -27,15 +29,21 @@ function facts(): string[] {
     `- ${products.quoteLine} Published prices: ${abs('/savers')}`,
     `- Website: ${abs('/')}`,
     ...(has('email') ? [`- Email: ${site.email}`] : []),
-    ...(has('location') ? [`- Based in: ${site.location}`] : []),
-    ...(has('serviceArea') ? [`- Works across: ${site.serviceArea}`] : []),
+    ...(has('location') ? [`- Based in: ${[site.location, site.region].filter(Boolean).join(', ')}, Australia`] : []),
+    ...(has('serviceArea') ? [`- Serves: ${site.serviceArea}`] : []),
+    `- People: ${people.map((p) => `${p.name} (${p.role.toLowerCase()})`).join(' and ')}. ${abs('/about')}`,
   ];
 }
+
+const byline = (p: Post) => `${person(p.data.author).name}, ${dateLong(p.data.date)}${p.data.updated ? `, updated ${dateLong(p.data.updated)}` : ''}`;
+
+/** A post's Markdown, as written, without the HTML wrappers some blocks use. */
+const bodyOf = (p: Post) => (p.body ?? '').replace(/<\/?[a-z][^>]*>/gi, '').replace(/\n{3,}/g, '\n\n').trim();
 
 const head = () => [`# ${site.name}`, '', `> ${site.origin} ${site.description}`, '', ...facts()];
 
 /** /llms.txt: what the site is, and where each thing is explained. */
-export function llmsIndex(): string {
+export function llmsIndex(blog: Post[] = []): string {
   return [
     ...head(),
     '',
@@ -60,9 +68,19 @@ export function llmsIndex(): string {
     `- [All cases](${abs('/cases')}): what was built for each business, and what it changed.`,
     ...realCases.map((c) => `- [${sentenceCase(c.headline)}](${caseUrl(c.id)}): ${c.descriptor}. ${c.summary} Before: ${figure(c.before)}. After: ${figure(c.after)}.`),
     '',
+    ...(blog.length
+      ? [
+          '## Blog',
+          '',
+          `- [All posts](${abs('/blog')}): guides, news and notes from the work. Feed: ${abs('/rss.xml')}`,
+          ...blog.map((p) => `- [${p.data.title}](${abs(postHref(p))}): ${p.data.description} (${categoryLabel(p.data.category)}, ${byline(p)})`),
+          '',
+        ]
+      : []),
     '## Optional',
     '',
     `- [Everything in one file](${abs('/llms-full.txt')}): every service, its products and questions, the audit, Savers and each case in full.`,
+    `- [About us](${abs('/about')}): the two people who are KEYSTROKE.`,
     `- [How we count keystrokes](${abs('/counting')}): the published counting method.`,
     `- [Privacy policy](${abs('/privacy')})`,
     `- [Website terms of use](${abs('/terms')})`,
@@ -92,7 +110,7 @@ function serviceFull(s: Service): string[] {
 }
 
 /** /llms-full.txt: the substance of every public page that is real, in one file. */
-export function llmsFull(): string {
+export function llmsFull(blog: Post[] = []): string {
   const audit = products.audit;
   const savers = products.savers;
   return [
@@ -164,6 +182,20 @@ export function llmsFull(): string {
       `After: ${figure(c.after)}. ${c.after.note}`,
       '',
     ]),
+    ...(blog.length
+      ? [
+          '## Blog',
+          '',
+          `${abs('/blog')}. Feed: ${abs('/rss.xml')}`,
+          '',
+          ...blog.flatMap((p) => [`### ${p.data.title}`, '', abs(postHref(p)), '', `${categoryLabel(p.data.category)}. By ${byline(p)}.`, '', bodyOf(p), '']),
+        ]
+      : []),
+    '## Who we are',
+    '',
+    ...people.map((p) => `- ${p.name}, ${p.role.toLowerCase()}. ${p.line}`),
+    `- More: ${abs('/about')}`,
+    '',
     '## Contact',
     '',
     `Book a free consultation: ${abs('/contact')}`,

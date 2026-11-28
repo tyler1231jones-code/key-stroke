@@ -1,0 +1,104 @@
+/* The blog and the About page: a list of posts, a post, the two people.
+   Site tokens only. Motion is the site's own load-in and nothing else. */
+
+/* ============ A list of posts ============ */
+/* Dated rows, read down the page like the counting method, not a grid of cards. */
+.post-list { display: grid; }
+.post-row { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2) var(--space-12); padding-block: var(--space-6); border-top: 1px solid var(--hairline); }
+.post-list > .post-row:last-child { border-bottom: 1px solid var(--hairline); }
+.post-row[hidden] { display: none; }
+.post-row-copy { display: grid; gap: var(--space-3); align-content: start; }
+.post-row .display-s { max-width: 34ch; }
+.post-row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+.post-row:has(.card-link:hover) { border-top-color: var(--ink); }
+.post-row:has(.card-link:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
+@media (min-width: 900px) {
+  .post-row { grid-template-columns: 18ch minmax(0, 1fr); }
+}
+/* A row whose post has a cover shows it small at the end: square on a phone, the cover's own shape on a desktop. */
+.post-row.has-cover { grid-template-columns: minmax(0, 1fr) 96px; grid-template-areas: "date date" "copy cover"; column-gap: var(--space-4); }
+.post-row.has-cover .post-row-date { grid-area: date; }
+.post-row.has-cover .post-row-copy { grid-area: copy; }
+.post-row-cover { grid-area: cover; display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--rule); background: var(--base-100); }
+@media (min-width: 900px) {
+  .post-row.has-cover { grid-template-columns: 18ch minmax(0, 1fr) 240px; grid-template-areas: "date copy cover"; column-gap: var(--space-12); }
+  .post-row-cover { aspect-ratio: 1200 / 630; }
+}
+.post-feed { margin-top: var(--space-8); }
+
+/* ============ A post ============ */
+.post-head .display-l { max-width: 22ch; text-wrap: balance; }
+.post-head .lede { max-width: 50ch; }
+.post-draft { color: var(--signal); }
+/* The cover, full width under the title. Held at its shape so nothing moves as it loads. */
+.post-cover { margin-bottom: var(--space-8); }
+.post-cover img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 630; object-fit: cover; border: 1px solid var(--rule); background: var(--base-100); }
+/* Who, when and how long, in its own column beside the text on a desktop, as the counting page sets its sections. */
+.post-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8) var(--space-12); }
+.post-meta { display: grid; gap: var(--space-4); align-content: start; border-top: 1px solid var(--rule); padding-top: var(--space-4); }
+.post-facts { display: grid; gap: var(--space-1); }
+.post-facts > div { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); }
+.post-facts dd { margin: 0; }
+@media (min-width: 960px) {
+  .post-grid { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+  .post-meta { position: sticky; top: calc(var(--bar-h) + var(--space-6)); }
+  .post-main { border-top: 1px solid var(--rule); padding-top: var(--space-4); }
+}
+
+.prose { padding-bottom: var(--space-12); }
+.prose > * + * { margin-top: var(--space-4); }
+.prose p, .prose li, .prose blockquote { max-width: var(--measure); }
+.prose h2 { font-family: var(--font-display); text-transform: uppercase; font-size: 22px; line-height: 24px; font-weight: 500; letter-spacing: 0.01em; max-width: 30ch; margin-top: var(--space-12); }
+.prose h3 { font-size: 16px; line-height: 25px; font-weight: 600; max-width: var(--measure); margin-top: var(--space-8); }
+.prose h2 + *, .prose h3 + * { margin-top: var(--space-3); }
+.prose strong { font-weight: 600; }
+.prose ul, .prose ol { display: grid; gap: var(--space-2); }
+.prose ul > li { position: relative; padding-left: var(--space-6); }
+.prose ul > li::before { content: "/"; position: absolute; left: 0; font-family: var(--font-data); color: var(--ink-muted); }
+.prose ol { counter-reset: item; }
+.prose ol > li { position: relative; padding-left: var(--space-8); counter-increment: item; }
+.prose ol > li::before { content: counter(item); position: absolute; left: 0; font-family: var(--font-data); color: var(--ink-muted); }
+.prose li > ul, .prose li > ol { margin-top: var(--space-2); }
+.prose blockquote { border-left: 2px solid var(--rule); padding-left: var(--space-6); color: var(--readout); }
+.prose code { font-family: var(--font-data); font-size: 0.9375em; }
+.prose pre { overflow-x: auto; border: 1px solid var(--rule); padding: var(--space-4); background: var(--base-100); }
+.prose hr { border: 0; border-top: 1px solid var(--hairline); margin-block: var(--space-12); }
+.prose .table-frame { max-width: 960px; }
+.prose img { border: 1px solid var(--rule); }
+.prose sup { font-size: 0.75em; line-height: 0; }
+/* Figures made up to show a method. Each block says so in its own first line. */
+.prose [data-sample] { display: grid; gap: var(--space-4); max-width: 960px; border: 1px solid var(--rule); background: var(--base-100); padding: var(--space-6); }
+.prose [data-sample] > * { margin: 0; }
+.prose .footnotes { margin-top: var(--space-12); padding-top: var(--space-6); border-top: 1px solid var(--hairline); }
+.prose .footnotes h2 { margin-top: 0; }
+.prose .footnotes li, .prose .footnotes p { font-size: 14px; line-height: 21px; }
+
+.post-foot { display: grid; gap: var(--space-12); padding-bottom: var(--section); max-width: 960px; }
+.post-ask { border-top: 1px solid var(--rule); padding-top: var(--space-6); }
+.post-service { max-width: 640px; }
+.post-next { display: grid; gap: var(--space-6); }
+
+/* ============ The latest social posts ============ */
+/* Still tiles, saved into the site: nothing loads from Instagram or TikTok, and nothing moves. */
+.social { display: grid; gap: var(--space-6); }
+.post-feed + .social, .post-list + .more + .social { margin-top: var(--space-19); }
+.social-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-4); }
+@media (min-width: 700px) { .social-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* One row of six on a wide screen: a strip, not a second page. */
+@media (min-width: 1100px) { .social-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.social-tile { display: grid; gap: var(--space-2); color: inherit; text-decoration: none; }
+.social-tile img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--rule); background: var(--base-100); }
+.social-tile:hover img { border-color: var(--ink); }
+.social-tile:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+.social-tile-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+
+/* ============ About ============ */
+.people { display: grid; gap: var(--space-12); }
+.person, .about-work { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4) var(--space-12); border-top: 1px solid var(--rule); padding-top: var(--space-6); }
+.person { scroll-margin-top: calc(var(--bar-h) + var(--space-6)); }
+.person-head { display: grid; gap: var(--space-2); align-content: start; }
+.person-copy { display: grid; gap: var(--space-6); align-content: start; }
+.about-work { margin-top: var(--space-19); }
+@media (min-width: 960px) {
+  .person, .about-work { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+}

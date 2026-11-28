@@ -48,6 +48,11 @@ let total = 0;
 
 for (const route of (await pages(dist)).sort()) {
   await page.goto(url + route, { waitUntil: 'networkidle' });
+  // A page that shares an image of its own, such as a blog post's cover, needs none made here.
+  if (await page.evaluate(() => {
+    const own = document.querySelector('meta[property="og:image"]')?.getAttribute('content');
+    return own != null && !own.includes('/og/');
+  })) continue;
   await page.evaluate(() => document.fonts.ready);
   await page.evaluate(() => {
     const text = (sel) => document.querySelector(sel)?.textContent?.replace(/\s+/g, ' ').trim() ?? '';

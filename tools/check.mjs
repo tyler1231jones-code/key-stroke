@@ -15,6 +15,17 @@
 //   - the word GST on any page but /terms: no price or plan names it
 //   - a disabled control
 //   - a crew card without the tag "AI agent"
+//   - in a blog post ([data-post-body]): a figure (a percentage, a figure of
+//     1,000 or more, or a number with a unit such as hours, days, staff or
+//     keystrokes) whose paragraph, list item or table carries no source. A
+//     source is a link (to the page the figure comes from, or out) or a
+//     footnote. Figures inside [data-sample] are made up to show a method;
+//     each such block must say "sample". The footnotes themselves are sources.
+//   - US spelling (color, organize, center, percent and so on) on any page
+//   - a client's name, people or domain, read from clients/ (kept out of git)
+//     when that folder is on this computer, on any page or in the AI files
+// A figure that is sourced in a post may be repeated elsewhere on the site
+// (in the post's description, or a list of posts) without its link.
 // Text inside [data-artefact] is skipped for the figure checks: artefacts show
 // invented sample rows. The dollar rule has no exceptions and reads them too.
 // Colours and radii inside a service demonstration are --demo-* properties
@@ -87,6 +98,47 @@ const INTERNAL = [
   [/\bPractice \d\d\b/i, 'a practice number'],
   [/\bCase \d{3}\b/, 'a case number'],
 ];
+// Australian English. Each pattern is the US form; the second value is ours.
+const US_SPELLING = [
+  [/\bcolor(?:s|ed|ing|ful)?\b/i, 'colour'], [/\bfavor(?:s|ed|ing|ite|ites)?\b/i, 'favour'], [/\bbehavior(?:s|al)?\b/i, 'behaviour'],
+  [/\bhonor(?:s|ed)?\b/i, 'honour'], [/\blabor\b/i, 'labour'], [/\bneighbor/i, 'neighbour'], [/\bcenter(?:s|ed)?\b/i, 'centre'],
+  [/\bcatalogs?\b/i, 'catalogue'], [/\banalyz/i, 'analyse'], [/\b(?:cancel|travel|label|model|signal)(?:ed|ing)\b/i, 'a doubled l (labelled)'],
+  [/\bfulfill(?:s|ment)?\b/i, 'fulfil'], [/\benroll(?:s|ment)?\b/i, 'enrol'], [/\bgray\b/i, 'grey'], [/\bdefense\b/i, 'defence'],
+  [/\boffense\b/i, 'offence'], [/\bpercent\b/i, 'per cent'], [/\baluminum\b/i, 'aluminium'],
+  [/\b(?!(?:prizes?|seiz(?:e|es|ed|ing)|maize|capsiz(?:e|ed)|resiz(?:e|es|ed|ing)|oversized?|downsiz(?:e|ed|ing))\b)[a-z]{2,}iz(?:e|es|ed|ing|ation|ations|er|ers)\b/i, '-ise, -isation'],
+];
+
+// A figure in a blog post: a dollar figure, a percentage, a figure of 1,000 or more, or a number with a unit.
+const UNIT = 'hours?|hrs?|minutes?|mins?|days?|weeks?|months?|years?|keystrokes?|clicks?|staff|employees|people|businesses|times|invoices|quotes|jobs';
+const POST_FIGURE = new RegExp(
+  String.raw`\$\s?\d[\d,]*(?:\.\d+)?|\d+(?:\.\d+)?\s?(?:%|per\s?cent\b)|\b\d{1,3}(?:,\d{3})+\b|\b\d+(?:\.\d+)?(?:\s?(?:–|-|to)\s?\d+(?:\.\d+)?)?\s(?:${UNIT})\b`,
+  'gi',
+);
+
+// Clients' names, people and domains, from the plain client forms in clients/. That folder is kept out of git, so
+// this rule runs on this computer only, and no name is ever written into this file or printed by it.
+function clientPatterns() {
+  const dir = join(root, 'clients');
+  if (!existsSync(dir)) return [];
+  const out = [];
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  for (const file of readdirSync(dir).filter((f) => /\.(ts|js|mjs|json)$/.test(f) && f !== 'passcodes.json')) {
+    const text = readFileSync(join(dir, file), 'utf8');
+    const names = new Set();
+    for (const m of text.matchAll(/\bclient:\s*['"]([^'"]{3,})['"]/g)) names.add(esc(m[1]).replace(/\s+/g, '\\s*'));
+    for (const m of text.matchAll(/\bname:\s*['"]([A-Z][a-z]+ [A-Z][A-Za-z'-]+)['"]\s*,\s*role:/g)) names.add(esc(m[1]));
+    for (const m of text.matchAll(/@([a-z0-9-]+)((?:\.[a-z0-9-]+)+)/gi)) {
+      if (/^key-stroke$/i.test(m[1])) continue;
+      names.add(esc(m[1] + m[2]));
+      if (m[1].length >= 5) names.add(`\\b${esc(m[1])}\\b`);
+    }
+    for (const n of names) out.push({ re: new RegExp(n, 'i'), file });
+  }
+  return out;
+}
+const CLIENTS = clientPatterns();
+const namesClient = (text) => CLIENTS.find((c) => c.re.test(text));
+
 // The design system rationed the word "automation" to once a page. Revision 2
 // names a service and a product after it and asks for it in titles, so that
 // ration is no longer checked.
@@ -166,26 +218,70 @@ const SKIP = new Set(['script', 'style', 'template', 'svg']);
 const attr = (node, name) => node.attrs?.find((a) => a.name === name)?.value;
 const hasClass = (node, cls) => (attr(node, 'class') ?? '').split(/\s+/).includes(cls);
 
+const textOf = (node) => {
+  if (node.nodeName === '#text') return node.value;
+  return (node.childNodes ?? []).map(textOf).join('');
+};
+// What a reader reads in a block: no scripts, styles or drawings.
+const readable = (node) => {
+  if (node.nodeName === '#text') return node.value;
+  if (node.tagName && SKIP.has(node.tagName)) return '';
+  return (node.childNodes ?? []).map(readable).join('');
+};
+const linkIn = (node) => (node.tagName === 'a' && attr(node, 'href') !== undefined) || (node.childNodes ?? []).some(linkIn);
+const LEAF = new Set(['p', 'h2', 'h3', 'h4', 'h5', 'h6', 'dt', 'dd', 'figcaption']);
+
+/**
+ * A blog post's body as the blocks a reader reads: each paragraph, heading,
+ * list item and table, with whether it carries a source. Sample blocks and the
+ * footnotes are returned apart.
+ */
+function postBlocks(body) {
+  const blocks = [];
+  const samples = [];
+  const walkBlock = (node, prev) => {
+    if (!node.tagName || SKIP.has(node.tagName)) return;
+    if (attr(node, 'data-sample') !== undefined) return void samples.push(readable(node));
+    if (attr(node, 'data-footnotes') !== undefined) return;
+    if (node.tagName === 'table') return void blocks.push({ text: readable(node), sourced: linkIn(node) || Boolean(prev && linkIn(prev)) });
+    const kids = (node.childNodes ?? []).filter((c) => c.tagName);
+    if (LEAF.has(node.tagName)) return void blocks.push({ text: readable(node), sourced: linkIn(node) });
+    if (node.tagName === 'li' && !kids.some((c) => c.tagName === 'p')) {
+      // The item's own words, apart from any list inside it.
+      const own = { ...node, childNodes: (node.childNodes ?? []).filter((c) => c.tagName !== 'ul' && c.tagName !== 'ol') };
+      blocks.push({ text: readable(own), sourced: linkIn(own) });
+      for (const c of kids) if (c.tagName === 'ul' || c.tagName === 'ol') walkBlock(c, null);
+      return;
+    }
+    let before = prev;
+    for (const c of kids) {
+      walkBlock(c, before);
+      before = c;
+    }
+  };
+  walkBlock(body, null);
+  return { blocks, samples };
+}
+
 function readPage(html) {
   const doc = parse(html, { scriptingEnabled: false });
-  const page = { text: '', all: '', counters: [], tallies: [], h1: 0, robots: null, buildDate: null, redirect: false, disabled: 0, crewCards: 0, crewCardsMarked: 0, styles: [], inline: [] };
-  const textOf = (node) => {
-    if (node.nodeName === '#text') return node.value;
-    return (node.childNodes ?? []).map(textOf).join('');
-  };
+  // text: every word a reader sees. outside: the same, less a blog post's body, whose figures are checked against
+  // their sources instead (postBlocks).
+  const page = { text: '', all: '', outside: '', post: null, counters: [], tallies: [], h1: 0, robots: null, buildDate: null, redirect: false, disabled: 0, crewCards: 0, crewCardsMarked: 0, styles: [], inline: [] };
+  let inPost = 0;
   const visit = (node) => {
     const tag = node.tagName;
     if (tag === 'style') page.styles.push(textOf(node));
     if (tag === 'meta') {
       if (attr(node, 'name') === 'robots') page.robots = attr(node, 'content');
       if (attr(node, 'name') === 'ks-build-date') page.buildDate = attr(node, 'content');
-      if (attr(node, 'name') === 'description') page.text += `\n${attr(node, 'content')}\n`;
+      if (attr(node, 'name') === 'description') add(`\n${attr(node, 'content')}\n`);
       if ((attr(node, 'http-equiv') ?? '').toLowerCase() === 'refresh') page.redirect = true;
     }
     if (node.attrs) {
       for (const a of node.attrs) {
         if (a.name === 'style' || a.name === 'fill' || a.name === 'stroke') page.inline.push(`${a.name}:${a.value}`);
-        if (a.name === 'aria-label' || a.name === 'alt') page.text += `\n${a.value}\n`;
+        if (a.name === 'aria-label' || a.name === 'alt') add(`\n${a.value}\n`);
         if (a.name === 'disabled' || (a.name === 'aria-disabled' && a.value === 'true')) page.disabled++;
       }
     }
@@ -206,26 +302,72 @@ function readPage(html) {
     else if (tag && hasClass(node, 'ctr') && attr(node, 'data-figure') !== 'other') {
       page.counters.push(textOf(node).replace(/\s+/g, ''));
     }
+    // A blog post's body: its figures are read block by block, against their sources.
+    const post = node.attrs && attr(node, 'data-post-body') !== undefined;
+    if (post) {
+      page.post = postBlocks(node);
+      inPost++;
+    }
     if (node.nodeName === '#text') {
-      page.text += node.value;
+      add(node.value);
       page.all += node.value;
     }
-    if (tag && BLOCK.has(tag)) page.text += '\n';
+    if (tag && BLOCK.has(tag)) add('\n');
     for (const child of node.childNodes ?? []) visit(child);
-    if (tag && BLOCK.has(tag)) page.text += '\n';
+    if (tag && BLOCK.has(tag)) add('\n');
+    if (post) inPost--;
+  };
+  const add = (s) => {
+    page.text += s;
+    if (!inPost) page.outside += s;
   };
   visit(doc);
+  page.outside = page.outside.replace(/[ \t ]+/g, ' ').replace(/\s*\n\s*/g, '\n');
   page.text = page.text.replace(/[ \t ]+/g, ' ').replace(/\s*\n\s*/g, '\n');
   return page;
 }
 
 const toNumber = (s) => Number(s.replace(/,/g, ''));
 
-for (const file of walk(dist, '.html')) {
-  const where = relative(dist, file).replace(/\\/g, '/');
-  const page = readPage(readFileSync(file, 'utf8'));
+const built = walk(dist, '.html').map((file) => ({ where: relative(dist, file).replace(/\\/g, '/'), page: readPage(readFileSync(file, 'utf8')) }));
+
+// Figures a blog post states with a source beside them. They may be repeated without it elsewhere on the site.
+const sourced = new Set();
+for (const { page } of built) {
+  for (const b of page.post?.blocks ?? []) {
+    if (!b.sourced) continue;
+    for (const m of b.text.matchAll(/\d[\d,]*(?:\.\d+)?/g)) sourced.add(toNumber(m[0]));
+  }
+}
+
+for (const { where, page } of built) {
   if (page.redirect) continue; // a redirect written by Astro: no content of its own
-  const allowed = allowedFor(page.buildDate ?? new Date().toISOString().slice(0, 10));
+  const dated = allowedFor(page.buildDate ?? new Date().toISOString().slice(0, 10));
+  const allowed = { has: (n) => dated.has(n) || sourced.has(n) };
+
+  // A blog post: every figure has its source beside it, or is a sample that says so.
+  if (page.post) {
+    for (const b of page.post.blocks) {
+      if (b.sourced) continue;
+      for (const m of b.text.matchAll(POST_FIGURE)) {
+        if (/^\d{1,3}(,\d{3})+$/.test(m[0]) && dated.has(toNumber(m[0]))) continue; // a figure already in a content file
+        fail(where, `figure "${m[0]}" has no source beside it: "${b.text.replace(/\s+/g, ' ').trim().slice(0, 80)}". Link to where it comes from, add a footnote, or put it in a sample block`);
+      }
+    }
+    for (const s of page.post.samples) {
+      if (!/\bsample\b/i.test(s)) fail(where, `a [data-sample] block does not say it holds sample figures: "${s.replace(/\s+/g, ' ').trim().slice(0, 60)}"`);
+    }
+  }
+
+  // Australian English.
+  for (const [pattern, ours] of US_SPELLING) {
+    const m = page.text.match(pattern);
+    if (m) fail(where, `US spelling "${m[0]}": Australian English uses ${ours}`);
+  }
+
+  // A client is never named on the site (clients/ on this computer).
+  const client = namesClient(page.text) ?? namesClient(page.all);
+  if (client) fail(where, `names a client from clients/${client.file}. The name is not printed here`);
 
   // Words.
   let text = page.text;
@@ -276,12 +418,13 @@ for (const file of walk(dist, '.html')) {
     else if (!savers && !catalogue) fail(where, `dollar figure ${m[0]}: prices appear on /savers and nowhere else`);
     else if (!allowedDollars.has(m[0])) fail(where, `dollar figure ${m[0]} is not in a content file`);
   }
-  for (const m of page.text.matchAll(/(?<![$\d,.])(\d{1,3}(?:,\d{3})+)(?![\d,]*\.\d)/g)) {
+  // A blog post's own body was read above, against its sources.
+  for (const m of page.outside.matchAll(/(?<![$\d,.])(\d{1,3}(?:,\d{3})+)(?![\d,]*\.\d)/g)) {
     if (!allowed.has(toNumber(m[1]))) fail(where, `figure ${m[1]} is not in a content file and is not computed from the ledger`);
   }
   // Same line only: a year at the end of one block is not a figure for the next.
   // Not in capitals: "2026 KEYSTROKE" in the copyright line is the firm's name.
-  for (const m of page.text.matchAll(/(?<![$\d,.])(\d[\d,]*) +[kK]eystrokes?\b/g)) {
+  for (const m of page.outside.matchAll(/(?<![$\d,.])(\d[\d,]*) +[kK]eystrokes?\b/g)) {
     if (!allowed.has(toNumber(m[1]))) fail(where, `keystroke figure ${m[1]} is not in a content file and is not computed from the ledger`);
   }
   // The homepage intro counts the keystrokes it types: the letters in the first word of each service's name.
@@ -349,6 +492,32 @@ for (const name of ['llms.txt', 'llms-full.txt']) {
   const dollar = text.match(/\$\s?\d/);
   if (dollar) fail(name, 'a price: prices are on /savers and nowhere else');
   for (const [pattern, what] of INTERNAL) if (pattern.test(text)) fail(name, `uses ${what}, an internal term`);
+  const client = namesClient(text);
+  if (client) fail(name, `names a client from clients/${client.file}. The name is not printed here`);
+}
+
+/* ---------- The blog's feed (/rss.xml) ---------- */
+// Each post in full, so the page rules for words, prices and clients apply here too.
+{
+  const file = join(dist, 'rss.xml');
+  if (existsSync(file)) {
+    let text = readFileSync(file, 'utf8')
+      .replace(/<!\[CDATA\[|\]\]>/g, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&lt;[^&]*?&gt;/g, ' ')
+      .replace(/&(amp|quot|#39|apos);/g, ' ');
+    for (const line of APPROVED) text = text.split(line).join(' ');
+    for (const word of BANNED) {
+      const m = text.match(word);
+      if (m) fail('rss.xml', `banned word "${m[0]}"`);
+    }
+    if (/\bTODO\b/.test(text)) fail('rss.xml', 'prints TODO');
+    if (text.includes('!')) fail('rss.xml', 'exclamation mark');
+    if (/\$\s?\d/.test(text)) fail('rss.xml', 'a price: prices are on /savers and nowhere else');
+    if (/\p{Extended_Pictographic}/u.test(text.replace(/[©®™]/g, ''))) fail('rss.xml', 'emoji');
+    const client = namesClient(text);
+    if (client) fail('rss.xml', `names a client from clients/${client.file}. The name is not printed here`);
+  }
 }
 
 /* ---------- Config ---------- */

@@ -12,6 +12,12 @@ export function dateShort(iso: string): string {
   return `${d} ${MONTHS[m - 1]} ${y}`;
 }
 
+/** "2026-02-09" -> "9 February 2026" */
+export function dateLong(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${MONTHS_LONG[m - 1]} ${y}`;
+}
+
 /** "2026-02-09" -> "February 2026" */
 export function monthYear(iso: string): string {
   const [y, m] = iso.split('-').map(Number);

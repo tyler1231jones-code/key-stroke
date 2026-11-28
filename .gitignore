@@ -45,3 +45,6 @@ HANDOVER.md
 # Client forms in plain text, their passcodes and the key they are sealed
 # with. Only the sealed copies in src/onboarding/sealed/ go to git.
 /clients/
+# Marketing context for the skills: draws on the business plan, so it stays
+# on this computer.
+/.agents/

@@ -1,0 +1,108 @@
+---
+// One post: its kind, title and reason to read it; its cover, if it has one;
+// who wrote it, when, when it last changed and how long it takes; the post;
+// then a line to book, the service it is about, and two posts to read next.
+// The closing band follows, as on every page.
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Fig from '../../components/Fig.astro';
+import PostRow from '../../components/PostRow.astro';
+import {
+  posts, person, personHref, postHtml, postSchema, relatedTo, readingMinutes, serviceOf, categoryLabel, shareOf, type Post,
+} from '../../lib/blog';
+import { abs } from '../../lib/seo';
+import { products, serviceHref } from '../../lib/data';
+import { dateLong } from '../../lib/format';
+import '../../styles/pages.css';
+import '../../styles/blog.css';
+
+export async function getStaticPaths() {
+  return (await posts()).map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { title, description, date, updated, category, cta, draft, cover, coverAlt } = post.data;
+const author = person(post.data.author);
+const share = await shareOf(post);
+const s = serviceOf(post);
+const next = relatedTo(post, await posts());
+const ask =
+  cta === 'audit'
+    ? { line: `We can count this in your business. ${products.audit.free}`, href: '/audit', label: `How the ${products.audit.name.replace(/^The /, '')} works` }
+    : { line: `If this is the admin in your business, talk to us. ${products.audit.free}`, href: '/contact', label: 'Book a free consultation' };
+---
+<Base
+  title={title}
+  description={description}
+  page="post"
+  current="blog"
+  service={s?.id}
+  noindex={draft}
+  crumbs={[{ name: 'Blog', href: '/blog' }, { name: title, href: `/blog/${post.id}` }]}
+  schema={[postSchema(post, share.src)]}
+  shareImage={cover ? share : undefined}
+  article={{ published: date, modified: updated ?? date, author: abs(personHref(author)), section: categoryLabel(category) }}
+>
+  <article class="post">
+    <header class="page-head post-head">
+      <div class="wrap">
+        {draft && <p class="plate post-draft">Draft. Not published.</p>}
+        <p class="load-in"><a class="tag" href={`/blog?kind=${category}`}>{categoryLabel(category)}</a></p>
+        <h1 class="display-l load-in" style="--i:1"><Fig text={title} /></h1>
+        <p class="lede load-in" style="--i:2"><Fig text={description} /></p>
+      </div>
+    </header>
+
+    {cover && (
+      <figure class="wrap post-cover">
+        <Image
+          src={cover}
+          alt={coverAlt ?? ''}
+          widths={[640, 960, 1280, 1920, 2560].filter((w) => w <= cover.width)}
+          sizes="(min-width: 1440px) 1450px, 100vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </figure>
+    )}
+
+    <div class="wrap post-grid">
+      <aside class="post-meta load-in" style="--i:3" aria-label="About this post">
+        <p class="body-s">By <a href={personHref(author)}>{author.name}</a>, {author.role.toLowerCase()}</p>
+        <dl class="post-facts body-s">
+          <div><dt class="muted">Published</dt> <dd><time datetime={date}><Fig text={dateLong(date)} /></time></dd></div>
+          {updated && <div><dt class="muted">Updated</dt> <dd><time datetime={updated}><Fig text={dateLong(updated)} /></time></dd></div>}
+          <div><dt class="muted">Reading time</dt> <dd><Fig text={`${readingMinutes(post)} min`} /></dd></div>
+        </dl>
+      </aside>
+
+      <div class="post-main">
+      <div class="prose" data-post-body set:html={postHtml(post)} />
+
+      <div class="post-foot">
+        <p class="body post-ask">{ask.line} <a href={ask.href}>{ask.label}</a>.</p>
+
+        {s && (
+          <section class="post-service card" aria-labelledby="post-service-h">
+            <h2 class="display-s" id="post-service-h"><a class="card-link" href={serviceHref(s)}>{s.name}</a></h2>
+            <p class="body-s">{s.line} {s.what}</p>
+          </section>
+        )}
+
+        {next.length > 0 && (
+          <section class="post-next" aria-labelledby="post-next-h">
+            <h2 class="display-m" id="post-next-h">Read next</h2>
+            <div class="post-list">
+              {next.map((p) => <PostRow post={p} />)}
+            </div>
+          </section>
+        )}
+      </div>
+      </div>
+    </div>
+  </article>
+</Base>
+
+<script>
+  import '../../scripts/page.ts';
+</script>

@@ -13,13 +13,21 @@ import BookButton from '../components/BookButton.astro';
 import QuizButton from '../components/QuizButton.astro';
 import Fig from '../components/Fig.astro';
 import Pitch from '../components/Pitch.astro';
+import PostRow from '../components/PostRow.astro';
+import SocialGrid from '../components/SocialGrid.astro';
 import { site, crew, ledger, services, products, featuredCases, homepageTotal, proofFigures, experienceLine } from '../lib/data';
 import { professionalService } from '../lib/seo';
 import { dateInZone } from '../lib/ledger';
 import { words, withArticle } from '../lib/format';
+import { posts } from '../lib/blog';
+import { socialGrid } from '../lib/social';
 import '../styles/home.css';
+import '../styles/blog.css';
 
 const today = dateInZone(site.timezone);
+// The three newest posts and the latest social posts; each part shows only when it has something in it.
+const latest = (await posts()).slice(0, 3);
+const social = socialGrid(today).length > 0;
 const year = today.slice(0, 4);
 const home = homepageTotal(today);
 const proof = proofFigures(4);
@@ -30,8 +38,8 @@ const lines = [w.slice(0, 3), w.slice(3, 5), w.slice(5)].map((l) => l.join(' '))
 const crewCount = words(crew.length);
 ---
 <Base
-  title={`${site.name} | Business automation, websites and branding`}
-  description="We find the admin your team does by hand and make it run itself, then build the reports, software, website and brand to match. Free consultation."
+  title={`${site.name} | ${site.location} business automation, websites, branding`}
+  description={`We find the admin your team does by hand and make it run itself, then build the reports, software, website and brand. ${site.location}-based, across Australia.`}
   canvas
   page="home"
   band="none"
@@ -216,7 +224,27 @@ const crewCount = words(crew.length);
     </div>
   </section>
 
-  <!-- 8. Not sure where to start? -->
+  <!-- 8. From the blog, and the latest social posts -->
+  {(latest.length > 0 || social) && (
+    <section id="blog" class="section-pad">
+      <div class="wrap">
+        {latest.length > 0 && (
+          <>
+            <header class="section-head" data-reveal>
+              <h2 class="display-l">From the blog.</h2>
+            </header>
+            <div class="post-list">
+              {latest.map((p) => <PostRow post={p} />)}
+            </div>
+            <a class="more" href="/blog">Read the blog</a>
+          </>
+        )}
+        <SocialGrid level={latest.length > 0 ? 'h3' : 'h2'} />
+      </div>
+    </section>
+  )}
+
+  <!-- 9. Not sure where to start? -->
   <section class="band on-900" aria-labelledby="quiz-h" data-reveal>
     <div class="wrap band-inner">
       <h2 class="display-l" id="quiz-h">Not sure where to start?</h2>
@@ -225,7 +253,7 @@ const crewCount = words(crew.length);
     </div>
   </section>
 
-  <!-- 9. Where we are -->
+  <!-- 10. Where we are -->
   <section class="origin">
     <div class="wrap" data-reveal>
       <p class="display-m">{site.origin}</p>

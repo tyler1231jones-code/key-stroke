@@ -1,0 +1,16 @@
+[
+  {
+    "id": "tyler",
+    "name": "Tyler Jones",
+    "role": "Software and digital developer",
+    "line": "Tyler designs and builds the websites, the software and the brand work.",
+    "knows": ["web-software", "brand-design", "reporting"]
+  },
+  {
+    "id": "kieran",
+    "name": "Kieran",
+    "role": "Automation and integration engineer",
+    "line": "Kieran builds the automations, the links between systems and the AI agents.",
+    "knows": ["automation"]
+  }
+]

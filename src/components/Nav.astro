@@ -1,6 +1,7 @@
 ---
 import Logotype from './Logotype.astro';
 import { BOOK_HREF, BOOK_LABEL, crew } from '../lib/data';
+import { posts, MENU_AT } from '../lib/blog';
 
 interface Props {
   /** The key of the header item the current page belongs to. */
@@ -12,7 +13,9 @@ const { current, minimal = false } = Astro.props;
 
 // Each item is its own page. The live underline marks the one the visitor is on.
 // Crew is listed only once an agent runs for clients (a crew.json record not
-// marked demo).
+// marked demo). Blog joins once there are MENU_AT posts (owner, 28 November
+// 2026); until then the footer and the pages link to it.
+const inMenu = (await posts()).length >= MENU_AT;
 const items = [
   { key: 'services', label: 'Services', href: '/services' },
   { key: 'products', label: 'Products', href: '/products' },
@@ -20,8 +23,11 @@ const items = [
   { key: 'audit', label: 'Audit', href: '/audit' },
   { key: 'crew', label: 'Crew', href: '/crew' },
   { key: 'savers', label: 'Savers', href: '/savers' },
+  { key: 'blog', label: 'Blog', href: '/blog' },
   { key: 'quiz', label: 'Quiz', href: '/quiz' },
-].filter((item) => item.key !== 'crew' || crew.length > 0);
+]
+  .filter((item) => item.key !== 'crew' || crew.length > 0)
+  .filter((item) => item.key !== 'blog' || inMenu);
 ---
 <header class="bar">
   <div class="wrap">

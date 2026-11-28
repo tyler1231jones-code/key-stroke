@@ -9,6 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "build:onboard": "node tools/onboard-preview.mjs",
+    "blog:build": "node tools/blog-build.mjs",
+    "social:save": "node tools/social-save.mjs",
     "client:seal": "node tools/client-seal.mjs",
     "client:preview": "wrangler dev --local --port 8787 --env-file clients/dev.env",
     "preview": "astro preview",
