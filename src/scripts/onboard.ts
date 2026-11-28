@@ -18,7 +18,7 @@ import { tokenFor } from './forms';
 interface SubDef { id: string; label: string; type: string }
 interface FieldDef { id: string; type: string; label: string; item?: string; fields?: SubDef[] }
 interface StepDef { id: string; title: string; fields: FieldDef[] }
-interface Definition {
+export interface Definition {
   id: string;
   name: string;
   formId: string;
@@ -27,7 +27,33 @@ interface Definition {
   termsVersion: string;
   terms: string[];
   steps: StepDef[];
+  /** A client form: the client's name, and whether it ends with terms to accept (service forms always do). */
+  client?: string;
+  agreement?: boolean;
 }
+
+/**
+ * A card number: 13 to 19 digits, spaces or dashes allowed between them, that
+ * pass the Luhn check. The forms never need one, so none is ever sent.
+ */
+export function looksLikeCard(text: string): boolean {
+  for (const match of text.matchAll(/\d(?:[ -]?\d){12,18}/g)) {
+    const digits = match[0].replace(/\D/g, '');
+    if (digits.length < 13 || digits.length > 19) continue;
+    let sum = 0;
+    for (let i = 0; i < digits.length; i++) {
+      let d = Number(digits[digits.length - 1 - i]);
+      if (i % 2 === 1) {
+        d *= 2;
+        if (d > 9) d -= 9;
+      }
+      sum += d;
+    }
+    if (sum % 10 === 0) return true;
+  }
+  return false;
+}
+const CARD_MESSAGE = 'This looks like a card number. We never need your card details: you add them yourself on the provider\'s own billing page. Please take it out.';
 interface When { field: string; is?: string[]; has?: string[]; filled?: boolean; ticked?: boolean }
 type Answer = string | string[] | boolean;
 type Input = HTMLInputElement | HTMLTextAreaElement;
@@ -56,7 +82,8 @@ const root = document.querySelector<HTMLElement>('[data-onboard]');
 const definitionEl = document.getElementById('ob-definition');
 if (root && definitionEl?.textContent) init(root, JSON.parse(definitionEl.textContent) as Definition);
 
-function init(root: HTMLElement, def: Definition): void {
+/** Start a form. Service forms start here on load; a client form starts once its passcode opens it (client-form.ts). */
+export function init(root: HTMLElement, def: Definition): void {
   const form = root.querySelector<HTMLFormElement>('[data-onboard-form]')!;
   const steps = Array.from(form.querySelectorAll<HTMLFieldSetElement>('.ob-step'));
   const intro = root.querySelector<HTMLElement>('.ob-intro')!;
@@ -124,7 +151,7 @@ function init(root: HTMLElement, def: Definition): void {
   const groupItems = (wrapper: HTMLElement) => Array.from(wrapper.querySelectorAll<HTMLElement>('.ob-item'));
   const itemValues = (item: HTMLElement) =>
     Array.from(item.querySelectorAll<Input>('input, textarea'))
-      .filter((i) => (i.type === 'color' ? i.dataset.touched : i.value.trim()))
+      .filter((i) => (i.type === 'color' ? i.dataset.touched : i.type === 'checkbox' ? (i as HTMLInputElement).checked : i.value.trim()))
       .map((i) => i.value.trim());
 
   function addItem(wrapper: HTMLElement, index?: number): HTMLElement | null {
@@ -242,6 +269,7 @@ function init(root: HTMLElement, def: Definition): void {
     if (!input) return '';
     const value = input.value.trim();
     if (required && !value) return 'Please fill this in.';
+    if (value && kind !== 'colour' && kind !== 'date' && looksLikeCard(value)) return CARD_MESSAGE;
     if (value && kind === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Enter a full email address.';
     if (value && kind === 'url' && !/\.[a-z]{2,}/i.test(value)) return 'Enter a full web address, such as yourbusiness.com.au.';
     return '';
@@ -369,8 +397,18 @@ function init(root: HTMLElement, def: Definition): void {
           .map((item, i) => {
             const parts = (f.fields ?? [])
               .map((g) => {
-                const input = item.querySelector<Input>(`[name$=".${CSS.escape(g.id)}"]`);
-                const v = input ? (input.type === 'color' ? (input.dataset.touched ? input.value : '') : input.value.trim()) : '';
+                const inputs = Array.from(item.querySelectorAll<Input>(`[name$=".${CSS.escape(g.id)}"]`));
+                const input = inputs[0];
+                const v =
+                  g.type === 'multi'
+                    ? inputs.filter((i) => (i as HTMLInputElement).checked).map((i) => i.value).join(', ')
+                    : input
+                      ? input.type === 'color'
+                        ? input.dataset.touched
+                          ? input.value
+                          : ''
+                        : input.value.trim()
+                      : '';
                 return v ? `${g.label}: ${v}` : '';
               })
               .filter(Boolean);
@@ -386,11 +424,36 @@ function init(root: HTMLElement, def: Definition): void {
     return out;
   }
 
+  /** Access blocks not yet done: shown first on the review, so what is still open is plain. */
+  function stillOpen(): HTMLElement | null {
+    const open = def.steps
+      .flatMap((s) => s.fields.filter((f) => f.type === 'access'))
+      .filter((f) => wrapperOf(f.id) && !isHidden(wrapperOf(f.id)!) && answer(f.id) !== 'Done')
+      .map((f) => `${f.label}: ${(answer(f.id) as string) || 'not answered yet'}`);
+    if (!open.length) return null;
+    const section = document.createElement('section');
+    section.className = 'ob-review-open';
+    const h = document.createElement('h3');
+    h.className = 'display-s';
+    h.textContent = 'Still open';
+    const p = document.createElement('p');
+    p.className = 'body-s';
+    p.textContent = 'You can send now and finish these later. We will follow them up with you.';
+    const ul = document.createElement('ul');
+    ul.className = 'ticks';
+    ul.append(...open.map((text) => Object.assign(document.createElement('li'), { textContent: text })));
+    section.append(h, p, ul);
+    return section;
+  }
+
   function buildReview(): void {
+    const open = stillOpen();
     review.replaceChildren(
+      ...(open ? [open] : []),
       ...def.steps
         .map((s) => ({ s, el: steps.find((x) => x.dataset.step === s.id)! }))
-        .filter(({ el }) => !el.hidden)
+        // Steps with nothing to answer (a welcome, a summary) have nothing to review.
+        .filter(({ s, el }) => !el.hidden && s.fields.length > 0)
         .map(({ s, el }) => {
           const section = document.createElement('section');
           section.className = 'ob-review-step';
@@ -403,7 +466,8 @@ function init(root: HTMLElement, def: Definition): void {
           change.type = 'button';
           change.className = 'ob-link';
           change.dataset.goto = String(steps.indexOf(el));
-          change.textContent = `Change ${s.title.toLowerCase()}`;
+          // Only the first letter is lowered, so names such as WorkGuru keep their capitals.
+          change.textContent = `Change ${s.title.charAt(0).toLowerCase()}${s.title.slice(1)}`;
           head.append(h, change);
           const dl = document.createElement('dl');
           const answers = answersOf(s);
@@ -532,8 +596,10 @@ function init(root: HTMLElement, def: Definition): void {
     const data = new FormData();
     const business = textOf('business_name');
     const contact = textOf('contact_name');
-    data.set('_subject', `Onboarding: ${def.name}${business ? `, ${business}` : ''}`);
+    const who = def.client ?? business;
+    data.set('_subject', `Onboarding: ${def.name}${who && !def.name.includes(who) ? `, ${who}` : ''}`);
     data.set('Service', def.name);
+    if (def.client) data.set('Client form', `${def.client} (${def.id})`);
     if (business) data.set('Business', business);
     if (contact) data.set('Contact', contact);
     const email = textOf('contact_email');
@@ -555,15 +621,20 @@ function init(root: HTMLElement, def: Definition): void {
       data.set(`${String(i + 1).padStart(2, '0')}. ${s.title}`, answers.map((a) => `${a.label}\n  ${a.value.replace(/\n/g, '\n  ')}`).join('\n\n'));
     });
 
-    data.set('Agreement', 'Accepted');
-    data.set('Accepted by', [textOf('agree_name'), textOf('agree_position')].filter(Boolean).join(', '));
-    data.set('Agreement date', textOf('agree_date'));
+    const agreement = def.agreement !== false;
+    if (agreement) {
+      data.set('Agreement', 'Accepted');
+      data.set('Accepted by', [textOf('agree_name'), textOf('agree_position')].filter(Boolean).join(', '));
+      data.set('Agreement date', textOf('agree_date'));
+    }
     const sentAt = new Date(meta.at ?? Date.now());
     const brisbane = sentAt.toLocaleString('en-AU', { timeZone: 'Australia/Brisbane', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
     data.set('Sent at', `${brisbane} AEST (${sentAt.toISOString()})`);
     data.set('Sent from', meta.ip ? `IP address ${meta.ip}` : 'Not recorded');
-    data.set('Terms version', def.termsVersion);
-    data.set('Terms', def.terms.join('\n'));
+    if (agreement) {
+      data.set('Terms version', def.termsVersion);
+      data.set('Terms', def.terms.join('\n'));
+    }
 
     for (const s of def.steps) {
       for (const f of s.fields) {
@@ -584,6 +655,17 @@ function init(root: HTMLElement, def: Definition): void {
       if (isHidden(el) || el.closest('template') || !SECRET.test(el.value)) continue;
       const label = el.closest('.field')?.querySelector('label, legend')?.textContent?.replace(/\s*optional$/, '').trim();
       if (label) found.push(label);
+    }
+    return found;
+  }
+
+  /** Answers anywhere in the form, groups included, that look like a card number. */
+  function cardsTyped(): string[] {
+    const found: string[] = [];
+    for (const el of Array.from(form.querySelectorAll<Input>('input[type="text"], input[type="email"], input[type="tel"], input:not([type]), textarea'))) {
+      if (isHidden(el) || el.closest('template') || !looksLikeCard(el.value)) continue;
+      const label = el.closest('.field')?.querySelector('label, legend')?.textContent?.replace(/\s*optional$/, '').trim();
+      found.push(label || 'one of the answers');
     }
     return found;
   }
@@ -618,6 +700,11 @@ function init(root: HTMLElement, def: Definition): void {
     const secrets = secretsTyped();
     if (secrets.length) {
       fail(`It looks like a password has been typed into: ${secrets.join('; ')}. Please take it out before sending. We never need your passwords; we tell you how to give us access instead.`);
+      return;
+    }
+    const cards = cardsTyped();
+    if (cards.length) {
+      fail(`It looks like a card number has been typed into: ${cards.join('; ')}. Please take it out before sending. We never need your card details: you add them yourself on the provider's own billing page.`);
       return;
     }
     if ((form.querySelector<HTMLInputElement>('[name="_gotcha"]')?.value ?? '') !== '') {

@@ -7,6 +7,8 @@
 //                     the values.
 //   GET  /api/stamp   the time and the visitor's IP address, recorded with an
 //                     onboarding form's acceptance of the terms
+//   POST /api/client  a client form's id and passcode in, the form out
+//                     (src/onboarding/sealed.ts, README "Client forms")
 //
 // One quiz request works like this:
 //
@@ -26,7 +28,11 @@
 // and Secrets) and never written in this project:
 //   ANTHROPIC_API_KEY   from the Claude Console, made inside a workspace
 //   RECAPTCHA_SECRET    the reCAPTCHA v3 secret key
+//   ONBOARD_KEY         the key the client forms are sealed with (clients/.key)
+//   ONBOARD_PASSCODES   each client form's passcode, as JSON: {"<id>": "<passcode>"}
 import Anthropic from '@anthropic-ai/sdk';
+import { open, passcodeMatches } from './onboarding/sealed';
+import { sealedForms } from './onboarding/sealed/index';
 import quiz from './content/quiz.json';
 import productsJson from './content/products.json';
 import servicesJson from './content/services.json';
@@ -41,6 +47,9 @@ interface Env {
   /** Accepted as another name for RECAPTCHA_SECRET. */
   RECAPTCHA_SECRET_KEY?: string;
   QUIZ_LIMIT?: { limit(options: { key: string }): Promise<{ success: boolean }> };
+  ONBOARD_KEY?: string;
+  ONBOARD_PASSCODES?: string;
+  ONBOARD_LIMIT?: { limit(options: { key: string }): Promise<{ success: boolean }> };
 }
 
 export type Answers = Record<string, string[]>;
@@ -263,11 +272,55 @@ async function quizResult(request: Request, env: Env): Promise<Response> {
   }
 }
 
+/* ---------- Client forms ---------- */
+// A wrong passcode and an unknown id get the same answer, in about the same
+// time, so the reply says nothing about which forms exist. Nothing about the
+// request is logged: not the id, not what was typed.
+async function clientForm(request: Request, env: Env): Promise<Response> {
+  let passcodes: Record<string, unknown> = {};
+  try {
+    passcodes = JSON.parse(env.ONBOARD_PASSCODES ?? '{}');
+  } catch {
+    console.error('ONBOARD_PASSCODES is not valid JSON.');
+  }
+  if (!env.ONBOARD_KEY || !passcodes || typeof passcodes !== 'object') return json({ error: 'not-configured' }, 503);
+  const origin = request.headers.get('origin');
+  if (origin && new URL(origin).host !== new URL(request.url).host) return json({ error: 'forbidden' }, 403);
+  if (Number(request.headers.get('content-length') ?? 0) > 1024) return json({ error: 'too-large' }, 413);
+
+  const ip = request.headers.get('cf-connecting-ip');
+  if (env.ONBOARD_LIMIT && !(await env.ONBOARD_LIMIT.limit({ key: ip ?? 'unknown' })).success) return json({ error: 'slow-down' }, 429);
+
+  let body: { id?: unknown; passcode?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: 'bad-request' }, 400);
+  }
+  const { id, passcode } = body;
+  if (typeof id !== 'string' || !/^[a-z0-9-]{6,64}$/.test(id) || typeof passcode !== 'string' || passcode.length > 200) return json({ error: 'bad-request' }, 400);
+
+  const sealed = Object.hasOwn(sealedForms, id) ? sealedForms[id] : undefined;
+  const stored = Object.hasOwn(passcodes, id) && typeof passcodes[id] === 'string' ? (passcodes[id] as string) : '';
+  // Always compare, even with nothing to compare against, so timing tells nothing.
+  const matches = await passcodeMatches(passcode, stored || '\u0000no form');
+  if (!sealed || !stored || !matches) return json({ error: 'no-match' }, 403);
+  try {
+    return json({ form: JSON.parse(await open(sealed, env.ONBOARD_KEY)) });
+  } catch {
+    console.error('A client form would not open with ONBOARD_KEY. Was it sealed with a different key?');
+    return json({ error: 'not-configured' }, 503);
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const { pathname } = new URL(request.url);
     if (pathname === '/api/quiz') {
       return request.method === 'POST' ? quizResult(request, env) : json({ error: 'method' }, 405);
+    }
+    if (pathname === '/api/client') {
+      return request.method === 'POST' ? clientForm(request, env) : json({ error: 'method' }, 405);
     }
     // The onboarding forms record when, and from which address, a client
     // accepted the terms. Read by the page just before it sends.
@@ -275,7 +328,7 @@ export default {
       return json({ at: new Date().toISOString(), ip: request.headers.get('cf-connecting-ip') ?? null });
     }
     if (pathname === '/api/health') {
-      return json({ anthropicKey: Boolean(env.ANTHROPIC_API_KEY), recaptchaSecret: Boolean(env.RECAPTCHA_SECRET ?? env.RECAPTCHA_SECRET_KEY), rateLimit: Boolean(env.QUIZ_LIMIT) });
+      return json({ anthropicKey: Boolean(env.ANTHROPIC_API_KEY), recaptchaSecret: Boolean(env.RECAPTCHA_SECRET ?? env.RECAPTCHA_SECRET_KEY), rateLimit: Boolean(env.QUIZ_LIMIT), onboardKey: Boolean(env.ONBOARD_KEY), onboardPasscodes: Boolean(env.ONBOARD_PASSCODES) });
     }
     if (pathname.startsWith('/api/')) return json({ error: 'not-found' }, 404);
     return env.ASSETS.fetch(request);

@@ -28,9 +28,9 @@ const inputType = types[f.type] ?? 'text';
   <label for={uid}>{f.label}{!f.required && <span class="opt"> optional</span>}</label>
   {f.help && <p class="ob-help" id={helpId}>{f.help}</p>}
   {f.type === 'longtext' ? (
-    <textarea id={uid} name={name} rows={f.rows ?? 5} placeholder={f.placeholder} aria-describedby={describedBy} data-required={f.required ? '' : undefined} data-kind="longtext"></textarea>
+    <textarea id={uid} name={name} rows={f.rows ?? 5} placeholder={f.placeholder} aria-describedby={describedBy} data-required={f.required ? '' : undefined} data-kind="longtext">{f.value ?? ''}</textarea>
   ) : f.type === 'colour' ? (
-    <input id={uid} name={name} type="color" value="#0b0d10" class="ob-colour" aria-describedby={describedBy} data-kind="colour" />
+    <input id={uid} name={name} type="color" value={f.value ?? '#0b0d10'} class="ob-colour" aria-describedby={describedBy} data-kind="colour" data-touched={f.value ? '1' : undefined} />
   ) : (
     <input
       id={uid}
@@ -43,6 +43,7 @@ const inputType = types[f.type] ?? 'text';
       aria-describedby={describedBy}
       data-required={f.required ? '' : undefined}
       data-kind={f.type}
+      value={'value' in f ? f.value : undefined}
     />
   )}
   <p class="field-error" id={errId} hidden></p>

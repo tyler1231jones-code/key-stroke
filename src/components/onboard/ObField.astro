@@ -25,7 +25,11 @@ const access = onboarding.accessEmail;
 const withAccess = (text: string) => text.split('{access}');
 ---
 {f.type === 'note' ? (
-  <p class:list={['ob-note', 'field-wide', { 'ob-warn': f.tone === 'warn' }]} data-field={f.id} {...wrap}>{f.text}</p>
+  <div class:list={['ob-note', 'field-wide', { 'ob-warn': f.tone === 'warn', 'ob-safe': f.tone === 'safe' }]} data-field={f.id} {...wrap}>
+    {f.title && <p class="ob-note-title">{f.title}</p>}
+    {f.text && <p>{f.text}</p>}
+    {f.items?.length ? <ul class="ticks">{f.items.map((item) => <li>{item}</li>)}</ul> : null}
+  </div>
 ) : f.type === 'choice' || f.type === 'multi' ? (
   <fieldset class="field ob-field ob-choice field-wide" data-field={f.id} data-kind={f.type} data-required={required ? '' : undefined} aria-describedby={errId} {...wrap}>
     <legend>{f.label}{!required && <span class="opt"> optional</span>}</legend>
@@ -33,7 +37,7 @@ const withAccess = (text: string) => text.split('{access}');
     <div class="ob-options">
       {[...f.options, ...(f.other ? ['Other'] : [])].map((option, i) => (
         <label class="ob-option">
-          <input type={f.type === 'choice' ? 'radio' : 'checkbox'} name={f.id} value={option} id={`${uid}-${i}`} />
+          <input type={f.type === 'choice' ? 'radio' : 'checkbox'} name={f.id} value={option} id={`${uid}-${i}`} checked={f.type === 'choice' && f.value === option} />
           <span>{option}</span>
         </label>
       ))}
@@ -69,7 +73,12 @@ const withAccess = (text: string) => text.split('{access}');
       <div class="ob-item" data-item-index="0">
         <p class="plate ob-item-label">{f.item} <span class="fig">1</span></p>
         <div class="form-fields">
-          {f.fields.map((g) => <ObInput field={{ ...g, required: false }} name={`${f.id}.0.${g.id}`} uid={`${uid}-0-${g.id}`} />)}
+          {f.fields.map((g) => g.type === 'multi' ? (
+            <fieldset class="field ob-sub-multi field-wide" data-field={`${f.id}.0.${g.id}`}>
+              <legend>{g.label}</legend>
+              <div class="ob-options">{g.options.map((o) => <label class="ob-option"><input type="checkbox" name={`${f.id}.0.${g.id}`} value={o} /><span>{o}</span></label>)}</div>
+            </fieldset>
+          ) : <ObInput field={{ ...g, required: false }} name={`${f.id}.0.${g.id}`} uid={`${uid}-0-${g.id}`} />)}
         </div>
       </div>
     </div>
@@ -77,7 +86,12 @@ const withAccess = (text: string) => text.split('{access}');
       <div class="ob-item" data-item-index="__n__">
         <p class="plate ob-item-label">{f.item} <span class="fig">__label__</span></p>
         <div class="form-fields">
-          {f.fields.map((g) => <ObInput field={{ ...g, required: false }} name={`${f.id}.__n__.${g.id}`} uid={`${uid}-__n__-${g.id}`} />)}
+          {f.fields.map((g) => g.type === 'multi' ? (
+            <fieldset class="field ob-sub-multi field-wide" data-field={`${f.id}.__n__.${g.id}`}>
+              <legend>{g.label}</legend>
+              <div class="ob-options">{g.options.map((o) => <label class="ob-option"><input type="checkbox" name={`${f.id}.__n__.${g.id}`} value={o} /><span>{o}</span></label>)}</div>
+            </fieldset>
+          ) : <ObInput field={{ ...g, required: false }} name={`${f.id}.__n__.${g.id}`} uid={`${uid}-__n__-${g.id}`} />)}
         </div>
         <button class="key key-2 ob-remove" type="button" data-remove>Remove</button>
       </div>

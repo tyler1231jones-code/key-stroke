@@ -318,9 +318,60 @@ limits (Formspree takes 10 files of 25 MB a submission) and the terms every
 client accepts. Change `terms.version` whenever the terms change, so each
 email records which version was accepted.
 
-The forms carry `noindex`, are left out of the sitemap, the menu and the
-share images, and have a plain header and footer. `npm run check` allows
-the dollar figure in the terms on these pages and nowhere else but `/savers`.
+The forms carry `noindex` (in the page, and as an `X-Robots-Tag` header from
+`public/_headers`), are left out of the sitemap, the menu and the share
+images, and have a plain header and footer. `npm run check` allows the
+dollar figure in the terms on these pages and nowhere else but `/savers`.
+
+Every form refuses to send an answer that looks like a password, or a card
+number (13 to 19 digits that pass the Luhn check), anywhere in it.
+
+### Client forms
+
+A form written for one client, with their details filled in, at
+`/onboard/client/#<id>`. It works like a service form once open, but
+nothing about the client is in the page or in git in plain text: the
+repository is public.
+
+- The form is a file in `clients/` (not in git), shaped like a template plus
+  a few client fields (the `ClientForm` type in `src/onboarding/types.ts`):
+  the client's name, a byline, `agreement: false` when they have already
+  accepted a quote, and `value` / `items` to fill answers in.
+- `npm run client:seal` checks it as the build checks templates, encrypts
+  it (AES-256-GCM) into `src/onboarding/sealed/<id>.json`, and lists it in
+  `src/onboarding/sealed/index.ts`. Only these sealed files go to git. It
+  refuses a form that still says TODO, or has no passcode.
+- The client opens the link and types the passcode we gave them. The Worker
+  (`POST /api/client`) checks it and sends the form back; the page draws it
+  (`src/onboarding/render.ts`, which writes the same markup as
+  `ObField.astro`). A wrong passcode and an unknown link get the same
+  answer, five tries a minute per address (`ONBOARD_LIMIT` in
+  `wrangler.jsonc`), and nothing about the request is logged.
+
+**Adding one.**
+
+1. `node tools/client-seal.mjs --new-id` prints a random id.
+2. Copy an existing file in `clients/`, give it the new id and write it.
+3. Add a passcode for it to `clients/passcodes.json`:
+   `{"<id>": "<passcode>"}`, 12 characters or more. Several plain words are
+   easy to read out on the phone.
+4. `npm run client:seal`. The first run makes the sealing key,
+   `clients/.key`. Keep a copy in the password manager: without it no form
+   can be sealed again.
+5. Look at it: `npm run build`, `npm run client:preview` (the Worker on this
+   computer, at http://localhost:8787, using `clients/dev.env`), open
+   `/onboard/client/#<id>`. `node tools/client-test.mjs` walks it at phone
+   and desktop sizes with Formspree intercepted, and puts screenshots of
+   every step and the email it would send in `shots/client/<id>/`.
+6. A person puts the two values from `clients/cloudflare-secrets.txt` into
+   the Cloudflare dashboard (Workers & Pages, key-stroke, Settings, Variables
+   and Secrets, type Secret): `ONBOARD_KEY` and `ONBOARD_PASSCODES`. Then
+   commit the sealed files and push. `/api/health` says whether both are set.
+7. Send the client the link and, separately, the passcode.
+
+A form is changed the same way: edit the file, seal, push. To retire one,
+delete its file and seal again; its passcode stops working with the next
+`ONBOARD_PASSCODES`.
 
 ## Service demonstrations
 
@@ -548,6 +599,8 @@ The repository is public. `.gitignore` keeps these on this computer only:
 - `src/content/signatures.json` and the `signatures/` folder, which hold
   personal phone numbers. Copy `src/content/signatures.example.json` to
   `signatures.json` and fill it in to run `npm run signatures`.
+- `clients/`: client forms in plain text, their passcodes and the sealing
+  key. Only the sealed copies in `src/onboarding/sealed/` are committed.
 
 A fresh clone therefore has no PDFs in `docs/`. Copy them in from the
 principals before starting work that needs them.

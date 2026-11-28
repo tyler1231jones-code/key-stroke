@@ -1,0 +1,139 @@
+---
+// A form for one client: /onboard/client/#<id>. The form itself is not in
+// this page, or anywhere in the public repository in plain text. The page
+// asks for the passcode we gave the client, the Worker checks it and opens
+// the sealed form (POST /api/client), and src/scripts/client-form.ts draws
+// it here and hands it to the same script as the service forms.
+//
+// The page is unlisted (nothing links to it) and marked noindex, here and in
+// public/_headers. Built only when the service forms are (onboardBuilt).
+import Base from '../../layouts/Base.astro';
+import ObField from '../../components/onboard/ObField.astro';
+import Fig from '../../components/Fig.astro';
+import { onboarding, onboardBuilt, onboardFormId, onboardLive } from '../../onboarding';
+import type { Settings } from '../../onboarding/render';
+import '../../styles/pages.css';
+import '../../styles/onboard.css';
+
+export function getStaticPaths() {
+  return onboardBuilt ? [{ params: {} }] : [];
+}
+
+const terms = onboarding.terms;
+const settings: Settings & { privacy: string; keptOnDevice: string } = {
+  accessEmail: onboarding.accessEmail,
+  files: onboarding.files,
+  formId: onboardFormId,
+  live: onboardLive,
+  termsVersion: terms.version,
+  terms: terms.items,
+  privacy: onboarding.privacy,
+  keptOnDevice: onboarding.keptOnDevice,
+};
+---
+<Base title="Client onboarding" description="An onboarding form for one KEYSTROKE client." page="onboard" theme="light" noindex minimal band="none">
+  <section class="page-head ob-head">
+    <div class="wrap">
+      <p class="plate ob-eyebrow load-in" data-byline>Client onboarding</p>
+      <h1 class="display-xl load-in" style="--i:1" data-title>Your onboarding form.</h1>
+      <p class="lede load-in" style="--i:2" data-summary>This form was made for one business. Enter the passcode from our email to open it.</p>
+    </div>
+  </section>
+
+  <section class="page-body ob-body">
+    <div class="wrap ob" data-client-form>
+      <script is:inline>document.documentElement.classList.add('ob-js');</script>
+
+      <div class="ob-lock" data-lock>
+        <form class="form ob-lock-form" novalidate data-lock-form>
+          <div class="field">
+            <label for="ob-passcode">Passcode</label>
+            <p class="ob-help" id="ob-passcode-help">It is in the email we sent you with this link. Capitals and spaces do not matter.</p>
+            <input id="ob-passcode" name="passcode" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="ob-passcode-help ob-lock-status" required />
+          </div>
+          <button class="key key-l" type="submit" data-label="Open the form">Open the form</button>
+          <p class="form-status" id="ob-lock-status" role="alert" data-lock-status hidden></p>
+        </form>
+        <p class="body-s ob-muted">No passcode, or it will not open? Reply to the email we sent you and we will sort it out.</p>
+        <noscript><p class="form-legal">This form needs JavaScript. Please turn it on, or reply to the email we sent you.</p></noscript>
+      </div>
+
+      <div data-onboard hidden>
+        <div class="ob-intro">
+          <div class="ob-intro-grid">
+            <div>
+              <h2 class="display-s">Before you start</h2>
+              <p class="body" data-time></p>
+              <ul class="ticks ob-bring" data-bring></ul>
+            </div>
+            <div class="ob-privacy">
+              <h2 class="display-s">Your information</h2>
+              <p class="body-s">{onboarding.privacy} <a href="/privacy">Our privacy policy</a>.</p>
+              <p class="body-s ob-kept">{onboarding.keptOnDevice}</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="ob-resume body-s" data-resume hidden>
+          <span data-resume-text></span>
+          <button class="ob-link" type="button" data-restart>Start again with an empty form</button>
+        </p>
+
+        <div class="ob-progress" data-progress hidden>
+          <p class="plate" aria-live="polite"><span data-progress-text></span></p>
+          <ol class="ob-strip" data-strip aria-hidden="true"></ol>
+        </div>
+
+        <form class="form ob-form" method="post" novalidate data-onboard-form>
+          <div data-steps hidden></div>
+
+          <fieldset class="ob-step ob-final" data-step="send">
+            <legend class="display-l ob-step-title" tabindex="-1">Check and send.</legend>
+            <p class="body ob-step-intro" data-final-intro>Read through your answers. Change anything that is wrong, then send.</p>
+            <div class="ob-review" data-review></div>
+
+            <div data-agreement>
+              <div class="ob-terms">
+                <h2 class="display-m">{terms.title}.</h2>
+                <p class="body">{terms.intro}</p>
+                <ul class="ticks">
+                  {terms.items.map((item) => <li><Fig text={item} /></li>)}
+                </ul>
+                <p class="body-s"><a href="/terms" target="_blank">Website terms of use</a> · <a href="/privacy" target="_blank">Privacy policy</a></p>
+              </div>
+              <div class="form-fields">
+                <ObField field={{ id: 'agree_terms', type: 'tick', label: 'I have read these terms and accept them.', required: true }} />
+                <ObField field={{ id: 'agree_authority', type: 'tick', label: 'I am authorised to accept them for the business.', required: true }} />
+                <ObField field={{ id: 'agree_name', type: 'text', label: 'Your full name', required: true, autocomplete: 'name' }} />
+                <ObField field={{ id: 'agree_position', type: 'text', label: 'Your position', required: true, autocomplete: 'organization-title' }} />
+                <ObField field={{ id: 'agree_date', type: 'date', label: 'Date', required: true }} />
+              </div>
+              <p class="body-s ob-stamp">When you send this we record the time and the internet address it came from, with your acceptance.</p>
+            </div>
+          </fieldset>
+
+          <input class="form-pot" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <div class="ob-nav">
+            <button class="key key-2 key-l" type="button" data-back hidden>Back</button>
+            <button class="key key-l" type="button" data-next>Next</button>
+            <button class="key key-l form-submit" type="submit" data-send data-label="Send">Send</button>
+          </div>
+          <p class="form-status" role="alert" data-status hidden></p>
+          <p class="form-legal">This site is protected by reCAPTCHA. <a href="/privacy">How we handle your details</a> · <a href="/terms">Terms</a></p>
+        </form>
+
+        <div class="form-thanks ob-done" tabindex="-1" data-done hidden>
+          <p class="display-m">Thank you. That is with us.</p>
+          <h2 class="display-s">What happens next</h2>
+          <div data-next-list></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script type="application/json" id="ob-client-settings" is:inline set:html={JSON.stringify(settings)} />
+</Base>
+
+<script>
+  import '../../scripts/client-form.ts';
+</script>

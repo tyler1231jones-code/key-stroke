@@ -42,3 +42,6 @@ HANDOVER.md
 /signatures/
 # Handoff packs: their files are copied into src/ and public/ where used.
 /_handoff/
+# Client forms in plain text, their passcodes and the key they are sealed
+# with. Only the sealed copies in src/onboarding/sealed/ go to git.
+/clients/
