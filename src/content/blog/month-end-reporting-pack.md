@@ -9,8 +9,8 @@ pillar: 2
 term: month end reporting pack
 adds: A short pack in reading order for a small business, with the few numbers that go first, tied to BAS, Payday Super and job profit, not a CFO's board pack.
 cta: audit
-# cover: ./covers/month-end-reporting-pack.jpg
-# coverAlt: What the cover shows, for a reader who cannot see it.
+cover: ./covers/month-end-reporting-pack.jpg
+coverAlt: A deep stack of identical white sheets held by a black bulldog clip, with one sheet poking out of the middle.
 draft: false
 ---
 

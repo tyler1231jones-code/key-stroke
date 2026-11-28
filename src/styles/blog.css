@@ -19,10 +19,13 @@
 .post-row.has-cover { grid-template-columns: minmax(0, 1fr) 96px; grid-template-areas: "date date" "copy cover"; column-gap: var(--space-4); }
 .post-row.has-cover .post-row-date { grid-area: date; }
 .post-row.has-cover .post-row-copy { grid-area: copy; }
-.post-row-cover { grid-area: cover; display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--rule); background: var(--base-100); }
+/* Covers keep their subject in the middle with room around it, so the small copy is cropped in towards the centre. */
+.post-row-cover { grid-area: cover; display: block; overflow: hidden; aspect-ratio: 1; border: 1px solid var(--rule); background: var(--base-100); }
+.post-row-cover img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.15); }
 @media (min-width: 900px) {
   .post-row.has-cover { grid-template-columns: 18ch minmax(0, 1fr) 240px; grid-template-areas: "date copy cover"; column-gap: var(--space-12); }
   .post-row-cover { aspect-ratio: 1200 / 630; }
+  .post-row-cover img { transform: scale(1.25); }
 }
 .post-feed { margin-top: var(--space-8); }
 

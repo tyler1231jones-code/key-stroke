@@ -25,5 +25,5 @@ const { title, description, date, category, author, cover } = post.data;
     <p class="body-s"><Fig text={description} /></p>
     <p class="post-row-meta body-s muted"><span class="tag">{categoryLabel(category)}</span> <span>{person(author).name}, <Fig text={`${readingMinutes(post)} min read`} /></span></p>
   </div>
-  {cover && <Image class="post-row-cover" src={cover} alt="" widths={[240, 480]} sizes="(min-width: 900px) 240px, 96px" loading="lazy" />}
+  {cover && <span class="post-row-cover"><Image src={cover} alt="" widths={[240, 480, 720]} sizes="(min-width: 900px) 360px, 112px" loading="lazy" /></span>}
 </article>
