@@ -10,7 +10,7 @@ term: AI agent for small business
 adds: Real jobs with what each agent hands back, the decisions it must stop short of, and the Australian privacy and consumer law points, not a list of AI hype.
 cta: consultation
 cover: ./covers/ai-agents-in-a-small-business.jpg
-coverAlt: Three blank charcoal keycaps seen from above. The outer two are worn glossy; the middle one is shut under a hinged safety guard.
+coverAlt: A paper aeroplane straining to take off, held back by a chain tied to a heavy rubber stamp.
 draft: false
 ---
 

@@ -10,7 +10,7 @@ term: month end reporting pack
 adds: A short pack in reading order for a small business, with the few numbers that go first, tied to BAS, Payday Super and job profit, not a CFO's board pack.
 cta: audit
 cover: ./covers/month-end-reporting-pack.jpg
-coverAlt: A deep stack of identical white sheets held by a black bulldog clip, with one sheet poking out of the middle.
+coverAlt: A layer cake made of report pages and binder clips on a cake stand, with one slice served on a plate to show the layers.
 draft: false
 ---
 

@@ -8,7 +8,7 @@ pillar: 5
 adds: The reasoning behind measuring admin in keystrokes, with its research roots and its limits, from the firm that counts them.
 cta: audit
 cover: ./covers/why-we-count-keystrokes.jpg
-coverAlt: A blank numeric keypad seen from above, every key matte except the middle row, worn glossy by the same three presses.
+coverAlt: An hourglass running on tiny blank keycaps instead of sand, with a few keycaps escaped onto the ground beside it.
 draft: false
 ---
 
