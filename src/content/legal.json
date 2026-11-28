@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "privacy": {
     "title": "Privacy Policy",
     "lede": "This policy explains what personal information Keystroke collects, why, where it goes, how long we keep it, and how to get it corrected or deleted. It covers our website and its quiz, our emails and calls, and the work we do for clients.",
@@ -172,7 +172,7 @@
         "h": "Complaints",
         "blocks": [
           { "p": "{privacyAsk} with what happened. We acknowledge your complaint within five business days and give you a written response within 30 days." },
-          { "p": "If you are not satisfied, you can complain to the Office of the Australian Information Commissioner on 1300 363 992. If your complaint is about health information in Victoria, you can also contact the Health Complaints Commissioner." }
+          { "p": "If you are not satisfied, you can complain to the Office of the Australian Information Commissioner on 1300 363 992. If your complaint is about health information held under a state health records law, you can also contact that state's health complaints body." }
         ]
       },
       {
@@ -284,7 +284,7 @@
       {
         "h": "Law",
         "blocks": [
-          { "p": "These terms are governed by the law of Victoria, Australia. You and we submit to the courts of Victoria and the courts that hear appeals from them." }
+          { "p": "These terms are governed by the law of Queensland, Australia. You and we submit to the courts of Queensland and the courts that hear appeals from them." }
         ]
       },
       {
