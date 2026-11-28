@@ -13,14 +13,13 @@
 .post-card-cover img, .post-card-plain { display: block; width: 100%; height: 100%; object-fit: cover; }
 .post-card-copy { display: flex; flex-direction: column; gap: var(--space-3); flex: 1; }
 .post-card-copy > * { margin: 0; }
-.post-card-title { font-family: var(--font-display); text-transform: uppercase; font-size: 28px; line-height: 30px; font-weight: 500; letter-spacing: 0.005em; text-wrap: balance; }
+.post-card-title { font-family: var(--font-display); text-transform: uppercase; font-size: 28px; line-height: 34px; font-weight: 500; letter-spacing: 0.01em; text-wrap: balance; }
 .post-card-title a { color: inherit; }
 .post-card-desc { max-width: none; }
 .post-card-meta { margin-top: auto; }
 .post-card:has(.card-link:hover) .post-card-cover { border-color: var(--ink); }
-.post-card:has(.card-link:hover) .post-card-title a { text-decoration: underline; text-underline-offset: 4px; }
 .post-card:has(.card-link:focus-visible) { outline: 2px solid var(--focus); outline-offset: 6px; }
-@media (max-width: 719px) { .post-card-title { font-size: 26px; line-height: 28px; } }
+@media (max-width: 719px) { .post-card-title { font-size: 26px; line-height: 31px; } }
 
 /* /blog: a shorter head than other pages, so the first row of cards is on screen. */
 .blog-head { padding-bottom: var(--space-8); }
@@ -44,7 +43,7 @@
 
 /* The post in the left two thirds; the author and the post's contents in the right third, held in view as the post
    scrolls. On a phone the author follows the post, and the contents are left out. */
-.post-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-12) var(--space-19); }
+.post-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-12); }
 .post-side-inner { display: grid; gap: var(--space-6); align-content: start; border-top: 1px solid var(--rule); padding-top: var(--space-6); }
 .post-author { display: flex; align-items: center; gap: var(--space-4); }
 .post-author > div > * { margin: 0; }
@@ -69,9 +68,9 @@
 
 /* The words: a larger size and a wider measure than the rest of the site, so a long read is comfortable. */
 .prose { padding-bottom: var(--space-12); }
-.prose > * + * { margin-top: var(--space-6); }
-.prose p, .prose li, .prose blockquote { max-width: 31em; font-size: 20px; line-height: 32px; }
-.prose > p:first-child { max-width: 29em; font-size: 23px; line-height: 35px; color: var(--ink); }
+.prose > * + * { margin-top: var(--space-8); }
+.prose p, .prose li, .prose blockquote { max-width: none; font-size: 21px; line-height: 36px; }
+.prose > p:first-child { font-size: 24px; line-height: 39px; color: var(--ink); }
 /* Each section opens on a rule, in the display face, large enough to find again while scrolling. */
 .prose h2 { font-family: var(--font-display); text-transform: uppercase; font-size: 34px; line-height: 36px; font-weight: 500; letter-spacing: 0.005em; max-width: none; text-wrap: balance; margin-top: var(--space-19); padding-top: var(--space-6); border-top: 1px solid var(--rule); scroll-margin-top: calc(var(--bar-h) + var(--space-6)); }
 .prose h3 { font-size: 20px; line-height: 28px; font-weight: 600; max-width: 60ch; margin-top: var(--space-12); }

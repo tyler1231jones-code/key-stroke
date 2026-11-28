@@ -1,6 +1,50 @@
 {
   "profiles": {
-    "instagram": "https://www.instagram.com/keystroke_au"
+    "instagram": "https://www.instagram.com/keystroke_au",
+    "tiktok": "https://www.tiktok.com/@user6109743311226"
   },
-  "posts": []
+  "posts": [
+    {
+      "network": "instagram",
+      "url": "https://www.instagram.com/reel/DgRuX-AINWo/",
+      "date": "2026-11-28",
+      "image": "instagram-8019f209b3.webp",
+      "alt": "Reel: a typewriter among crumpled paper under a desk lamp, captioned 'Reconciling the bank by hand at 11 pm'."
+    },
+    {
+      "network": "instagram",
+      "url": "https://www.instagram.com/reel/DgRvI6kJIfW/",
+      "date": "2026-11-28",
+      "image": "instagram-9a6f110b9f.webp",
+      "alt": "Reel: a tall stack of paper under the caption 'Tell me you still do admin by hand without telling me'."
+    },
+    {
+      "network": "instagram",
+      "url": "https://www.instagram.com/reel/DgRwDmfzWO6/",
+      "date": "2026-11-28",
+      "image": "instagram-e2f869cd9a.webp",
+      "alt": "Reel: a worn keyboard under the caption 'POV: typing the same invoice into the second system'."
+    },
+    {
+      "network": "tiktok",
+      "url": "https://www.tiktok.com/@user6109743311226/video/7713106894495304978",
+      "date": "2026-11-28",
+      "image": "tiktok-6fcd0ecaff.webp",
+      "alt": "Slide reading 'Five agents. None of them are people.'"
+    },
+    {
+      "network": "tiktok",
+      "url": "https://www.tiktok.com/@user6109743311226/video/7713122385649487112",
+      "date": "2026-11-28",
+      "image": "tiktok-04d3ad2676.webp",
+      "alt": "Video: a keyboard key close up under the caption 'Me sending the third just following up email'."
+    },
+    {
+      "network": "tiktok",
+      "url": "https://www.tiktok.com/@user6109743311226/video/7713124458638134549",
+      "date": "2026-11-28",
+      "image": "tiktok-a00af92048.webp",
+      "alt": "Video: an office printer on a cabinet under the caption 'The office printer when you need one page before you leave'."
+    }
+  ]
 }

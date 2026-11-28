@@ -74,7 +74,8 @@ for (const [size, opts] of Object.entries(SIZES)) {
       } else flags.push(`no #${part} on the page`);
     } else await page.screenshot({ path: file, fullPage: true });
     if (m.sideways > 0) flags.push(`${m.sideways}px sideways scroll`);
-    if (m.widest > 80) flags.push(`a line of ${m.widest} characters`);
+    // Post text runs the full width of its column (the owner's choice, 28 November 2026), so only a line past 100 characters is flagged.
+    if (m.widest > 100) flags.push(`a line of ${m.widest} characters`);
     if (errors.length) flags.push(`script errors: ${errors.join('; ')}`);
     if (outside.size) flags.push(`loads from another site: ${[...outside].join(', ')}`);
     problems += flags.length;
