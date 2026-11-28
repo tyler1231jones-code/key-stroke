@@ -3,7 +3,7 @@
 // line on what each builds, and the posts each has written. Every blog post's
 // byline links here. Nothing on this page is about a client.
 import Base from '../layouts/Base.astro';
-import PostRow from '../components/PostRow.astro';
+import PostCard from '../components/PostCard.astro';
 import { site, has } from '../lib/data';
 import { posts, people, peopleSchema } from '../lib/blog';
 import '../styles/pages.css';
@@ -42,8 +42,8 @@ const where = has('location') ? ` We are based in ${site.location}${has('service
               <div class="person-copy">
                 <p class="body">{p.line}</p>
                 {theirs.length > 0 && (
-                  <div class="post-list">
-                    {theirs.map((post) => <PostRow post={post} />)}
+                  <div class="post-cards post-cards-2">
+                    {theirs.map((post) => <PostCard post={post} />)}
                   </div>
                 )}
               </div>

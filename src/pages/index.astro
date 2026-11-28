@@ -13,7 +13,7 @@ import BookButton from '../components/BookButton.astro';
 import QuizButton from '../components/QuizButton.astro';
 import Fig from '../components/Fig.astro';
 import Pitch from '../components/Pitch.astro';
-import PostRow from '../components/PostRow.astro';
+import PostCard from '../components/PostCard.astro';
 import SocialGrid from '../components/SocialGrid.astro';
 import { site, crew, ledger, services, products, featuredCases, homepageTotal, proofFigures, experienceLine } from '../lib/data';
 import { professionalService } from '../lib/seo';
@@ -233,8 +233,8 @@ const crewCount = words(crew.length);
             <header class="section-head" data-reveal>
               <h2 class="display-l">From the blog.</h2>
             </header>
-            <div class="post-list">
-              {latest.map((p) => <PostRow post={p} />)}
+            <div class="post-cards">
+              {latest.map((p) => <PostCard post={p} />)}
             </div>
             <a class="more" href="/blog">Read the blog</a>
           </>

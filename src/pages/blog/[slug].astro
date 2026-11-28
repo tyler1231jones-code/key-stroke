@@ -6,7 +6,7 @@
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Fig from '../../components/Fig.astro';
-import PostRow from '../../components/PostRow.astro';
+import PostCard from '../../components/PostCard.astro';
 import {
   posts, person, personHref, postHtml, postSchema, relatedTo, readingMinutes, serviceOf, categoryLabel, shareOf, type Post,
 } from '../../lib/blog';
@@ -92,8 +92,8 @@ const ask =
         {next.length > 0 && (
           <section class="post-next" aria-labelledby="post-next-h">
             <h2 class="display-m" id="post-next-h">Read next</h2>
-            <div class="post-list">
-              {next.map((p) => <PostRow post={p} />)}
+            <div class="post-cards post-cards-2">
+              {next.map((p) => <PostCard post={p} />)}
             </div>
           </section>
         )}

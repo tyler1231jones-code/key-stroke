@@ -21,6 +21,9 @@ export type Post = CollectionEntry<'blog'>;
 export type Person = (typeof peopleJson)[number];
 
 export const MENU_AT = 6;
+/** Posts on each page of /blog: three rows of three. Later pages are /blog/2, /blog/3 and so on. */
+export const PAGE_SIZE = 9;
+export const listHref = (n: number): string => (n <= 1 ? '/blog' : `/blog/${n}`);
 export const people: Person[] = peopleJson;
 export const BLOG_ID = abs('/blog#blog');
 
@@ -46,6 +49,8 @@ function load(): Promise<Post[]> {
   return getCollection('blog', ({ data }) => showDrafts || !data.draft).then((list) => {
     list.sort((a, b) => b.data.date.localeCompare(a.data.date) || a.id.localeCompare(b.id));
     for (const post of list) {
+      // /blog/2 is the second page of the list, so a post cannot be named with a number alone.
+      if (/^\d+$/.test(post.id)) throw new Error(`blog: a post cannot be named "${post.id}"; /blog/${post.id} is a page of the list`);
       const c = post.data.cover;
       // A cover is shown wide above the post and cut to 1200 by 630 to share, so it has to be at least that, and that shape.
       if (c && (c.width < 1200 || Math.abs(c.width / c.height - 1200 / 630) > 0.04)) {

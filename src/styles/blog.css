@@ -2,32 +2,36 @@
    Site tokens only. Motion is the site's own load-in and nothing else. */
 
 /* ============ A list of posts ============ */
-/* Dated rows, read down the page like the counting method, not a grid of cards. */
-.post-list { display: grid; }
-.post-row { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2) var(--space-12); padding-block: var(--space-6); border-top: 1px solid var(--hairline); }
-.post-list > .post-row:last-child { border-bottom: 1px solid var(--hairline); }
-.post-row[hidden] { display: none; }
-.post-row-copy { display: grid; gap: var(--space-3); align-content: start; }
-.post-row .display-s { max-width: 34ch; }
-.post-row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
-.post-row:has(.card-link:hover) { border-top-color: var(--ink); }
-.post-row:has(.card-link:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
-@media (min-width: 900px) {
-  .post-row { grid-template-columns: 18ch minmax(0, 1fr); }
-}
-/* A row whose post has a cover shows it small at the end: square on a phone, the cover's own shape on a desktop. */
-.post-row.has-cover { grid-template-columns: minmax(0, 1fr) 96px; grid-template-areas: "date date" "copy cover"; column-gap: var(--space-4); }
-.post-row.has-cover .post-row-date { grid-area: date; }
-.post-row.has-cover .post-row-copy { grid-area: copy; }
-/* Covers keep their subject in the middle with room around it, so the small copy is cropped in towards the centre. */
-.post-row-cover { grid-area: cover; display: block; overflow: hidden; aspect-ratio: 1; border: 1px solid var(--rule); background: var(--base-100); }
-.post-row-cover img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.15); }
-@media (min-width: 900px) {
-  .post-row.has-cover { grid-template-columns: 18ch minmax(0, 1fr) 240px; grid-template-areas: "date copy cover"; column-gap: var(--space-12); }
-  .post-row-cover { aspect-ratio: 1200 / 630; }
-  .post-row-cover img { transform: scale(1.25); }
-}
-.post-feed { margin-top: var(--space-8); }
+/* Cards in rows of three, as most blogs lay out their posts: the cover on top,
+   shown whole, then the kind, the title, the reason to read it, and who and when. */
+.post-cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-12) var(--space-6); }
+@media (min-width: 720px) { .post-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .post-cards:not(.post-cards-2) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.post-card { position: relative; display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+.post-card[hidden] { display: none; }
+.post-card-cover { aspect-ratio: 1200 / 630; overflow: hidden; border: 1px solid var(--rule); background: var(--base-100); }
+.post-card-cover img, .post-card-plain { display: block; width: 100%; height: 100%; object-fit: cover; }
+.post-card-copy { display: flex; flex-direction: column; gap: var(--space-3); flex: 1; }
+.post-card-copy > * { margin: 0; }
+.post-card-title { font-family: var(--font-display); text-transform: uppercase; font-size: 28px; line-height: 30px; font-weight: 500; letter-spacing: 0.005em; text-wrap: balance; }
+.post-card-title a { color: inherit; }
+.post-card-desc { max-width: none; }
+.post-card-meta { margin-top: auto; }
+.post-card:has(.card-link:hover) .post-card-cover { border-color: var(--ink); }
+.post-card:has(.card-link:hover) .post-card-title a { text-decoration: underline; text-underline-offset: 4px; }
+.post-card:has(.card-link:focus-visible) { outline: 2px solid var(--focus); outline-offset: 6px; }
+@media (max-width: 719px) { .post-card-title { font-size: 26px; line-height: 28px; } }
+
+/* /blog: a shorter head than other pages, so the first row of cards is on screen. */
+.blog-head { padding-bottom: var(--space-8); }
+.blog-head .filter { margin: var(--space-2) 0 0; }
+.blog-body { padding-top: 0; }
+.pager { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-4); margin-top: var(--space-19); }
+.pager > :last-child { justify-self: end; }
+.pager-step { font-weight: 600; }
+.pager-pages { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.pager-pages .chip[aria-current] { background: var(--readout); color: var(--base-900); font-weight: 600; }
+.post-feed { margin-top: var(--space-12); }
 
 /* ============ A post ============ */
 .post-head .display-l { max-width: 22ch; text-wrap: balance; }
@@ -89,7 +93,7 @@
 /* ============ The latest social posts ============ */
 /* Still tiles, saved into the site: nothing loads from Instagram or TikTok, and nothing moves. */
 .social { display: grid; gap: var(--space-6); }
-.post-feed + .social, .post-list + .more + .social { margin-top: var(--space-19); }
+.post-feed + .social, .post-cards + .more + .social { margin-top: var(--space-19); }
 .social-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-4); }
 @media (min-width: 700px) { .social-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 /* One row of six on a wide screen: a strip, not a second page. */

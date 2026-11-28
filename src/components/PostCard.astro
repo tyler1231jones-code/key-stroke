@@ -1,0 +1,46 @@
+---
+// One post as a card: its cover, what kind of post it is, the title, the
+// reason to read it, then who wrote it, when, and how long it takes. The
+// whole card is the link. Used wherever posts are listed: /blog, the
+// homepage, the service pages, under a post and on /about.
+//
+// The cover is shown whole, at its own shape, so it reads at a glance. A post
+// without a cover gets a plain panel of the same shape, so a row stays even.
+import { Image } from 'astro:assets';
+import Fig from './Fig.astro';
+import { categoryLabel, person, postHref, readingMinutes, type Post } from '../lib/blog';
+import { dateLong } from '../lib/format';
+
+interface Props {
+  post: Post;
+  /** Heading level: h2 on /blog, h3 under a section heading. */
+  level?: 'h2' | 'h3';
+  /** The first row on /blog loads its covers straight away; the rest wait until they are near the screen. */
+  eager?: boolean;
+}
+const { post, level = 'h3', eager = false } = Astro.props;
+const H = level;
+const { title, description, date, category, author, cover } = post.data;
+// The cover's alt is empty: the title below it already names the post, so it is not read out twice.
+---
+<article class="post-card" data-category={category}>
+  <div class="post-card-cover">
+    {cover ? (
+      <Image
+        src={cover}
+        alt=""
+        widths={[480, 720, 960, 1200].filter((w) => w <= cover.width)}
+        sizes="(min-width: 1100px) 460px, (min-width: 720px) 46vw, 92vw"
+        loading={eager ? 'eager' : 'lazy'}
+      />
+    ) : (
+      <span class="post-card-plain" aria-hidden="true"></span>
+    )}
+  </div>
+  <div class="post-card-copy">
+    <p><span class="tag">{categoryLabel(category)}</span></p>
+    <H class="post-card-title"><a class="card-link" href={postHref(post)}><Fig text={title} /></a></H>
+    <p class="body-s post-card-desc"><Fig text={description} /></p>
+    <p class="body-s muted post-card-meta">{person(author).name}, <time datetime={date}>{dateLong(date)}</time>, <Fig text={`${readingMinutes(post)} min read`} /></p>
+  </div>
+</article>

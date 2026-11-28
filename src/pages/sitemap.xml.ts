@@ -6,7 +6,7 @@ import type { APIRoute } from 'astro';
 import { services, cases, crew, serviceHref } from '../lib/data';
 import { products, productHref } from '../lib/catalogue';
 import { abs } from '../lib/seo';
-import { posts, postHref } from '../lib/blog';
+import { posts, postHref, PAGE_SIZE, listHref } from '../lib/blog';
 
 export const GET: APIRoute = async () => {
   const blog = await posts();
@@ -33,6 +33,7 @@ export const GET: APIRoute = async () => {
   // The blog once a post is published. Drafts never reach an ordinary build.
   if (blog.length) {
     pages.push({ path: '/blog', lastmod: blog.map((p) => p.data.updated ?? p.data.date).sort().at(-1) });
+    for (let n = 2; n <= Math.ceil(blog.length / PAGE_SIZE); n++) pages.push({ path: listHref(n) });
     for (const p of blog.filter((p) => !p.data.draft)) pages.push({ path: postHref(p), lastmod: p.data.updated ?? p.data.date });
   }
   const url = ({ path, lastmod }: { path: string; lastmod?: string }) =>

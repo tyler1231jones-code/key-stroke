@@ -550,7 +550,7 @@ by Tyler and Kieran. The plan is the Claude Doc "Blog, news and social plan".
 Posts are Markdown files in this repository: no CMS, no third-party embeds, no
 tracking, no cookie banner.
 
-**What is built.** `/blog` lists every post, newest first, with a row of
+**What is built.** `/blog` shows every post, newest first, as cards in rows of three, nine to a page (`/blog`, then `/blog/2` and on), with a row of
 filters by kind (Guides, News, Work notes) that runs in the page. Each post
 has its kind, title and description, then its author (linked to `/about`),
 the day it was published, the day it last changed and the reading time, the

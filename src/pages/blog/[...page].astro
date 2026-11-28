@@ -1,0 +1,85 @@
+---
+// /blog: every post, newest first, as cards in rows of three, nine to a page
+// (/blog, then /blog/2 and on). One row of filters by kind (guides, news,
+// work notes) sits above the cards while every post fits on one page; the
+// filters run in the page, and without script every post shows. Separate
+// pages per kind wait until each has six or more posts, so none is thin. The
+// latest social posts follow the cards.
+//
+// Only built once there is a post to read (src/lib/blog.ts).
+import type { Page } from 'astro';
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import SocialGrid from '../../components/SocialGrid.astro';
+import { posts, people, blogSchema, CATEGORIES, PAGE_SIZE, listHref, type Post } from '../../lib/blog';
+import '../../styles/pages.css';
+import '../../styles/blog.css';
+
+export async function getStaticPaths({ paginate }: { paginate: (data: Post[], opts: { pageSize: number }) => unknown[] }) {
+  const list = await posts();
+  return list.length > 0 ? paginate(list, { pageSize: PAGE_SIZE }) : [];
+}
+
+const { page } = Astro.props as { page: Page<Post> };
+const all = await posts();
+const pages = page.lastPage;
+const first = page.currentPage === 1;
+const used = CATEGORIES.filter((c) => all.some((p) => p.data.category === c.id));
+const names = people.map((p) => p.name.split(' ')[0]).join(' and ');
+const of = first ? '' : `, page ${page.currentPage}`;
+---
+<Base
+  title={`Blog${of}: automation, reporting, websites, branding`}
+  description={`Guides, news and notes from the work, written by ${names}: automation and AI agents, reporting, websites and branding, from Brisbane${first ? '' : `. Page ${page.currentPage} of ${pages}`}.`}
+  page="blog"
+  current="blog"
+  crumbs={[{ name: 'Blog', href: '/blog' }, ...(first ? [] : [{ name: `Page ${page.currentPage}`, href: listHref(page.currentPage) }])]}
+  schema={[blogSchema(page.data)]}
+>
+  <section class="page-head blog-head">
+    <div class="wrap">
+      <h1 class="display-l load-in">Blog{first ? '.' : `, page ${page.currentPage}.`}</h1>
+      <p class="lede load-in" style="--i:1">Guides, news and notes from the work, written by {names}, the two people who do it.</p>
+      {pages === 1 && used.length > 1 && (
+        <div class="filter load-in" style="--i:2" id="post-filter" role="group" aria-label="Show posts by kind">
+          <button class="chip" type="button" aria-pressed="true" data-value="all">All</button>
+          {used.map((c) => (
+            <button class="chip" type="button" aria-pressed="false" data-value={c.id}>{c.label}</button>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="page-body blog-body">
+    <div class="wrap">
+      <p class="vh" id="filter-status" role="status" aria-live="polite"></p>
+      <div class="post-cards" id="post-list">
+        {page.data.map((p, i) => <PostCard post={p} level="h2" eager={first && i < 3} />)}
+      </div>
+
+      {pages > 1 && (
+        <nav class="pager" aria-label="Pages of posts">
+          {page.url.prev ? <a class="pager-step" href={page.url.prev} rel="prev">Newer posts</a> : <span></span>}
+          <ol class="pager-pages">
+            {Array.from({ length: pages }, (_, k) => k + 1).map((n) => (
+              <li>
+                {n === page.currentPage
+                  ? <span class="chip" aria-current="page">{n}</span>
+                  : <a class="chip" href={listHref(n)} aria-label={`Page ${n}`}>{n}</a>}
+              </li>
+            ))}
+          </ol>
+          {page.url.next ? <a class="pager-step" href={page.url.next} rel="next">Older posts</a> : <span></span>}
+        </nav>
+      )}
+
+      <p class="body-s muted post-feed">New posts also come by <a href="/rss.xml">RSS feed</a>.</p>
+      <SocialGrid />
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../../scripts/blog.ts';
+</script>
