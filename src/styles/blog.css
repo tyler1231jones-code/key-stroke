@@ -36,30 +36,53 @@
 /* ============ A post ============ */
 .post-head .display-l { max-width: 22ch; text-wrap: balance; }
 .post-head .lede { max-width: 50ch; }
+.post-byline a { color: var(--ink); }
 .post-draft { color: var(--signal); }
 /* The cover, full width under the title. Held at its shape so nothing moves as it loads. */
-.post-cover { margin-bottom: var(--space-8); }
+.post-cover { margin-bottom: var(--space-12); }
 .post-cover img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 630; object-fit: cover; border: 1px solid var(--rule); background: var(--base-100); }
-/* Who, when and how long, in its own column beside the text on a desktop, as the counting page sets its sections. */
-.post-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8) var(--space-12); }
-.post-meta { display: grid; gap: var(--space-4); align-content: start; border-top: 1px solid var(--rule); padding-top: var(--space-4); }
-.post-facts { display: grid; gap: var(--space-1); }
-.post-facts > div { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); }
-.post-facts dd { margin: 0; }
-@media (min-width: 960px) {
-  .post-grid { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
-  .post-meta { position: sticky; top: calc(var(--bar-h) + var(--space-6)); }
-  .post-main { border-top: 1px solid var(--rule); padding-top: var(--space-4); }
+
+/* The post in the left two thirds; the author and the post's contents in the right third, held in view as the post
+   scrolls. On a phone the author follows the post, and the contents are left out. */
+.post-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-12) var(--space-19); }
+.post-side-inner { display: grid; gap: var(--space-6); align-content: start; border-top: 1px solid var(--rule); padding-top: var(--space-6); }
+.post-author { display: flex; align-items: center; gap: var(--space-4); }
+.post-author > div > * { margin: 0; }
+.post-author-name { font-family: var(--font-display); text-transform: uppercase; font-size: 22px; line-height: 24px; font-weight: 500; }
+.post-author-name a { color: inherit; text-decoration: none; }
+.post-author-name a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.post-contents { display: none; }
+@media (min-width: 1024px) {
+  .post-layout { grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); }
+  .post-side-inner { position: sticky; top: calc(var(--bar-h) + var(--space-6)); }
+  .post-contents { display: grid; gap: var(--space-3); border-top: 1px solid var(--hairline); padding-top: var(--space-6); }
+  .post-contents ol { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); counter-reset: part; }
+  .post-contents li { counter-increment: part; display: grid; grid-template-columns: 3ch minmax(0, 1fr); font-size: 14px; line-height: 21px; }
+  .post-contents li::before { content: counter(part); font-family: var(--font-data); color: var(--ink-muted); }
+  .post-contents a { color: var(--readout); text-decoration: none; padding-block: var(--space-1); }
+  .post-contents a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 }
 
+/* A person's picture: their photo once it is saved, their initial until then. */
+.person-photo { display: grid; place-items: center; flex: none; width: var(--size); height: var(--size); object-fit: cover; border: 1px solid var(--rule); background: var(--base-100); }
+.person-initial { font-family: var(--font-display); text-transform: uppercase; font-size: calc(var(--size) * 0.5); line-height: 1; font-weight: 500; color: var(--readout); }
+
+/* The words: a larger size and a wider measure than the rest of the site, so a long read is comfortable. */
 .prose { padding-bottom: var(--space-12); }
-.prose > * + * { margin-top: var(--space-4); }
-.prose p, .prose li, .prose blockquote { max-width: var(--measure); }
-.prose h2 { font-family: var(--font-display); text-transform: uppercase; font-size: 22px; line-height: 24px; font-weight: 500; letter-spacing: 0.01em; max-width: 30ch; margin-top: var(--space-12); }
-.prose h3 { font-size: 16px; line-height: 25px; font-weight: 600; max-width: var(--measure); margin-top: var(--space-8); }
-.prose h2 + *, .prose h3 + * { margin-top: var(--space-3); }
+.prose > * + * { margin-top: var(--space-6); }
+.prose p, .prose li, .prose blockquote { max-width: 31em; font-size: 20px; line-height: 32px; }
+.prose > p:first-child { max-width: 29em; font-size: 23px; line-height: 35px; color: var(--ink); }
+/* Each section opens on a rule, in the display face, large enough to find again while scrolling. */
+.prose h2 { font-family: var(--font-display); text-transform: uppercase; font-size: 34px; line-height: 36px; font-weight: 500; letter-spacing: 0.005em; max-width: none; text-wrap: balance; margin-top: var(--space-19); padding-top: var(--space-6); border-top: 1px solid var(--rule); scroll-margin-top: calc(var(--bar-h) + var(--space-6)); }
+.prose h3 { font-size: 20px; line-height: 28px; font-weight: 600; max-width: 60ch; margin-top: var(--space-12); }
+.prose h2 + *, .prose h3 + * { margin-top: var(--space-4); }
+@media (max-width: 719px) {
+  .prose p, .prose li, .prose blockquote { font-size: 17px; line-height: 28px; }
+  .prose > p:first-child { font-size: 19px; line-height: 30px; }
+  .prose h2 { font-size: 28px; line-height: 30px; margin-top: var(--space-12); }
+}
 .prose strong { font-weight: 600; }
-.prose ul, .prose ol { display: grid; gap: var(--space-2); }
+.prose ul, .prose ol { display: grid; gap: var(--space-3); }
 .prose ul > li { position: relative; padding-left: var(--space-6); }
 .prose ul > li::before { content: "/"; position: absolute; left: 0; font-family: var(--font-data); color: var(--ink-muted); }
 .prose ol { counter-reset: item; }
@@ -73,6 +96,50 @@
 .prose .table-frame { max-width: 960px; }
 .prose img { border: 1px solid var(--rule); }
 .prose sup { font-size: 0.75em; line-height: 0; }
+
+/* ---- Small pictures in a post, written as HTML in the Markdown (README, "Blog"). They take the full width of the
+   post's column, wider than the words, so the eye has somewhere to land. No motion. ---- */
+/* A figure worth stopping on: the number large, what it means beside it, and its source in the same line. */
+.prose .stat { display: grid; gap: var(--space-2) var(--space-8); max-width: none; padding-block: var(--space-6); border-block: 1px solid var(--rule); }
+.prose .stat strong { font-family: var(--font-data); font-size: 64px; line-height: 64px; font-weight: 500; letter-spacing: -0.03em; color: var(--ink); }
+.prose .stat .stat-text { font-size: 17px; line-height: 27px; color: var(--readout); max-width: 52ch; }
+@media (min-width: 720px) { .prose .stat { grid-template-columns: auto minmax(0, 1fr); align-items: center; } }
+/* A line from the post, set large on its own. */
+.prose .pull { max-width: 26ch; border-left: 0; padding: var(--space-6) 0 0; border-top: 2px solid var(--readout); font-family: var(--font-display); text-transform: uppercase; font-size: 34px; line-height: 38px; font-weight: 500; color: var(--ink); text-wrap: balance; }
+.prose .pull p { font-size: inherit; line-height: inherit; max-width: none; }
+.prose .pull cite { display: block; margin-top: var(--space-4); font-family: var(--font-body); text-transform: none; font-style: normal; font-size: 14px; line-height: 21px; color: var(--ink-muted); }
+@media (max-width: 719px) { .prose .pull { font-size: 28px; line-height: 32px; } }
+/* Two sides compared: who does what, what counts and what does not. */
+.prose .split { display: grid; gap: var(--space-4); max-width: none; }
+@media (min-width: 720px) { .prose .split { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.prose .split > div { display: grid; gap: var(--space-3); align-content: start; border: 1px solid var(--rule); background: var(--base-100); padding: var(--space-6); }
+.prose .split > div > * { margin: 0; }
+.prose .split-h { font-family: var(--font-display); text-transform: uppercase; font-size: 22px; line-height: 24px; font-weight: 500; }
+.prose .split li { font-size: 16px; line-height: 25px; }
+/* Steps in order, left to right on a wide screen, top to bottom on a phone. */
+.prose .flow { list-style: none; padding: 0; display: grid; gap: var(--space-3); max-width: none; counter-reset: step; }
+.prose .flow > li { position: relative; display: grid; gap: var(--space-1); align-content: start; padding: var(--space-4) var(--space-4) var(--space-4) var(--space-12); border: 1px solid var(--rule); background: var(--base-100); font-size: 15px; line-height: 23px; max-width: none; counter-increment: step; }
+.prose .flow > li::before { content: counter(step); position: absolute; left: var(--space-4); top: var(--space-4); font-family: var(--font-data); color: var(--ink-muted); }
+.prose .flow > li strong { font-family: var(--font-display); text-transform: uppercase; font-size: 18px; line-height: 22px; font-weight: 500; color: var(--ink); }
+.prose .flow > li.flow-person { border-color: var(--readout); }
+@media (min-width: 720px) {
+  .prose .flow { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .prose .flow > li { padding: var(--space-12) var(--space-4) var(--space-4); }
+}
+/* Two or three figures side by side as bars, with their source in the same line. */
+.prose .bars { display: grid; gap: var(--space-3); max-width: none; padding: var(--space-6); border: 1px solid var(--rule); background: var(--base-100); font-size: 15px; line-height: 23px; }
+.prose .bars .bars-h { font-family: var(--font-display); text-transform: uppercase; font-size: 20px; line-height: 22px; font-weight: 500; color: var(--ink); }
+.prose .bars .bars-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-1) var(--space-4); }
+.prose .bars .bars-row::after { content: ""; grid-column: 1 / -1; height: 12px; width: var(--v); min-width: 4px; background: var(--readout); }
+.prose .bars .bar-v { font-family: var(--font-data); color: var(--ink); }
+.prose .bars .bars-src { color: var(--ink-muted); font-size: 14px; }
+/* A sum worked through: each term in a box, the operators between. */
+.prose .sum { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); max-width: none; font-size: 16px; line-height: 24px; }
+.prose .sum .term { display: grid; padding: var(--space-3) var(--space-4); border: 1px solid var(--rule); background: var(--base-100); }
+.prose .sum .term b { font-family: var(--font-data); font-weight: 500; font-size: 26px; line-height: 30px; color: var(--ink); }
+.prose .sum .op { font-family: var(--font-data); font-size: 24px; color: var(--ink-muted); }
+.prose .sum .sum-src { flex-basis: 100%; font-size: 14px; color: var(--ink-muted); }
+
 /* Figures made up to show a method. Each block says so in its own first line. */
 .prose [data-sample] { display: grid; gap: var(--space-4); max-width: 960px; border: 1px solid var(--rule); background: var(--base-100); padding: var(--space-6); }
 .prose [data-sample] > * { margin: 0; }
@@ -82,10 +149,10 @@
   .prose .table th, .prose .table td { padding-inline: var(--space-2); }
 }
 .prose .footnotes { margin-top: var(--space-12); padding-top: var(--space-6); border-top: 1px solid var(--hairline); }
-.prose .footnotes h2 { margin-top: 0; }
+.prose .footnotes h2 { margin-top: 0; padding-top: 0; border-top: 0; font-size: 22px; line-height: 24px; }
 .prose .footnotes li, .prose .footnotes p { font-size: 14px; line-height: 21px; }
 
-.post-foot { display: grid; gap: var(--space-12); padding-bottom: var(--section); max-width: 960px; }
+.post-foot { display: grid; gap: var(--space-12); padding-bottom: var(--section); }
 .post-ask { border-top: 1px solid var(--rule); padding-top: var(--space-6); }
 .post-service { max-width: 640px; }
 .post-next { display: grid; gap: var(--space-6); }

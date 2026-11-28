@@ -144,6 +144,16 @@ function personNode(p: Person) {
   return { '@type': 'Person', '@id': personId(p), name: p.name, jobTitle: p.role, url: abs(personHref(p)), worksFor: { '@id': ORG } };
 }
 
+/** The post's sections, from its second-level headings, for the contents beside it. The footnotes' heading is left out. */
+export function contentsOf(post: Post): { id: string; text: string }[] {
+  const html = post.rendered?.html ?? '';
+  const plain = (s: string) =>
+    s.replace(/<[^>]+>/g, '').replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').trim();
+  return [...html.matchAll(/<h2 id="([^"]+)">([\s\S]*?)<\/h2>/g)]
+    .filter(([, id]) => id !== 'footnote-label')
+    .map(([, id, inner]) => ({ id, text: plain(inner) }));
+}
+
 /** How a share image is cut: the size every network expects. */
 const SHARE = { width: 1200, height: 630 };
 

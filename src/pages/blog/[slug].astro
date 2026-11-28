@@ -1,14 +1,17 @@
 ---
-// One post: its kind, title and reason to read it; its cover, if it has one;
-// who wrote it, when, when it last changed and how long it takes; the post;
-// then a line to book, the service it is about, and two posts to read next.
-// The closing band follows, as on every page.
+// One post: its kind, title, reason to read it, and who wrote it, when and
+// how long it takes; its cover, if it has one; then the post in the left two
+// thirds, with the author and the post's contents in a column on the right
+// (below the post on a phone). Under the post: a line to book, the service
+// it is about, and two posts to read next. The closing band follows, as on
+// every page.
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Fig from '../../components/Fig.astro';
 import PostCard from '../../components/PostCard.astro';
+import PersonPhoto from '../../components/PersonPhoto.astro';
 import {
-  posts, person, personHref, postHtml, postSchema, relatedTo, readingMinutes, serviceOf, categoryLabel, shareOf, type Post,
+  posts, person, personHref, postHtml, postSchema, relatedTo, readingMinutes, serviceOf, categoryLabel, shareOf, contentsOf, type Post,
 } from '../../lib/blog';
 import { abs } from '../../lib/seo';
 import { products, serviceHref } from '../../lib/data';
@@ -26,6 +29,7 @@ const author = person(post.data.author);
 const share = await shareOf(post);
 const s = serviceOf(post);
 const next = relatedTo(post, await posts());
+const contents = contentsOf(post);
 const ask =
   cta === 'audit'
     ? { line: `We can count this in your business. ${products.audit.free}`, href: '/audit', label: `How the ${products.audit.name.replace(/^The /, '')} works` }
@@ -50,6 +54,9 @@ const ask =
         <p class="load-in"><a class="tag" href={`/blog?kind=${category}`}>{categoryLabel(category)}</a></p>
         <h1 class="display-l load-in" style="--i:1"><Fig text={title} /></h1>
         <p class="lede load-in" style="--i:2"><Fig text={description} /></p>
+        <p class="body-s muted post-byline load-in" style="--i:3">
+          By <a href={personHref(author)}>{author.name}</a>, <time datetime={date}><Fig text={dateLong(date)} /></time>{updated && <>, updated <time datetime={updated}><Fig text={dateLong(updated)} /></time></>}, <Fig text={`${readingMinutes(post)} min read`} />
+        </p>
       </div>
     </header>
 
@@ -66,16 +73,7 @@ const ask =
       </figure>
     )}
 
-    <div class="wrap post-grid">
-      <aside class="post-meta load-in" style="--i:3" aria-label="About this post">
-        <p class="body-s">By <a href={personHref(author)}>{author.name}</a>, {author.role.toLowerCase()}</p>
-        <dl class="post-facts body-s">
-          <div><dt class="muted">Published</dt> <dd><time datetime={date}><Fig text={dateLong(date)} /></time></dd></div>
-          {updated && <div><dt class="muted">Updated</dt> <dd><time datetime={updated}><Fig text={dateLong(updated)} /></time></dd></div>}
-          <div><dt class="muted">Reading time</dt> <dd><Fig text={`${readingMinutes(post)} min`} /></dd></div>
-        </dl>
-      </aside>
-
+    <div class="wrap post-layout">
       <div class="post-main">
       <div class="prose" data-post-body set:html={postHtml(post)} />
 
@@ -99,6 +97,27 @@ const ask =
         )}
       </div>
       </div>
+
+      <aside class="post-side" aria-label="About this post">
+        <div class="post-side-inner">
+          <div class="post-author">
+            <PersonPhoto person={author} size={72} />
+            <div>
+              <p class="post-author-name"><a href={personHref(author)}>{author.name}</a></p>
+              <p class="body-s muted">{author.role}</p>
+            </div>
+          </div>
+          <p class="body-s">{author.line}</p>
+          {contents.length > 2 && (
+            <nav class="post-contents" aria-labelledby="post-contents-h">
+              <p class="body-s muted" id="post-contents-h">On this page</p>
+              <ol>
+                {contents.map((h) => <li><a href={`#${h.id}`}>{h.text}</a></li>)}
+              </ol>
+            </nav>
+          )}
+        </div>
+      </aside>
     </div>
   </article>
 </Base>

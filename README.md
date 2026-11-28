@@ -599,25 +599,74 @@ cover: ./covers/month-end-pack.jpg
 coverAlt: A worn numpad seen from directly above, the 0 key polished smooth.
 ```
 
-The cover is shown full width under the title, small beside the post in every
-list, and cut to 1200 by 630 as the post's share image (in place of the one
-`npm run og` would draw). Astro makes the sizes each screen needs. The build
-stops if a cover is smaller than 1200 by 630 or not that shape, or has no
-`coverAlt`. The art itself:
+The cover is shown full width under the title, whole on the post's card in
+every list, and cut to 1200 by 630 as the post's share image (in place of the
+one `npm run og` would draw). Astro makes the sizes each screen needs. The
+build stops if a cover is smaller than 1200 by 630 or not that shape, or has
+no `coverAlt`. The art itself:
 
 - 2400 by 1260 (1200 by 630 is the least), JPG at about quality 85, under 1 MB.
-- No words, logos or figures in the image: the title is set by the page, the
-  cover is cropped square in lists, and words in a picture are not read out.
-  Keep the subject in the middle square so the crop keeps it.
-- The design system's photography brief: rendered objects, monochrome, matte,
-  one flat even light, the camera square-on or straight overhead, deep focus,
-  a ground of `base-000` or `base-900`. Neutral greys only; never `signal` or
-  `live` on an object. No people, faces or hands, and nothing that passes for
-  a photograph of a real office or client. The fun is in the object and what
-  has happened to it (a worn key, a numpad mid-tally, a receipt roll run out),
-  not in colour or effects.
+- No words, logos or figures in the image: the title is set by the page, and
+  words in a picture are not read out.
+- Greys only, on a near-black ground (`base-000` or `base-900`); never
+  `signal` or `live`. No people, faces or hands, and nothing that passes for a
+  photograph of a real office or client. One object scene with a joke in it:
+  the launch covers are a paper aeroplane chained to a rubber stamp, a cake
+  made of report pages, and an hourglass running on keycaps. The owner chose
+  these playful, studio-lit scenes over the design system's flat, square-on
+  renders on 28 November 2026.
 - Covers are made in the Keystroke Social Media project (Canva, Higgsfield)
   and saved here; nothing on a page loads them from anywhere else.
+
+**How a post is laid out.** The post takes the left two thirds; the right
+third holds the author (photo, name, role and a line) and "On this page", the
+post's sections from its `##` headings, held in view as the post scrolls. On a
+phone the author follows the post and the contents are left out. The first
+paragraph is set larger as the lede; every `##` heading opens on a rule.
+
+**Pictures inside a post.** Small visuals, written as HTML in the Markdown
+with a blank line above and below. They span the post's column, wider than
+the words, and nothing in them moves. A figure in one still needs its source
+in the same element, as `npm run check` reads it.
+
+```html
+<p class="stat"><strong>52%</strong> <span class="stat-text">What the figure means, with its <a href="https://...">source</a>.</span></p>
+
+<blockquote class="pull">
+<p>A line from the post, or a short quotation.</p>
+<cite>Who said it, <a href="https://...">where</a></cite>
+</blockquote>
+
+<div class="split">
+<div>
+<p class="split-h">One side</p>
+<ul><li>A point</li></ul>
+</div>
+<div>
+<p class="split-h">The other side</p>
+<ul><li>A point</li></ul>
+</div>
+</div>
+
+<ol class="flow">
+<li><strong>A step</strong> What happens in it.</li>
+<li class="flow-person"><strong>A person's step</strong> Outlined brighter.</li>
+</ol>
+
+<p class="bars"><span class="bars-h">What is compared</span><span class="bars-row" style="--v: 100%"><span>The larger</span><span class="bar-v">24.3 days</span></span><span class="bars-row" style="--v: 28%"><span>The smaller</span><span class="bar-v">6.9 days</span></span><span class="bars-src">From <a href="https://...">the source</a>.</span></p>
+
+<p class="sum"><span class="term"><b>60</b> runs a week</span><span class="op">×</span><span class="term"><b>32</b> each</span><span class="op">=</span><span class="term"><b>1,920</b> a week</span><span class="sum-src">From <a href="/counting">the source</a>.</span></p>
+```
+
+A `split` with four boxes makes a two-by-two grid. Each `--v` in `bars` is that
+row's share of the longest bar. Use two or three visuals in a post, not one a
+section.
+
+**Author photos.** Save a square-ish photo as
+`src/assets/people/<id>.jpg` (or `.png`, `.webp`), named after the person's id
+in `people.json`: `tyler.jpg`, `kieran.jpg`. It replaces the initial beside
+every post they wrote and on `/about`, cropped square from the top. Nothing
+else needs changing.
 
 **What `npm run check` holds a post to.** Everything it holds a page to
 (the banned words, no exclamation marks or emoji, no GST, no internal terms,

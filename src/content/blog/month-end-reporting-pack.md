@@ -26,7 +26,7 @@ a board. A business with a handful of people, a Xero or MYOB file and a job
 system needs a shorter pack, built from the same systems every month, and
 ready while the month can still be acted on.
 
-## First, the month has to be closed
+## First, close the month
 
 A pack built on unreconciled figures is a guess with a logo on it. Before
 anything goes in the pack, the month needs closing: bank and card accounts
@@ -73,7 +73,7 @@ Profit comes before cash because it explains the month, and
 cash comes before the balance sheet because it decides the quarter ahead. Most packs put the balance sheet second because the accounting
 software prints it second.
 
-## Which numbers go on the first page
+## The six numbers for page one
 
 Pick no more than six, and keep the same ones every month so the trend means
 something. For most small businesses these are enough to start with:
@@ -114,28 +114,36 @@ two oldest invoices.
 ## Why cash gets its own page
 
 Profit and cash part ways every month: a job invoiced is profit, but it is not
-in the bank until the customer pays. In ASIC's [insolvency figures for 2022–23](https://asic.gov.au/about-asic/news-centre/find-a-media-release/2023-releases/23-346mr-asic-s-annual-corporate-insolvency-statistics-shows-covid-19-impact-on-small-business),
-inadequate cash flow or high cash use was the most common cause of failure
-named by administrators, in 52% of their reports, and 82% of the failed
-companies had fewer than 20 employees.
+in the bank until the customer pays. When a small company fails, cash is
+usually where it shows.
 
-The aged debtors page is where cash goes missing. In the September quarter
-of 2026, Xero's [small business data](https://www.xero.com/au/resources/small-business-insights/latest-australia/)
-showed Australian small businesses waiting 24.3 days on average to be paid,
-and being paid 6.9 days late. A pack that lists the overdue invoices by name
-gets them chased the same morning.
+<p class="stat"><strong>52%</strong> <span class="stat-text">of administrators' reports named inadequate cash flow or high cash use as a cause of failure, the most common one, in ASIC's <a href="https://asic.gov.au/about-asic/news-centre/find-a-media-release/2023-releases/23-346mr-asic-s-annual-corporate-insolvency-statistics-shows-covid-19-impact-on-small-business">insolvency figures for 2022–23</a>. Of the failed companies, 82% had fewer than 20 employees.</span></p>
+
+The aged debtors page is where cash goes missing, because customers pay late.
+
+<p class="bars"><span class="bars-h">How long Australian small businesses wait to be paid</span><span class="bars-row" style="--v: 100%"><span>Average time to be paid</span><span class="bar-v">24.3 days</span></span><span class="bars-row" style="--v: 28%"><span>How late, on average</span><span class="bar-v">6.9 days</span></span><span class="bars-src">September quarter 2026, from Xero's <a href="https://www.xero.com/au/resources/small-business-insights/latest-australia/">small business data</a>.</span></p>
+
+A pack that lists the overdue invoices by name gets them chased the same
+morning.
 
 CPA Australia's [checklist for small business](https://www.cpaaustralia.com.au/-/media/project/cpa/corporate/documents/tools-and-resources/business-management/good-practice-checklist-small-business.pdf)
 asks for the same rhythm: review results against budget monthly, update the
 cash flow forecast monthly, and reconcile the debtors' ageing report at least
 monthly.
 
-## When the pack should be ready
+## When the pack should land
 
 A pack is worth most in the first week of the month. By the third week, the
 owner has already made the decisions it was meant to inform, from memory and
 the bank balance. If the close takes three to five days, the pack should be
 read by the end of the first week.
+
+<ol class="flow">
+<li><strong>Close the month</strong> Bank, cards, bills and payroll reconciled.</li>
+<li><strong>Build the pack</strong> Straight from the accounts and the job system.</li>
+<li class="flow-person"><strong>Read it</strong> In the first week, while the month can still change.</li>
+<li class="flow-person"><strong>Act on it</strong> Each action with a name and a date.</li>
+</ol>
 
 What holds most packs up is copying: exporting from the accounts and the job
 system, pasting into a spreadsheet, fixing the formulas that broke, and

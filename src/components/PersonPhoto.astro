@@ -1,0 +1,23 @@
+---
+// One of the two people, as a square picture: their photo once it is saved as
+// src/assets/people/<id>.jpg (or .png or .webp, named after their id in
+// people.json), and until then their initial on a plain square. Nothing else
+// needs changing when a photo arrives. The name always sits beside it, so the
+// picture is not read out.
+import { Image } from 'astro:assets';
+import type { Person } from '../lib/blog';
+
+interface Props {
+  person: Person;
+  /** Shown size in pixels; the photo is made at twice this for sharp screens. */
+  size?: number;
+}
+const { person, size = 72 } = Astro.props;
+const photos = import.meta.glob<{ default: ImageMetadata }>('../assets/people/*.{jpg,jpeg,png,webp}', { eager: true });
+const photo = Object.entries(photos).find(([path]) => path.split('/').pop()?.replace(/\.\w+$/, '') === person.id)?.[1].default;
+---
+{photo ? (
+  <Image class="person-photo" src={photo} alt="" width={size * 2} height={size * 2} fit="cover" position="top" style={`--size: ${size}px`} />
+) : (
+  <span class="person-photo person-initial" style={`--size: ${size}px`} aria-hidden="true">{person.name.slice(0, 1)}</span>
+)}

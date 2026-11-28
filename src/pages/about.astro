@@ -4,6 +4,7 @@
 // byline links here. Nothing on this page is about a client.
 import Base from '../layouts/Base.astro';
 import PostCard from '../components/PostCard.astro';
+import PersonPhoto from '../components/PersonPhoto.astro';
 import { site, has } from '../lib/data';
 import { posts, people, peopleSchema } from '../lib/blog';
 import '../styles/pages.css';
@@ -36,6 +37,7 @@ const where = has('location') ? ` We are based in ${site.location}${has('service
           return (
             <section class="person" id={p.id} aria-labelledby={`${p.id}-h`} data-reveal>
               <div class="person-head">
+                <PersonPhoto person={p} size={112} />
                 <h2 class="display-m" id={`${p.id}-h`}>{p.name}</h2>
                 <p class="plate muted">{p.role}</p>
               </div>

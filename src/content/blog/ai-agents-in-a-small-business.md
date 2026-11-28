@@ -21,12 +21,15 @@ business the useful ones take the typing out of work that follows the same
 steps every week. They should stop short of the decision. An agent drafts,
 matches and lists. A person approves, sends or pays.
 
-Most small businesses are not running agents yet. In the National AI Centre's
-[survey of Australian SMEs](https://www.ai.gov.au/news-and-insights/blog/ai-adoption-insights-december-2025-february-2026)
-for December 2025 to February 2026, 43% reported some use of AI, agents were
-still largely untapped, and around 65% of those not using AI said they did not
-trust its decisions or wanted people to stay in control. Keeping a person on
-every decision answers that worry.
+Most small businesses are not running agents yet, and the ones holding back
+say why.
+
+<p class="stat"><strong>43%</strong> <span class="stat-text">of Australian small and medium businesses reported some use of AI from December 2025 to February 2026, with agents still largely untapped, in the National AI Centre's <a href="https://www.ai.gov.au/news-and-insights/blog/ai-adoption-insights-december-2025-february-2026">survey of SMEs</a>.</span></p>
+
+Around 65% of the businesses not using AI told the same
+[survey](https://www.ai.gov.au/news-and-insights/blog/ai-adoption-insights-december-2025-february-2026)
+that they did not trust its decisions or wanted people to stay in control.
+Keeping a person on every decision answers that worry.
 
 ## What counts as an agent
 
@@ -48,10 +51,41 @@ someone to read something and type what they read somewhere else, an agent
 can probably do the reading and the typing. If it needs someone to decide,
 the agent can prepare the decision, and a person makes it.
 
-## Jobs an agent does well
+<div class="split">
+<div>
+<p class="split-h">The agent</p>
+<ul>
+<li>Reads the email and its attachment</li>
+<li>Files the document where it belongs</li>
+<li>Matches, codes and drafts</li>
+<li>Lists what it could not do</li>
+</ul>
+</div>
+<div>
+<p class="split-h">A person</p>
+<ul>
+<li>Checks the draft</li>
+<li>Approves, sends or pays</li>
+<li>Sorts out what the agent listed</li>
+<li>Decides anything about a customer or a staff member</li>
+</ul>
+</div>
+</div>
+
+## Five jobs an agent does well
 
 These are the kinds of jobs we build agents for. Each one ends in a draft or
-a list that a person checks.
+a list that a person checks. Here is the first of them, from the email
+arriving to the bill being approved:
+
+<ol class="flow">
+<li><strong>A bill arrives</strong> By email, with the PDF attached.</li>
+<li><strong>The agent reads it</strong> The supplier, the amount, the due date and the job.</li>
+<li><strong>It files and drafts</strong> The PDF is filed and a draft bill waits in Xero.</li>
+<li class="flow-person"><strong>A person checks it</strong> Then approves it, or fixes it first.</li>
+</ol>
+
+The five, and what each one hands back:
 
 1. **Bills and enquiries that arrive by email.** The agent reads each email
    and its attachment, pulls out the supplier, the amount, the due date and the
@@ -73,7 +107,7 @@ a list that a person checks.
    our own prospecting: an agent does the research and the drafts, and one of
    us reads every email before it goes.
 
-## What an agent should not do
+## Five things an agent should never do
 
 Most of what goes wrong with AI in a business comes from an agent that was
 allowed to act where it should only have drafted. So write down what each
@@ -105,7 +139,7 @@ someone can pause it, override it or undo what it did. OpenAI's
 [guide to building agents](https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/)
 names payments and large refunds among the actions that should go to a person.
 
-## Where a person approves
+## Where the person comes in
 
 The approval should be quick or people will stop doing it. The agent's output
 should land where the team already works, such as Outlook or Teams, with the
@@ -117,21 +151,42 @@ Give the agent its own account, with access to the folders and systems its
 job needs and nothing more. If it only drafts bills, it should not be able to
 approve them, even by mistake.
 
-The National AI Centre puts four questions to any agent before it goes live:
-what it can access, what it can do, what authority it has, and who stays
-accountable for it ([its notes on agentic AI and risk](https://www.ai.gov.au/news-and-insights/blog/five-takeaways-industry-discussions-agentic-ai-and-risk)).
+The National AI Centre puts four questions to any agent before it goes live
+([its notes on agentic AI and risk](https://www.ai.gov.au/news-and-insights/blog/five-takeaways-industry-discussions-agentic-ai-and-risk)).
 If you cannot answer one of them in a sentence, the agent is not ready.
 
-## Australian law still applies
+<div class="split">
+<div>
+<p class="split-h">Access</p>
+<p>What can it read, and where?</p>
+</div>
+<div>
+<p class="split-h">Actions</p>
+<p>What can it do with what it reads?</p>
+</div>
+<div>
+<p class="split-h">Authority</p>
+<p>What can it approve, send or change without a person?</p>
+</div>
+<div>
+<p class="split-h">Accountability</p>
+<p>Which person answers for what it does?</p>
+</div>
+</div>
+
+## The law still applies to your agent
 
 An agent acts for your business, so what it does is your business's
-responsibility.
+responsibility. If an agent talks to customers, the Australian Consumer Law
+applies to what it says, and the ACCC said so plainly in November 2026:
 
-If an agent talks to customers, the Australian Consumer Law applies to what it
-says. In [November 2026](https://www.accc.gov.au/media-release/think-and-check-before-letting-ai-shop-on-your-behalf)
-the ACCC put it plainly: "Businesses are responsible for the actions their AI
-chatbots and agents take." It also expects customers to be able to reach a
-person when the AI cannot sort out their problem.
+<blockquote class="pull">
+<p>"Businesses are responsible for the actions their AI chatbots and agents take."</p>
+<cite>The ACCC, <a href="https://www.accc.gov.au/media-release/think-and-check-before-letting-ai-shop-on-your-behalf">media release, November 2026</a></cite>
+</blockquote>
+
+The ACCC also expects customers to be able to reach a person when the AI
+cannot sort out their problem.
 
 Many small businesses are exempt from the Privacy Act because of their
 turnover, but not all of them: health service providers, for one, are covered
@@ -150,7 +205,7 @@ provider does with it: where the data is processed, how long it is kept, and
 whether it can be used to train the provider's models. Choose the business
 terms that rule that out, and write down which tool sees which data.
 
-## Choosing the first job for an agent
+## Picking the first job for an agent
 
 The best first job has four things going for it:
 

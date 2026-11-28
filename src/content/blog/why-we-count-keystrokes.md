@@ -43,10 +43,34 @@ of careful work or two hours of typing the same customer's details into three
 systems. A count separates the two, because only the inputs a rebuilt system
 would no longer need are counted. Reading, deciding and checking are not.
 
+<div class="split">
+<div>
+<p class="split-h">Counted</p>
+<ul>
+<li>A character typed into a field</li>
+<li>A click that selects, confirms, submits or moves on</li>
+<li>A copy and a paste, as two</li>
+<li>A file attached</li>
+</ul>
+</div>
+<div>
+<p class="split-h">Not counted</p>
+<ul>
+<li>Reading</li>
+<li>Deciding</li>
+<li>Choosing to check something</li>
+<li>Anything the rebuilt job still needs a person to type</li>
+</ul>
+</div>
+</div>
+
 ## A keystroke is what automation removes
 
-Nobody automates an hour. What gets automated is a particular input: the
-address typed a second time, the job number copied into the invoice, the
+<blockquote class="pull">
+<p>Nobody automates an hour.</p>
+</blockquote>
+
+What gets automated is a particular input: the address typed a second time, the job number copied into the invoice, the
 figure pasted from one spreadsheet into another. So we count the job in the
 same unit before and after it is rebuilt, and the difference is exactly what
 the build took away.
@@ -58,14 +82,15 @@ the side. A count shows each copy as its own set of keystrokes.
 
 ## Every keystroke typed twice is a chance to get it wrong
 
-Each time a fact is typed again, it can be typed wrong. A
-[review of 93 studies](https://pmc.ncbi.nlm.nih.gov/articles/PMC10775420/) of
-clinical research data found a pooled error rate of 0.29% for data keyed in
-once, and 6.57% when people copied details by hand out of medical records.
-That is a careful field that checks its data. A small error rate on a detail
-typed thousands of times a year still makes a steady supply of wrong addresses
-and mistyped amounts, and each one costs more to find later than it did to
-type.
+Each time a fact is typed again, it can be typed wrong. Even in clinical
+research, a careful field that checks its data, the error rate climbs when
+people copy details by hand:
+
+<p class="bars"><span class="bars-h">Errors per field, by how the data was entered</span><span class="bars-row" style="--v: 4.4%"><span>Keyed in once</span><span class="bar-v">0.29%</span></span><span class="bars-row" style="--v: 100%"><span>Copied by hand out of records</span><span class="bar-v">6.57%</span></span><span class="bars-src">Pooled rates from a <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10775420/">review of 93 studies</a> of clinical research data.</span></p>
+
+A small error rate on a detail typed thousands of times a year still makes a
+steady supply of wrong addresses and mistyped amounts, and each one costs more
+to find later than it did to type.
 
 ## Small jobs add up
 
@@ -73,8 +98,9 @@ A job that takes a few minutes and happens dozens of times a week matters more
 than a job that takes a day and happens once a year. A count makes that
 visible, because it is multiplied by the job's real frequency, taken from the
 business's own records rather than from what anyone remembers. The
-[counting page](/counting) works one through: invoicing that runs 60 times a
-week and clears 32 inputs each time takes 1,920 keystrokes a week off someone.
+[counting page](/counting) works one through, for invoicing:
+
+<p class="sum"><span class="term"><b>60</b> runs a week</span><span class="op">×</span><span class="term"><b>32</b> inputs cleared each run</span><span class="op">=</span><span class="term"><b>1,920</b> keystrokes a week off someone</span><span class="sum-src">The worked example on our <a href="/counting">counting page</a>.</span></p>
 
 ## Where the idea comes from
 
