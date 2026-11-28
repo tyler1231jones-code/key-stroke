@@ -3,7 +3,7 @@
   "rest": "Everything else is quoted on hours and given to you as a fixed total before work starts.",
   "hosting": {
     "title": "Hosting and maintenance",
-    "what": "For each website or tool we built that you want us to host and manage. If you host and manage it yourself, this cost does not apply.",
+    "what": "One monthly charge when we host and manage what we built for you. If you host and manage it yourself, this cost does not apply.",
     "name": "Managed hosting and maintenance",
     "monthly": "$89",
     "facts": [
@@ -13,7 +13,7 @@
       },
       {
         "label": "When it applies",
-        "text": "For each website or tool we host and manage for you. It is required for anything we manage."
+        "text": "One charge covers both your website and your tool. It is required for anything we manage."
       },
       {
         "label": "When it does not",
@@ -24,7 +24,7 @@
         "text": "Not included. Use hours from a Keystroke Savers plan, or ask for a quote."
       }
     ],
-    "unit": "a month, for each website or tool"
+    "unit": "a month, for your website and tool together"
   },
   "websites": {
     "title": "Website builds",

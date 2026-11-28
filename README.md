@@ -203,9 +203,9 @@ plan is named after a key: Tab (2 hours), Shift (5), Enter (10), Control
 $150 on Tab, then $5 less at each plan up, to $125 on Escape. Each plan
 carries its monthly price and its rate (`monthly` and `rate` in
 `products.json`; change both together). The three website
-care plans are gone. Hosting and maintenance is its own cost, $89 a month
-for each website or tool we host and manage; a client who hosts it
-themselves does not pay it. The plans are in `products.json` (`savers`) and
+care plans are gone. Hosting and maintenance is its own cost: one $89 a month
+covers both the website and the tool we host and manage; a client who hosts
+it themselves does not pay it. The plans are in `products.json` (`savers`) and
 hosting is in `prices.json` (`hosting`).
 
 No price names GST. It does not apply, so nothing on the site says
